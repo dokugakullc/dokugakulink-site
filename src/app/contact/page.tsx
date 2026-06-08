@@ -56,10 +56,10 @@ export default function ContactPage() {
             Email
           </p>
           <a
-            href="mailto:dokugakullc@gmail.com"
+            href="mailto:info@dokugakulink.com"
             className="text-xl font-medium text-[#0d2545] hover:text-blue-700 transition-colors"
           >
-            dokugakullc@gmail.com
+            info@dokugakulink.com
           </a>
           <p className="text-xs text-gray-400 mt-4 leading-loose">
             お問い合わせ内容によっては、回答までにお時間をいただく場合がございます。<br />

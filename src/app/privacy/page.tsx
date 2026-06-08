@@ -74,10 +74,10 @@ const sections = [
         〒530-0001 大阪府大阪市北区梅田1-1-3<br />
         メール：
         <a
-          href="mailto:dokugakullc@gmail.com"
+          href="mailto:info@dokugakulink.com"
           className="text-blue-700 hover:underline"
         >
-          dokugakullc@gmail.com
+          info@dokugakulink.com
         </a>
       </p>
     ),
