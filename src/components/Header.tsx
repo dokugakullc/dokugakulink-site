@@ -4,6 +4,7 @@ const navLinks = [
   { href: "/", label: "ホーム" },
   { href: "/business", label: "事業内容" },
   { href: "/company", label: "会社概要" },
+  { href: "/contact", label: "お問い合わせ" },
 ];
 
 export default function Header() {
@@ -19,7 +20,7 @@ export default function Header() {
               Dokugaku Link LLC
             </span>
           </Link>
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-6">
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}

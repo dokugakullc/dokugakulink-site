@@ -4,6 +4,8 @@ const navLinks = [
   { href: "/", label: "ホーム" },
   { href: "/business", label: "事業内容" },
   { href: "/company", label: "会社概要" },
+  { href: "/contact", label: "お問い合わせ" },
+  { href: "/privacy", label: "プライバシーポリシー" },
 ];
 
 const services = [

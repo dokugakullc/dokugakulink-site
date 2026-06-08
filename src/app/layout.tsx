@@ -10,13 +10,28 @@ const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
 });
 
+const siteTitle = "独学リンク合同会社 | 教育・学習支援サービスの企画・開発・運営";
+const siteDescription =
+  "独学リンク合同会社は教育・学習支援サービス、コンテンツ・コミュニティ事業、不動産情報サービス事業、インターネットサービス事業を展開しています。";
+
 export const metadata: Metadata = {
   title: {
-    default: "独学リンク合同会社",
+    default: siteTitle,
     template: "%s | 独学リンク合同会社",
   },
-  description:
-    "独学リンク合同会社は、教育・学習支援、コンテンツ・コミュニティ、不動産情報サービス、インターネットサービスを展開する合同会社です。大阪市北区梅田に拠点を置いています。",
+  description: siteDescription,
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    siteName: "独学リンク合同会社",
+    title: siteTitle,
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary",
+    title: siteTitle,
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({
