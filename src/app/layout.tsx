@@ -10,20 +10,24 @@ const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
 });
 
-const siteTitle = "独学リンク合同会社 | 教育・学習支援サービスの企画・開発・運営";
+const siteTitle = "dokugaku link合同会社 | 学びをもっと自由に、人生をもっと豊かに";
 const siteDescription =
-  "独学リンク合同会社は教育・学習支援サービス、コンテンツ・コミュニティ事業、不動産情報サービス事業、インターネットサービス事業を展開しています。";
+  "dokugaku link合同会社は、宅建・FP・行政書士・簿記などの資格独学支援アプリ開発と、資産形成・不動産のウェルスコンサルティング事業を展開。学習継続・独学合格率向上を支援します。";
 
 export const metadata: Metadata = {
   title: {
     default: siteTitle,
-    template: "%s | 独学リンク合同会社",
+    template: "%s | dokugaku link合同会社",
   },
   description: siteDescription,
+  keywords: [
+    "宅建", "宅建士", "独学", "資格取得", "学習支援", "FP", "ファイナンシャルプランナー",
+    "行政書士", "簿記", "資産形成", "不動産", "ウェルスコンサルティング", "独学合格",
+  ],
   openGraph: {
     type: "website",
     locale: "ja_JP",
-    siteName: "独学リンク合同会社",
+    siteName: "dokugaku link合同会社",
     title: siteTitle,
     description: siteDescription,
   },
