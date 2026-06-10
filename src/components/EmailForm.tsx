@@ -1,34 +1,36 @@
 "use client";
 import { useState } from "react";
 
-// TODO: Formspreeでフォームを作成し、エンドポイントURLを環境変数 NEXT_PUBLIC_FORMSPREE_URL に設定してください
-// 例: NEXT_PUBLIC_FORMSPREE_URL=https://formspree.io/f/xxxxxxxx
-const FORMSPREE_URL = process.env.NEXT_PUBLIC_FORMSPREE_URL ?? "";
+const INTERESTS = ["宅建", "FP", "簿記", "行政書士"] as const;
+type Interest = (typeof INTERESTS)[number];
+type Status = "idle" | "loading" | "success" | "duplicated" | "error";
 
-export default function EmailForm() {
+export default function EmailForm({ source = "takken_lp" }: { source?: string }) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [interests, setInterests] = useState<Interest[]>([]);
+  const [status, setStatus] = useState<Status>("idle");
+
+  function toggleInterest(item: Interest) {
+    setInterests((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!FORMSPREE_URL) {
-      setStatus("error");
-      return;
-    }
     setStatus("loading");
-
     try {
-      const res = await fetch(FORMSPREE_URL, {
+      const res = await fetch("/api/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ email }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, interests, source }),
       });
-      if (res.ok) {
-        setStatus("success");
-        setEmail("");
-      } else {
+      const data = (await res.json()) as { success?: boolean; duplicated?: boolean };
+      if (!res.ok || !data.success) {
         setStatus("error");
+        return;
       }
+      setStatus(data.duplicated ? "duplicated" : "success");
     } catch {
       setStatus("error");
     }
@@ -58,9 +60,35 @@ export default function EmailForm() {
     );
   }
 
+  if (status === "duplicated") {
+    return (
+      <div className="text-center py-8">
+        <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-blue-400"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <p className="text-white font-bold text-xl mb-2">登録済みのメールアドレスです</p>
+        <p className="text-blue-200 text-sm">すでに登録が完了しています。リリース時にご連絡いたします。</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="email"
           value={email}
@@ -77,17 +105,37 @@ export default function EmailForm() {
         >
           {status === "loading" ? "送信中..." : "リリース通知を受け取る"}
         </button>
-      </form>
+      </div>
+
+      <div>
+        <p className="text-white/60 text-xs mb-2.5">興味がある資格（任意・複数選択可）</p>
+        <div className="flex flex-wrap gap-2">
+          {INTERESTS.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => toggleInterest(item)}
+              disabled={status === "loading"}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors disabled:opacity-50 ${
+                interests.includes(item)
+                  ? "bg-white text-[#0d2545] border-white"
+                  : "bg-transparent text-white/70 border-white/30 hover:border-white/60"
+              }`}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {status === "error" && (
-        <p className="text-red-300 text-xs mt-3 text-center">
-          {!FORMSPREE_URL
-            ? "フォームの設定が必要です。NEXT_PUBLIC_FORMSPREE_URLを設定してください。"
-            : "送信に失敗しました。時間をおいて再度お試しください。"}
+        <p className="text-red-300 text-xs text-center">
+          送信に失敗しました。時間をおいて再度お試しください。
         </p>
       )}
-      <p className="text-white/30 text-xs mt-4 text-center">
+      <p className="text-white/30 text-xs text-center">
         スパムメールは送りません。リリース時のみご連絡します。
       </p>
-    </div>
+    </form>
   );
 }
