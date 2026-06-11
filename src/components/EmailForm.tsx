@@ -1,20 +1,21 @@
 "use client";
 import { useState } from "react";
 
+// Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
-  "続かない",
-  "忘れる",
-  "何を勉強すればいいか分からない",
-  "点数が伸びない",
-  "モチベーションが続かない",
+  { value: "continue", label: "続かない" },
+  { value: "forget", label: "忘れる" },
+  { value: "roadmap", label: "何を勉強すればいいか分からない" },
+  { value: "growth", label: "点数が伸びない" },
+  { value: "motivation", label: "モチベーションが続かない" },
 ] as const;
 
-type Problem = typeof PROBLEMS[number];
+type ProblemValue = typeof PROBLEMS[number]["value"];
 type Status = "idle" | "loading" | "success" | "duplicated" | "error";
 
 export default function EmailForm({ source = "takken_lp" }: { source?: string }) {
   const [email, setEmail] = useState("");
-  const [problem, setProblem] = useState<Problem | "">("");
+  const [problem, setProblem] = useState<ProblemValue | "">("");
   const [status, setStatus] = useState<Status>("idle");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -92,26 +93,26 @@ export default function EmailForm({ source = "takken_lp" }: { source?: string })
       <div>
         <p className="text-white/80 text-sm font-medium mb-3">宅建学習で一番困っていること</p>
         <div className="grid grid-cols-1 gap-2">
-          {PROBLEMS.map((p) => (
+          {PROBLEMS.map(({ value, label }) => (
             <button
-              key={p}
+              key={value}
               type="button"
               disabled={status === "loading"}
-              onClick={() => setProblem(problem === p ? "" : p)}
+              onClick={() => setProblem(problem === value ? "" : value)}
               className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm text-left font-medium border transition-colors disabled:opacity-50 ${
-                problem === p
+                problem === value
                   ? "bg-white text-[#0d2545] border-white"
                   : "bg-white/5 text-white/70 border-white/20 hover:border-white/40"
               }`}
             >
               <span
                 className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
-                  problem === p ? "border-[#0d2545] bg-[#0d2545]" : "border-white/50"
+                  problem === value ? "border-[#0d2545] bg-[#0d2545]" : "border-white/50"
                 }`}
               >
-                {problem === p && <span className="w-2 h-2 rounded-full bg-white block" />}
+                {problem === value && <span className="w-2 h-2 rounded-full bg-white block" />}
               </span>
-              {p}
+              {label}
             </button>
           ))}
         </div>

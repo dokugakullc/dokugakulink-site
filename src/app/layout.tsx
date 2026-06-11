@@ -15,6 +15,7 @@ const siteDescription =
   "dokugaku link合同会社は、宅建・FP・行政書士・簿記などの資格独学支援アプリ開発と、資産形成・不動産のウェルスコンサルティング事業を展開。学習継続・独学合格率向上を支援します。";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.dokugakulink.com"),
   title: {
     default: siteTitle,
     template: "%s | dokugaku link合同会社",

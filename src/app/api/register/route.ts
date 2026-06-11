@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const ALLOWED_SOURCES = ["takken_lp", "takken_lp_hero", "fp_lp", "boki_lp", "gyosei_lp"] as const;
-const ALLOWED_PROBLEMS = [
-  "続かない",
-  "忘れる",
-  "何を勉強すればいいか分からない",
-  "点数が伸びない",
-  "モチベーションが続かない",
-] as const;
+
+// 英語スラッグで統一 — Google Sheetsで集計しやすい形式
+const ALLOWED_PROBLEMS = ["continue", "forget", "roadmap", "growth", "motivation"] as const;
 
 type GasResponse = { success: boolean; duplicated?: boolean; error?: string };
+
+function deriveInterest(source: string): string {
+  if (source.startsWith("takken")) return "takken";
+  if (source.startsWith("fp")) return "fp";
+  if (source.startsWith("boki")) return "boki";
+  if (source.startsWith("gyosei")) return "gyosei";
+  return "";
+}
 
 export async function POST(req: NextRequest) {
   let body: unknown;
@@ -43,6 +47,9 @@ export async function POST(req: NextRequest) {
       ? problem
       : "";
 
+  // interest はソースから自動導出（LP別に固定値）
+  const interest = deriveInterest(normalizedSource);
+
   const gasUrl = process.env.GAS_WEBHOOK_URL;
   if (!gasUrl) {
     console.error("GAS_WEBHOOK_URL is not configured");
@@ -58,6 +65,7 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: email.trim().toLowerCase(),
+        interest,
         problem: normalizedProblem,
         source: normalizedSource,
         userAgent: userAgent.slice(0, 300),

@@ -10,8 +10,8 @@ import {
 const SLIDES = [
   {
     id: "review",
-    headline: "もう復習を忘れない",
-    benefit: "忘却タイミングを自動検知。記憶が消える前に必ず再出題されます。",
+    headline: "忘れた頃に、\nまた出題。",
+    benefit: "復習を管理する必要はありません。記憶が薄れるタイミングで自動的に出題されます。",
     Screen: ReviewScreen,
   },
   {
@@ -93,7 +93,7 @@ export default function AppStoreCarousel() {
               <Screen />
             </div>
             <div className="px-6 pb-8 text-center">
-              <h3 className="text-base font-bold text-[#0d2545] mb-2">{headline}</h3>
+              <h3 className="text-base font-bold text-[#0d2545] mb-2 whitespace-pre-line">{headline}</h3>
               <p className="text-xs text-gray-500 leading-relaxed">{benefit}</p>
             </div>
           </div>

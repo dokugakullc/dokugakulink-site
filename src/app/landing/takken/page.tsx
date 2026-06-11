@@ -75,6 +75,11 @@ export const metadata: Metadata = {
     locale: "ja_JP",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "宅建独学合格アプリ | β版先行登録 先着100名無料",
+    description: "模試30〜35点で伸び悩む宅建受験生へ。β版先着100名無料。",
+  },
 };
 
 const empathyItems = [
@@ -214,6 +219,11 @@ export default function TakkenLandingPage() {
       <section className="bg-[#0d2545] text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 via-transparent to-transparent pointer-events-none" />
         <div className="mx-auto max-w-5xl px-6 lg:px-8 py-16 md:py-24 relative">
+          {/* 対象者明示 — 広告流入ユーザーが3秒以内に宅建アプリだと分かるように */}
+          <p className="text-blue-400 text-xs font-black tracking-[0.18em] uppercase mb-4">
+            宅建独学者のための学習支援アプリ
+          </p>
+
           <div className="flex flex-wrap items-center gap-3 mb-8">
             <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white text-xs font-medium px-3 py-1.5 rounded-full">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
@@ -261,16 +271,14 @@ export default function TakkenLandingPage() {
               <p className="text-xs text-blue-300 mt-2">収録予定問題数</p>
             </div>
             <div className="px-4 py-2">
-              <p className="text-4xl md:text-5xl font-black tabular-nums">
-                {STATS.devProgress}<span className="text-2xl font-bold">%</span>
-              </p>
-              <p className="text-xs text-blue-300 mt-2">開発進捗</p>
+              <p className="text-4xl md:text-5xl font-black">4<span className="text-2xl font-bold">科目</span></p>
+              <p className="text-xs text-blue-300 mt-2">宅建全範囲対応</p>
             </div>
             <div className="px-4 py-2">
               <p className="text-4xl md:text-5xl font-black tabular-nums">
                 {STATS.totalSlots}<span className="text-2xl font-bold">名</span>
               </p>
-              <p className="text-xs text-blue-300 mt-2">β版先着限定</p>
+              <p className="text-xs text-blue-300 mt-2">β版参加費無料</p>
             </div>
           </div>
         </div>
