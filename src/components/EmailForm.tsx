@@ -1,20 +1,21 @@
 "use client";
 import { useState } from "react";
 
-const INTERESTS = ["宅建", "FP", "簿記", "行政書士"] as const;
-type Interest = (typeof INTERESTS)[number];
+const PROBLEMS = [
+  "続かない",
+  "忘れる",
+  "何を勉強すればいいか分からない",
+  "点数が伸びない",
+  "モチベーションが続かない",
+] as const;
+
+type Problem = typeof PROBLEMS[number];
 type Status = "idle" | "loading" | "success" | "duplicated" | "error";
 
 export default function EmailForm({ source = "takken_lp" }: { source?: string }) {
   const [email, setEmail] = useState("");
-  const [interests, setInterests] = useState<Interest[]>([]);
+  const [problem, setProblem] = useState<Problem | "">("");
   const [status, setStatus] = useState<Status>("idle");
-
-  function toggleInterest(item: Interest) {
-    setInterests((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
-    );
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +24,7 @@ export default function EmailForm({ source = "takken_lp" }: { source?: string })
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, interests, source }),
+        body: JSON.stringify({ email, problem, source }),
       });
       const data = (await res.json()) as { success?: boolean; duplicated?: boolean };
       if (!res.ok || !data.success) {
@@ -87,8 +88,37 @@ export default function EmailForm({ source = "takken_lp" }: { source?: string })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div>
+        <p className="text-white/80 text-sm font-medium mb-3">宅建学習で一番困っていること</p>
+        <div className="grid grid-cols-1 gap-2">
+          {PROBLEMS.map((p) => (
+            <button
+              key={p}
+              type="button"
+              disabled={status === "loading"}
+              onClick={() => setProblem(problem === p ? "" : p)}
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm text-left font-medium border transition-colors disabled:opacity-50 ${
+                problem === p
+                  ? "bg-white text-[#0d2545] border-white"
+                  : "bg-white/5 text-white/70 border-white/20 hover:border-white/40"
+              }`}
+            >
+              <span
+                className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
+                  problem === p ? "border-[#0d2545] bg-[#0d2545]" : "border-white/50"
+                }`}
+              >
+                {problem === p && <span className="w-2 h-2 rounded-full bg-white block" />}
+              </span>
+              {p}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-white/80 text-sm font-medium mb-2">メールアドレス</p>
         <input
           type="email"
           value={email}
@@ -96,37 +126,17 @@ export default function EmailForm({ source = "takken_lp" }: { source?: string })
           placeholder="例：your@email.com"
           required
           disabled={status === "loading"}
-          className="flex-1 px-4 py-3.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
+          className="w-full px-4 py-3.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
         />
-        <button
-          type="submit"
-          disabled={status === "loading"}
-          className="px-7 py-3.5 bg-white text-[#0d2545] text-sm font-bold rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-60 shrink-0 whitespace-nowrap"
-        >
-          {status === "loading" ? "送信中..." : "リリース通知を受け取る"}
-        </button>
       </div>
 
-      <div>
-        <p className="text-white/60 text-xs mb-2.5">興味がある資格（任意・複数選択可）</p>
-        <div className="flex flex-wrap gap-2">
-          {INTERESTS.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => toggleInterest(item)}
-              disabled={status === "loading"}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors disabled:opacity-50 ${
-                interests.includes(item)
-                  ? "bg-white text-[#0d2545] border-white"
-                  : "bg-transparent text-white/70 border-white/30 hover:border-white/60"
-              }`}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className="w-full py-4 bg-white text-[#0d2545] text-sm font-bold rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-60"
+      >
+        {status === "loading" ? "送信中..." : "無料でβ版に参加する →"}
+      </button>
 
       {status === "error" && (
         <p className="text-red-300 text-xs text-center">

@@ -222,3 +222,72 @@ export function ReviewScreen() {
     </PhoneFrame>
   );
 }
+
+export function RoadmapScreen() {
+  const steps = [
+    { label: "権利関係の基礎", done: true, score: "72%" },
+    { label: "宅建業法の完成", done: true, score: "88%" },
+    { label: "法令制限の強化", done: false, current: true, score: "55%" },
+    { label: "税その他の仕上げ", done: false, current: false, score: "" },
+    { label: "模試 → 弱点補強", done: false, current: false, score: "" },
+  ];
+
+  return (
+    <PhoneFrame>
+      <div className="h-full flex flex-col bg-[#f5f7fa]">
+        <div className="bg-[#0d2545] px-4 py-4">
+          <p className="text-white font-bold text-[11px]">学習ロードマップ</p>
+          <p className="text-blue-200 text-[9px] mt-0.5">試験日まで 87日</p>
+        </div>
+        <div className="flex-1 px-3 py-3 space-y-1.5 overflow-hidden">
+          {steps.map(({ label, done, current, score }, i) => (
+            <div
+              key={i}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl ${
+                current ? "bg-blue-600" : done ? "bg-white" : "bg-white/60"
+              }`}
+            >
+              <div
+                className={`w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-[8px] font-bold ${
+                  done
+                    ? "bg-green-400 text-white"
+                    : current
+                    ? "bg-white/30 border-2 border-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {done && "✓"}
+              </div>
+              <p
+                className={`text-[9px] font-medium flex-1 ${
+                  current ? "text-white" : done ? "text-gray-700" : "text-gray-400"
+                }`}
+              >
+                {label}
+              </p>
+              {score && (
+                <p className={`text-[8px] font-bold ${current ? "text-blue-200" : "text-green-500"}`}>
+                  {score}
+                </p>
+              )}
+              {current && (
+                <span className="bg-white/20 text-white text-[7px] font-bold px-1.5 py-0.5 rounded-full shrink-0">
+                  今ここ
+                </span>
+              )}
+            </div>
+          ))}
+          <div className="bg-white rounded-2xl p-3 mt-1">
+            <div className="flex justify-between mb-1">
+              <p className="text-gray-400 text-[9px]">全体進捗</p>
+              <p className="text-[#0d2545] font-bold text-[9px]">43%</p>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-[5px]">
+              <div className="bg-blue-600 rounded-full h-full w-[43%]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </PhoneFrame>
+  );
+}

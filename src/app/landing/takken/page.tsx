@@ -1,17 +1,62 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HomeScreen, ProblemScreen, AnalysisScreen, ReviewScreen } from "@/components/AppMockup";
+import AppStoreCarousel from "@/components/AppStoreCarousel";
 import EmailForm from "@/components/EmailForm";
 
-// ─── ここを変更するだけで数値が全ページに反映される ───────────────────
+// ─── 数値は随時更新 ──────────────────────────────────────────────────────────
 const STATS = {
-  registered: 27,    // β版登録者数（随時更新）
-  totalSlots: 100,   // 募集枠
-  problems: 305,     // 収録予定問題数
-  features: 12,      // 開発予定機能数
-  devProgress: 82,   // 開発進捗 %
+  registered: 27,
+  totalSlots: 100,
+  problems: 305,
+  features: 12,
+  devProgress: 82,
 };
-// ─────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Hero ABテスト ─────────────────────────────────────────────────────────
+// ここを "A" | "B" | "C" | "D" に変えるだけでHero文言が切り替わる
+const HERO_VARIANT: "A" | "B" | "C" | "D" = "A";
+
+const HERO_COPY = {
+  A: {
+    headline: (
+      <>
+        忘れた頃に、<br />
+        <span className="text-blue-300">また出題。</span>
+      </>
+    ),
+    sub: "仕事終わりの30分でも、独学合格を目指せる。宅建受験生専用の学習支援アプリ。",
+  },
+  B: {
+    headline: (
+      <>
+        何を勉強すれば<br />
+        <span className="text-blue-300">受かるか分かる。</span>
+      </>
+    ),
+    sub: "仕事終わりの30分でも、独学合格を目指せる。宅建受験生専用の学習支援アプリ。",
+  },
+  C: {
+    headline: (
+      <>
+        今年こそ<br />
+        <span className="text-blue-300">受かる。</span>
+      </>
+    ),
+    sub: "仕事終わりの30分でも、独学合格を目指せる。宅建受験生専用の学習支援アプリ。",
+  },
+  D: {
+    headline: (
+      <>
+        苦手を<br />
+        <span className="text-blue-300">自動分析。</span>
+      </>
+    ),
+    sub: "仕事終わりの30分でも、独学合格を目指せる。宅建受験生専用の学習支援アプリ。",
+  },
+} as const;
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
   title: "宅建独学合格アプリ | β版先行登録 先着100名無料",
@@ -39,65 +84,6 @@ const empathyItems = [
   { icon: "📊", text: "模試で35点の壁を超えられない" },
   { icon: "🤔", text: "合格まであと何点足りないか、正直分からない" },
   { icon: "😴", text: "仕事終わりに勉強しようとしても、続かない" },
-];
-
-const reasons = [
-  {
-    num: "01",
-    title: "継続できない",
-    body: "意志の力だけで勉強を続けるのには限界があります。習慣化の仕組みがなければ、モチベーションが下がった瞬間に止まります。",
-    highlight: "独学者の約70%が3ヶ月以内に挫折すると言われています",
-  },
-  {
-    num: "02",
-    title: "忘れる",
-    body: "学んでも復習しなければ忘れます。しかし「いつ・何を復習するか」を自分で管理し続けるのは、現実的ではありません。",
-    highlight: "1週間後の記憶定着率は平均20%以下（復習なしの場合）",
-  },
-  {
-    num: "03",
-    title: "現在地が分からない",
-    body: "「なんとなく勉強している」状態では、合格に必要な得点が見えません。弱点が分からなければ、的外れな学習が続きます。",
-    highlight: "合格ラインを常に意識しながら学習できている受験生は少数",
-  },
-];
-
-const storySteps = [
-  {
-    num: "01",
-    icon: "📱",
-    title: "アプリを開く",
-    desc: "今日やるべき問題と復習タイミングが即表示。「今日何しよう」という迷いがゼロになります。",
-    result: "→ 毎朝0秒で学習スタートできる",
-  },
-  {
-    num: "02",
-    icon: "❓",
-    title: "問題が自動で出題される",
-    desc: "苦手分野・忘却タイミングを考慮した問題が自動選択。1問から始められます。",
-    result: "→ 隙間時間が学習時間に変わる",
-  },
-  {
-    num: "03",
-    icon: "✋",
-    title: "○×で即回答",
-    desc: "直感的な○×形式で素早く回答。長い選択肢を読む必要がなく、テンポよく進みます。",
-    result: "→ ストレスなく続けられる",
-  },
-  {
-    num: "04",
-    icon: "💡",
-    title: "解説で理解を深める",
-    desc: "正解でも不正解でも、解説を確認。「なんとなく正解」をなくし、本番で使える知識に変えます。",
-    result: "→ 知識が定着する",
-  },
-  {
-    num: "05",
-    icon: "📅",
-    title: "次の復習が自動スケジュールされる",
-    desc: "回答結果に基づき、最適な復習タイミングが自動設定。忘れる前に必ず再出題されます。",
-    result: "→ 放置しても記憶が消えない",
-  },
 ];
 
 const beforeAfterItems = [
@@ -222,6 +208,7 @@ const roadmapItems = [
 export default function TakkenLandingPage() {
   const remaining = STATS.totalSlots - STATS.registered;
   const filledPct = Math.round((STATS.registered / STATS.totalSlots) * 100);
+  const hero = HERO_COPY[HERO_VARIANT];
 
   return (
     <div>
@@ -241,14 +228,11 @@ export default function TakkenLandingPage() {
           </p>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.2] tracking-tight mb-8">
-            あなたに足りないのは<br />
-            努力ではありません。<br />
-            <span className="text-blue-300">復習の仕組みです。</span>
+            {hero.headline}
           </h1>
 
           <p className="text-base md:text-lg text-blue-100 leading-loose mb-4 max-w-xl">
-            仕事終わりの30分でも、独学合格を目指せる。<br />
-            宅建受験生専用の学習支援アプリ。
+            {hero.sub}
           </p>
 
           <p className="text-sm text-white/50 mb-10">
@@ -256,7 +240,6 @@ export default function TakkenLandingPage() {
             残り<span className="text-white font-bold ml-1">{remaining}名</span>
           </p>
 
-          {/* CTA #1 */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <a
               href="#beta"
@@ -316,44 +299,46 @@ export default function TakkenLandingPage() {
         </div>
       </section>
 
-      {/* ━━━ 4. 問題提起 + CTA #2 ━━━ */}
-      <section className="py-20 md:py-28 bg-white">
-        <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-red-500 mb-4">Why</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-4">
-              宅建受験生の多くが落ちる理由
-            </h2>
-            <p className="text-base text-gray-600 max-w-xl mx-auto leading-loose">
-              能力の問題ではありません。<br />
-              <span className="font-bold text-[#0d2545]">仕組みの問題です。</span>
+      {/* ━━━ 4. 原因セクション ━━━ */}
+      <section className="py-20 md:py-28 bg-[#0d2545] text-white">
+        <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-6">Why</p>
+          <h2 className="text-2xl md:text-4xl font-bold mb-10 leading-tight">
+            なぜ宅建受験生は落ちるのか
+          </h2>
+
+          <div className="bg-white/5 border border-white/10 rounded-2xl px-8 py-10 text-left space-y-6 text-base md:text-lg leading-loose">
+            <p className="text-blue-100">
+              能力不足ではありません。
             </p>
+            <p className="text-white/70 text-sm">多くの人は</p>
+            <ul className="space-y-3">
+              {[
+                "復習設計がない",
+                "現在地が分からない",
+                "何をやるべきか分からない",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                  <span className="text-white font-semibold">{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-white/70 text-sm">という問題を抱えています。</p>
+            <div className="border-t border-white/10 pt-6">
+              <p className="text-white/70 text-sm mb-2">その結果</p>
+              <p className="text-xl font-bold text-white leading-relaxed">
+                勉強しているのに<br />点数が伸びません。
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            {reasons.map(({ num, title, body, highlight }) => (
-              <div key={num} className="bg-[#f5f7fa] rounded-2xl p-8 border-l-4 border-[#0d2545]">
-                <p className="text-6xl font-black text-[#0d2545]/8 mb-4 font-mono leading-none">{num}</p>
-                <h3 className="text-xl font-bold text-[#0d2545] mb-4">{title}</h3>
-                <p className="text-sm text-gray-600 leading-loose mb-6">{body}</p>
-                <div className="bg-white rounded-lg px-4 py-3 border border-red-100">
-                  <p className="text-xs text-red-500 font-semibold leading-relaxed">{highlight}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA #2 */}
-          <div className="text-center bg-[#0d2545] rounded-2xl py-12 px-6">
-            <p className="text-white font-bold text-lg md:text-xl mb-2">
-              この3つを、仕組みで解決します。
-            </p>
-            <p className="text-blue-200 text-sm mb-8">β版先着{STATS.totalSlots}名 · 参加費無料 · 残り{remaining}名</p>
+          <div className="mt-10">
             <a
               href="#beta"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#0d2545] text-base font-bold rounded-xl hover:bg-blue-50 transition-colors"
             >
-              無料でβ版に参加する →
+              仕組みで解決する →
             </a>
           </div>
         </div>
@@ -368,7 +353,6 @@ export default function TakkenLandingPage() {
             <p className="text-sm text-gray-500 mt-4">「本当に出るの？」という疑問にお答えします。</p>
           </div>
 
-          {/* 数字 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
               { value: `${STATS.problems}問`, label: "収録予定問題数", sub: "過去問ベース" },
@@ -384,7 +368,6 @@ export default function TakkenLandingPage() {
             ))}
           </div>
 
-          {/* 全体進捗バー */}
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-6">
             <div className="flex items-center justify-between mb-4">
               <p className="font-bold text-[#0d2545]">開発進捗</p>
@@ -401,7 +384,6 @@ export default function TakkenLandingPage() {
             </p>
           </div>
 
-          {/* 機能チェックリスト */}
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
             <p className="font-bold text-[#0d2545] mb-6">機能開発状況</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -428,41 +410,18 @@ export default function TakkenLandingPage() {
         </div>
       </section>
 
-      {/* ━━━ 6. 使ったらこうなります（ストーリー）━━━ */}
-      <section className="py-20 md:py-28 bg-white">
+      {/* ━━━ 6. App Storeカルーセル ━━━ */}
+      <section className="py-20 md:py-28 bg-white overflow-hidden">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">How it works</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545]">使ったら、こうなります</h2>
-            <p className="text-sm text-gray-500 mt-4">1回の学習セッションの流れ</p>
-          </div>
-          <div className="relative">
-            <div className="hidden md:block absolute left-7 top-7 bottom-7 w-0.5 bg-gray-100" />
-            <div className="space-y-4">
-              {storySteps.map(({ num, icon, title, desc, result }) => (
-                <div key={num} className="flex gap-5 md:gap-8 relative">
-                  <div className="shrink-0 w-14 h-14 bg-[#0d2545] rounded-2xl flex items-center justify-center text-white font-black text-sm z-10">
-                    {num}
-                  </div>
-                  <div className="flex-1 bg-[#f5f7fa] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xl">{icon}</span>
-                        <h3 className="font-bold text-[#0d2545]">{title}</h3>
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">{desc}</p>
-                    </div>
-                    <div className="shrink-0">
-                      <span className="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap">
-                        {result}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Features</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545]">
+              これがあれば、勉強が変わる
+            </h2>
+            <p className="text-sm text-gray-500 mt-4">左右にスワイプして確認できます</p>
           </div>
         </div>
+        <AppStoreCarousel />
       </section>
 
       {/* ━━━ 7. Before / After ━━━ */}
@@ -550,7 +509,6 @@ export default function TakkenLandingPage() {
           <div className="text-center mb-14">
             <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545]">利用者の声</h2>
           </div>
-          {/* β版後に実際の声に差し替える。overlayを削除してquoteとnameを更新するだけでOK */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { name: "20代・会社員", tag: "独学2年目" },
@@ -561,7 +519,6 @@ export default function TakkenLandingPage() {
                 key={name}
                 className="relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm overflow-hidden"
               >
-                {/* このオーバーレイをβ版後に削除する */}
                 <div className="absolute inset-0 bg-white/85 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 rounded-2xl">
                   <span className="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full mb-2">
                     β版準備中
@@ -631,7 +588,6 @@ export default function TakkenLandingPage() {
               </p>
             </div>
 
-            {/* 特典カード */}
             <div className="grid grid-cols-2 gap-3 mb-10">
               {betaPerks.map(({ icon, title, desc }) => (
                 <div key={title} className="bg-white/10 border border-white/20 rounded-xl p-5">
@@ -642,9 +598,7 @@ export default function TakkenLandingPage() {
               ))}
             </div>
 
-            {/* フォームカード */}
             <div className="bg-white/5 border border-white/20 rounded-2xl p-8">
-              {/* カウンター */}
               <div className="grid grid-cols-3 divide-x divide-white/10 text-center mb-6 pb-6 border-b border-white/10">
                 <div className="px-3">
                   <p className="text-xs text-blue-300 mb-1">登録済み</p>
@@ -660,7 +614,6 @@ export default function TakkenLandingPage() {
                 </div>
               </div>
 
-              {/* 埋まり具合バー */}
               <div className="mb-8">
                 <div className="w-full bg-white/10 rounded-full h-2.5">
                   <div
