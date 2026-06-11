@@ -10,32 +10,32 @@ import {
 const SLIDES = [
   {
     id: "review",
-    headline: "忘れた頃に、また出題。",
-    benefit: "忘却タイミングを自動検知し、記憶が消える直前に再出題。復習を意識しなくていい状態を作ります。",
+    headline: "もう復習を忘れない",
+    benefit: "忘却タイミングを自動検知。記憶が消える前に必ず再出題されます。",
     Screen: ReviewScreen,
   },
   {
     id: "today",
-    headline: "今日やるべき問題が分かる",
-    benefit: "アプリを開いた瞬間に今日の課題が表示。「何を勉強しよう」の迷いがゼロになります。",
+    headline: "何を勉強するか迷わない",
+    benefit: "今日やるべき問題が開いた瞬間に表示。「どこから始めよう」という迷いがゼロになります。",
     Screen: HomeScreen,
   },
   {
     id: "analysis",
-    headline: "苦手分野を自動分析",
-    benefit: "分野別正答率を自動集計。「法令制限55%・あと7%で合格ライン」が数字で可視化されます。",
+    headline: "苦手が見えるから点数が伸びる",
+    benefit: "分野別の正答率が自動で可視化。弱点を把握して、効率よく点数を上げられます。",
     Screen: AnalysisScreen,
   },
   {
     id: "prediction",
-    headline: "合格可能性予測",
-    benefit: "現在の学習ペースと正答率から合格確率をリアルタイム計算。ゴールまでの距離が常に分かります。",
+    headline: "今の実力が分かる",
+    benefit: "現在の学習状況から合格確率をリアルタイム計算。ゴールまでの距離が常に見えます。",
     Screen: HomeScreen,
   },
   {
     id: "roadmap",
-    headline: "学習ロードマップ",
-    benefit: "試験日から逆算した学習計画を自動生成。今日何をすべきかが常に明確になります。",
+    headline: "合格までの道筋が見える",
+    benefit: "試験日から逆算した学習計画を自動生成。やるべきことが常に明確になります。",
     Screen: RoadmapScreen,
   },
 ] as const;

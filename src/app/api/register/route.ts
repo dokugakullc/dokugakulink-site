@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ALLOWED_SOURCES = ["takken_lp", "fp_lp", "boki_lp", "gyosei_lp"] as const;
+const ALLOWED_SOURCES = ["takken_lp", "takken_lp_hero", "fp_lp", "boki_lp", "gyosei_lp"] as const;
 const ALLOWED_PROBLEMS = [
   "続かない",
   "忘れる",

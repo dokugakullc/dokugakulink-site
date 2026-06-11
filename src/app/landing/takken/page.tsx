@@ -4,9 +4,9 @@ import { HomeScreen, ProblemScreen, AnalysisScreen, ReviewScreen } from "@/compo
 import AppStoreCarousel from "@/components/AppStoreCarousel";
 import EmailForm from "@/components/EmailForm";
 
-// ─── 数値は随時更新 ──────────────────────────────────────────────────────────
+// ─── 開発進捗数値（随時更新） ────────────────────────────────────────────────
+// ※ registered は削除。固定値は信頼性を損なうため表示しない。
 const STATS = {
-  registered: 27,
   totalSlots: 100,
   problems: 305,
   features: 12,
@@ -14,7 +14,7 @@ const STATS = {
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ─── Hero ABテスト ─────────────────────────────────────────────────────────
+// ─── Hero ABテスト ──────────────────────────────────────────────────────────
 // ここを "A" | "B" | "C" | "D" に変えるだけでHero文言が切り替わる
 const HERO_VARIANT: "A" | "B" | "C" | "D" = "A";
 
@@ -143,27 +143,27 @@ const betaPerks = [
 const faqItems = [
   {
     q: "本当に無料ですか？",
-    a: "β版への参加は完全無料です。正式版のリリース後の料金については、β版参加者の方に最優先でご案内します。",
+    a: "β版への参加は完全無料です。正式版リリース後の料金については、β版参加者の方に最優先でご案内します。課金が始まるのは「使ってよかった」と感じてもらえる状態になってからです。",
   },
   {
-    q: "リリース時期はいつですか？",
+    q: "いつリリース予定ですか？",
     a: "2026年内のリリースを目標に開発中です。β版参加者の方には、開発進捗を定期的にご共有します。",
   },
   {
-    q: "iPhoneで使えますか？",
-    a: "はい、iOS（iPhone）に対応予定です。",
+    q: "iPhone・Android両方で使えますか？",
+    a: "はい。iOS（iPhone）・Android両OSに対応予定です。同時リリースを目指して開発しています。",
   },
   {
-    q: "Androidでも使えますか？",
-    a: "はい、Androidにも対応予定です。両OS同時リリースを目指しています。",
-  },
-  {
-    q: "他の資格にも対応しますか？",
+    q: "宅建以外の資格にも対応予定ですか？",
     a: "宅建士の次は、FP・簿記・行政書士への展開を計画しています。β版参加者のご要望を優先的に開発へ反映します。",
   },
   {
-    q: "登録後に何か送られてきますか？",
-    a: "スパムは一切送りません。お送りするのは、リリース情報・β版招待・開発進捗の3種類のみです。",
+    q: "登録したら営業メールは届きますか？",
+    a: "一切届きません。お送りするのは「β版招待」「リリース情報」「開発進捗レポート」の3種類のみです。登録後の営業・勧誘は行いません。",
+  },
+  {
+    q: "登録情報は何に使いますか？",
+    a: "メールアドレスはリリース連絡にのみ使用します。「学習の悩み」はアプリ開発の優先度判断に活用します。第三者への提供・販売は一切行いません。",
   },
 ];
 
@@ -206,8 +206,6 @@ const roadmapItems = [
 ];
 
 export default function TakkenLandingPage() {
-  const remaining = STATS.totalSlots - STATS.registered;
-  const filledPct = Math.round((STATS.registered / STATS.totalSlots) * 100);
   const hero = HERO_COPY[HERO_VARIANT];
 
   return (
@@ -215,7 +213,7 @@ export default function TakkenLandingPage() {
       {/* ━━━ 1. Hero ━━━ */}
       <section className="bg-[#0d2545] text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 via-transparent to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-5xl px-6 lg:px-8 py-24 md:py-36 relative">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8 py-16 md:py-24 relative">
           <div className="flex flex-wrap items-center gap-3 mb-8">
             <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white text-xs font-medium px-3 py-1.5 rounded-full">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
@@ -227,27 +225,29 @@ export default function TakkenLandingPage() {
             模試で30〜35点を行ったり来たりしている人へ
           </p>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.2] tracking-tight mb-8">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.2] tracking-tight mb-6">
             {hero.headline}
           </h1>
 
-          <p className="text-base md:text-lg text-blue-100 leading-loose mb-4 max-w-xl">
+          <p className="text-base md:text-lg text-blue-100 leading-loose mb-10 max-w-xl">
             {hero.sub}
           </p>
 
-          <p className="text-sm text-white/50 mb-10">
-            <span className="text-white font-bold">{STATS.registered}名</span>がすでに登録済み ·
-            残り<span className="text-white font-bold ml-1">{remaining}名</span>
-          </p>
+          {/* ─ Hero直下 簡易登録フォーム ─ */}
+          <div className="max-w-md">
+            <EmailForm source="takken_lp_hero" />
+          </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="mt-8">
             <a
-              href="#beta"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#0d2545] text-base font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-xl"
+              href="#features"
+              className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
             >
-              無料でβ版に参加する →
+              詳細を見る
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+              </svg>
             </a>
-            <p className="text-xs text-white/40">スパムなし · いつでも退会可能</p>
           </div>
         </div>
       </section>
@@ -257,18 +257,20 @@ export default function TakkenLandingPage() {
         <div className="mx-auto max-w-5xl px-6 lg:px-8">
           <div className="grid grid-cols-3 divide-x divide-white/10 text-white text-center">
             <div className="px-4 py-2">
-              <p className="text-4xl md:text-5xl font-black tabular-nums">{STATS.registered}</p>
-              <p className="text-xs text-blue-300 mt-2">β版登録者数</p>
-            </div>
-            <div className="px-4 py-2">
-              <p className="text-4xl md:text-5xl font-black tabular-nums">{remaining}</p>
-              <p className="text-xs text-blue-300 mt-2">残り募集枠</p>
+              <p className="text-4xl md:text-5xl font-black tabular-nums">{STATS.problems}<span className="text-2xl font-bold">問</span></p>
+              <p className="text-xs text-blue-300 mt-2">収録予定問題数</p>
             </div>
             <div className="px-4 py-2">
               <p className="text-4xl md:text-5xl font-black tabular-nums">
                 {STATS.devProgress}<span className="text-2xl font-bold">%</span>
               </p>
               <p className="text-xs text-blue-300 mt-2">開発進捗</p>
+            </div>
+            <div className="px-4 py-2">
+              <p className="text-4xl md:text-5xl font-black tabular-nums">
+                {STATS.totalSlots}<span className="text-2xl font-bold">名</span>
+              </p>
+              <p className="text-xs text-blue-300 mt-2">β版先着限定</p>
             </div>
           </div>
         </div>
@@ -411,7 +413,7 @@ export default function TakkenLandingPage() {
       </section>
 
       {/* ━━━ 6. App Storeカルーセル ━━━ */}
-      <section className="py-20 md:py-28 bg-white overflow-hidden">
+      <section id="features" className="py-20 md:py-28 bg-white overflow-hidden">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Features</p>
@@ -546,29 +548,77 @@ export default function TakkenLandingPage() {
       {/* ━━━ 11. 創業ストーリー ━━━ */}
       <section className="py-20 md:py-28 bg-white">
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Story</p>
             <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545]">なぜ、このアプリを作るのか</h2>
           </div>
-          <div className="space-y-6 text-sm md:text-base text-gray-700 leading-loose">
-            <p>「人生を変えたい」と思いながら、一歩を踏み出せない人をたくさん見てきました。</p>
-            <p>
-              時間がない。お金がない。どこから始めればいいか分からない。<br />
-              そうやって、夢を「いつか」に後回しにしてしまう。
-            </p>
-            <p>
-              でも、本当の問題は意志の弱さでも、環境でもないと私は思っています。<br />
-              <span className="font-bold text-[#0d2545]">適切な仕組みがないだけです。</span>
-            </p>
-            <p>
-              教育は、人生を豊かにするインフラです。<br />
-              良質な学習の機会は、誰にでも平等に届くべきだと信じています。
-            </p>
-            <p>
-              だからこそ、独学でも合格できる仕組みを作りたいと考えました。<br />
-              その第一歩が、この宅建アプリです。
+
+          {/* 冒頭メッセージ */}
+          <div className="mb-10">
+            <p className="text-xl md:text-2xl font-bold text-[#0d2545] leading-relaxed text-center">
+              教育は人生を変える力を持っています。
             </p>
           </div>
+
+          {/* 現実の障壁 */}
+          <div className="bg-[#f5f7fa] rounded-2xl p-8 mb-8">
+            <p className="text-sm text-gray-500 mb-5">しかし現実には、</p>
+            <ul className="space-y-4 mb-6">
+              {[
+                { icon: "⏱", label: "時間がない" },
+                { icon: "💴", label: "お金がない" },
+                { icon: "🔄", label: "続かない" },
+              ].map(({ icon, label }) => (
+                <li key={label} className="flex items-center gap-4">
+                  <span className="text-2xl">{icon}</span>
+                  <span className="text-lg font-bold text-[#0d2545]">{label}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-sm text-gray-600 leading-loose">
+              という理由で学ぶ機会を失う人がいます。<br />
+              私はそんな人をたくさん見てきました。
+            </p>
+          </div>
+
+          {/* ミッション */}
+          <div className="bg-[#0d2545] text-white rounded-2xl p-8 mb-8">
+            <p className="text-sm text-blue-300 mb-4">だからこそ、</p>
+            <p className="text-lg md:text-xl font-bold leading-relaxed mb-6">
+              時間やお金の制約によって<br />
+              人生を豊かにする機会を失う人をなくしたい。
+            </p>
+            <p className="text-blue-200 text-sm leading-loose">
+              その想いから<br />
+              <span className="text-white font-bold">dokugaku link</span>を設立しました。
+            </p>
+          </div>
+
+          {/* 現在と未来 */}
+          <div className="space-y-6 text-sm md:text-base text-gray-700 leading-loose">
+            <p>
+              最初の挑戦が<span className="font-bold text-[#0d2545]">宅建</span>です。
+            </p>
+
+            <div className="bg-[#f5f7fa] rounded-xl p-6">
+              <p className="text-sm text-gray-500 mb-4">将来的には</p>
+              <div className="flex flex-wrap gap-3 mb-4">
+                {["FP", "簿記", "行政書士"].map((q) => (
+                  <span
+                    key={q}
+                    className="inline-block bg-blue-100 text-blue-700 text-sm font-bold px-4 py-2 rounded-full"
+                  >
+                    {q}
+                  </span>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 leading-loose">
+                などへ広げ、<br />
+                <span className="font-bold text-[#0d2545]">学び続ける人が集まるプラットフォーム</span>を作ります。
+              </p>
+            </div>
+          </div>
+
           <p className="text-right text-xs text-gray-400 mt-10">dokugaku link合同会社 代表</p>
         </div>
       </section>
@@ -599,31 +649,17 @@ export default function TakkenLandingPage() {
             </div>
 
             <div className="bg-white/5 border border-white/20 rounded-2xl p-8">
-              <div className="grid grid-cols-3 divide-x divide-white/10 text-center mb-6 pb-6 border-b border-white/10">
+              <div className="grid grid-cols-2 divide-x divide-white/10 text-center mb-6 pb-6 border-b border-white/10">
                 <div className="px-3">
-                  <p className="text-xs text-blue-300 mb-1">登録済み</p>
-                  <p className="text-3xl font-black tabular-nums">{STATS.registered}<span className="text-sm font-normal text-blue-300 ml-0.5">名</span></p>
-                </div>
-                <div className="px-3">
-                  <p className="text-xs text-blue-300 mb-1">残り枠</p>
-                  <p className="text-3xl font-black tabular-nums">{remaining}<span className="text-sm font-normal text-blue-300 ml-0.5">名</span></p>
+                  <p className="text-xs text-blue-300 mb-1">募集枠</p>
+                  <p className="text-3xl font-black tabular-nums">
+                    {STATS.totalSlots}<span className="text-sm font-normal text-blue-300 ml-0.5">名限定</span>
+                  </p>
                 </div>
                 <div className="px-3">
                   <p className="text-xs text-blue-300 mb-1">参加費</p>
                   <p className="text-3xl font-black">無料</p>
                 </div>
-              </div>
-
-              <div className="mb-8">
-                <div className="w-full bg-white/10 rounded-full h-2.5">
-                  <div
-                    className="bg-green-400 rounded-full h-full"
-                    style={{ width: `${filledPct}%` }}
-                  />
-                </div>
-                <p className="text-xs text-blue-300 text-right mt-1.5">
-                  {STATS.totalSlots}名中 {STATS.registered}名が登録済み
-                </p>
               </div>
 
               <EmailForm />
