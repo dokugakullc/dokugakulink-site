@@ -281,7 +281,7 @@ export default function TakkenLandingPage() {
               <p className="text-4xl md:text-5xl font-black tabular-nums">
                 {STATS.totalSlots}<span className="text-2xl font-bold">名</span>
               </p>
-              <p className="text-xs text-blue-300 mt-2">β版参加費無料</p>
+              <p className="text-xs text-blue-300 mt-2 whitespace-nowrap">参加費無料</p>
             </div>
           </div>
         </div>
