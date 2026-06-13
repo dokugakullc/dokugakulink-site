@@ -223,6 +223,66 @@ export function ReviewScreen() {
   );
 }
 
+export function PredictionScreen() {
+  const bars = [50, 55, 58, 62, 63, 65, 68];
+  return (
+    <PhoneFrame>
+      <div className="h-full flex flex-col bg-[#f5f7fa]">
+        <div className="bg-[#0d2545] px-4 py-4">
+          <p className="text-white font-bold text-[11px]">合格可能性予測</p>
+          <p className="text-blue-200 text-[9px] mt-0.5">学習データから自動計算</p>
+        </div>
+        <div className="flex-1 px-3 py-3 space-y-2 overflow-hidden">
+          <div className="bg-white rounded-2xl p-4 shadow-sm">
+            <p className="text-gray-400 text-[9px] mb-2">現在の合格可能性</p>
+            <div className="flex items-end gap-1 mb-3">
+              <p className="text-[#0d2545] font-black text-[38px] leading-none">68</p>
+              <p className="text-[#0d2545] text-[16px] font-bold mb-1">%</p>
+              <p className="text-green-500 text-[8px] font-semibold mb-2 ml-1">↑ +2%</p>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-[6px] mb-1.5">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: "68%",
+                  background: "linear-gradient(to right, #3b82f6, #22c55e)",
+                }}
+              />
+            </div>
+            <div className="flex justify-between">
+              <p className="text-gray-400 text-[7px]">0%</p>
+              <p className="text-amber-600 font-bold text-[7px]">合格ライン 75%</p>
+              <p className="text-gray-400 text-[7px]">100%</p>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
+            <p className="text-blue-700 font-semibold text-[9px]">あと 7% で合格ライン</p>
+            <p className="text-blue-600 text-[8px] mt-0.5">法令制限の強化で到達可能</p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-3 shadow-sm">
+            <p className="text-gray-400 text-[9px] mb-2">週間推移</p>
+            <div className="flex items-end gap-1 h-10">
+              {bars.map((v, i) => (
+                <div
+                  key={i}
+                  className={`flex-1 rounded-sm ${i === bars.length - 1 ? "bg-blue-600" : "bg-blue-200"}`}
+                  style={{ height: `${(v / 80) * 100}%` }}
+                />
+              ))}
+            </div>
+            <div className="flex justify-between mt-1">
+              <p className="text-gray-400 text-[7px]">6週前</p>
+              <p className="text-blue-600 font-bold text-[7px]">今週</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </PhoneFrame>
+  );
+}
+
 export function RoadmapScreen() {
   const steps = [
     { label: "権利関係の基礎", done: true, score: "72%" },

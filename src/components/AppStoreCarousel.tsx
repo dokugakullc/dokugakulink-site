@@ -1,48 +1,71 @@
 "use client";
 import { useRef, useState, useEffect, useCallback } from "react";
 import {
+  ReviewScreen,
   HomeScreen,
   AnalysisScreen,
-  ReviewScreen,
+  PredictionScreen,
   RoadmapScreen,
 } from "@/components/AppMockup";
+import { sendGAEvent } from "@/lib/gtag";
 
 const SLIDES = [
   {
     id: "review",
+    slideName: "review",
+    badge: "SRS記憶法",
+    badgeClass: "bg-orange-400 text-white",
     headline: "忘れた頃に、\nまた出題。",
-    benefit: "復習を管理する必要はありません。記憶が薄れるタイミングで自動的に出題されます。",
+    benefit: "記憶が薄れるタイミングで自動出題。「復習しなきゃ」という悩みが完全に消えます。",
     Screen: ReviewScreen,
+    accentClass: "from-[#0d2545] to-[#0a1937]",
   },
   {
     id: "today",
-    headline: "何を勉強するか迷わない",
-    benefit: "今日やるべき問題が開いた瞬間に表示。「どこから始めよう」という迷いがゼロになります。",
+    slideName: "today_problems",
+    badge: "毎日の課題",
+    badgeClass: "bg-blue-400 text-white",
+    headline: "今日やるべき問題が\n開いた瞬間に分かる",
+    benefit: "今日の目標が即座に表示。「どこから始めよう」という迷いがゼロになります。",
     Screen: HomeScreen,
+    accentClass: "from-[#0d2545] to-blue-900",
   },
   {
     id: "analysis",
-    headline: "苦手が見えるから点数が伸びる",
+    slideName: "weakness_analysis",
+    badge: "苦手分析",
+    badgeClass: "bg-amber-400 text-white",
+    headline: "苦手が見えるから\n点数が伸びる",
     benefit: "分野別の正答率が自動で可視化。弱点を把握して、効率よく点数を上げられます。",
     Screen: AnalysisScreen,
+    accentClass: "from-[#0d2545] to-[#0a1a2e]",
   },
   {
     id: "prediction",
-    headline: "今の実力が分かる",
-    benefit: "現在の学習状況から合格確率をリアルタイム計算。ゴールまでの距離が常に見えます。",
-    Screen: HomeScreen,
+    slideName: "pass_prediction",
+    badge: "合格予測",
+    badgeClass: "bg-green-400 text-white",
+    headline: "今の実力が\nリアルタイムに分かる",
+    benefit: "現在の学習状況から合格確率を自動計算。ゴールまでの距離が常に見えます。",
+    Screen: PredictionScreen,
+    accentClass: "from-blue-900 to-[#0d2545]",
   },
   {
     id: "roadmap",
-    headline: "合格までの道筋が見える",
+    slideName: "roadmap",
+    badge: "学習設計",
+    badgeClass: "bg-purple-400 text-white",
+    headline: "合格までの\n道筋が見える",
     benefit: "試験日から逆算した学習計画を自動生成。やるべきことが常に明確になります。",
     Screen: RoadmapScreen,
+    accentClass: "from-[#0d2545] to-[#1a0d45]",
   },
 ] as const;
 
 export default function AppStoreCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const firedRef = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     const track = trackRef.current;
@@ -53,7 +76,12 @@ export default function AppStoreCarousel() {
         for (const entry of entries) {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
             const idx = Array.from(track.children).indexOf(entry.target as HTMLElement);
-            if (idx !== -1) setActive(idx);
+            if (idx === -1) continue;
+            setActive(idx);
+            if (!firedRef.current.has(idx)) {
+              firedRef.current.add(idx);
+              sendGAEvent("carousel_slide_view", { slide_name: SLIDES[idx].slideName });
+            }
           }
         }
       },
@@ -74,44 +102,68 @@ export default function AppStoreCarousel() {
 
   return (
     <div>
+      {/* Track */}
       <div
         ref={trackRef}
-        className="carousel-track flex overflow-x-auto snap-x snap-mandatory gap-5 py-4"
+        className="flex overflow-x-auto snap-x snap-mandatory gap-4 py-4"
         style={{
           scrollbarWidth: "none",
-          paddingLeft: "max(16px, calc(50% - 150px))",
-          paddingRight: "max(16px, calc(50% - 150px))",
+          paddingLeft: "max(16px, calc(50% - 155px))",
+          paddingRight: "max(16px, calc(50% - 155px))",
         }}
       >
-        {SLIDES.map(({ id, headline, benefit, Screen }, i) => (
+        {SLIDES.map(({ id, badge, badgeClass, headline, benefit, Screen, accentClass }, i) => (
           <div
             key={id}
-            className="snap-center shrink-0 w-[300px] bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden cursor-pointer"
             onClick={() => scrollTo(i)}
+            className={`snap-center shrink-0 w-[310px] rounded-3xl overflow-hidden shadow-lg border border-white/10 cursor-pointer transition-transform duration-200 ${
+              i === active ? "scale-100" : "scale-[0.97]"
+            }`}
           >
-            <div className="flex justify-center pt-8 pb-6 bg-gradient-to-b from-[#f0f4f9] to-white px-6">
-              <Screen />
+            {/* Gradient top — app screenshot area */}
+            <div className={`bg-gradient-to-b ${accentClass} flex flex-col items-center pt-5 pb-0 px-4`}>
+              <div className="flex items-center gap-2 mb-4 self-start">
+                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${badgeClass}`}>
+                  {badge}
+                </span>
+              </div>
+              {/* Phone mockup — no bottom rounding so it bleeds into the white section */}
+              <div className="relative">
+                <Screen />
+              </div>
             </div>
-            <div className="px-6 pb-8 text-center">
-              <h3 className="text-base font-bold text-[#0d2545] mb-2 whitespace-pre-line">{headline}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{benefit}</p>
+
+            {/* Text section */}
+            <div className="bg-white px-6 py-5">
+              <h3 className="text-[15px] font-bold text-[#0d2545] mb-2 leading-snug whitespace-pre-line">
+                {headline}
+              </h3>
+              <p className="text-[11px] text-gray-500 leading-relaxed">{benefit}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center gap-2 mt-3">
+      {/* Indicators */}
+      <div className="flex justify-center items-center gap-2 mt-2">
         {SLIDES.map((_, i) => (
           <button
             key={i}
             aria-label={`スライド ${i + 1}`}
             onClick={() => scrollTo(i)}
             className={`rounded-full transition-all duration-200 ${
-              i === active ? "w-5 h-2 bg-[#0d2545]" : "w-2 h-2 bg-gray-300 hover:bg-gray-400"
+              i === active
+                ? "w-6 h-2 bg-[#0d2545]"
+                : "w-2 h-2 bg-gray-300 hover:bg-gray-400"
             }`}
           />
         ))}
       </div>
+
+      {/* Swipe hint — visible only on mobile, disappears after first interaction */}
+      <p className="text-center text-[11px] text-gray-400 mt-3 md:hidden select-none">
+        ← スワイプして確認 →
+      </p>
     </div>
   );
 }
