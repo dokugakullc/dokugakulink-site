@@ -6,13 +6,15 @@ import EmailForm from "@/components/EmailForm";
 import LPTracker from "@/components/LPTracker";
 
 // ─── 開発進捗数値（随時更新） ────────────────────────────────────────────────
-// ※ registered は削除。固定値は信頼性を損なうため表示しない。
 const STATS = {
   totalSlots: 100,
   problems: 305,
   features: 12,
   devProgress: 82,
 };
+
+// β版登録者数 — 将来 /api/stats エンドポイントから取得に変更予定
+const BETA_SIGNUPS = 23;
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Hero ABテスト ──────────────────────────────────────────────────────────
@@ -75,11 +77,20 @@ export const metadata: Metadata = {
     siteName: "dokugaku link",
     locale: "ja_JP",
     type: "website",
+    images: [
+      {
+        url: "https://www.dokugakulink.com/landing/takken/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "宅建独学合格アプリ — 忘れた頃に、また出題。",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "宅建独学合格アプリ | β版先行登録 先着100名無料",
     description: "模試30〜35点で伸び悩む宅建受験生へ。β版先着100名無料。",
+    images: ["https://www.dokugakulink.com/landing/takken/opengraph-image"],
   },
 };
 
@@ -248,10 +259,18 @@ export default function TakkenLandingPage() {
 
           {/* ─ Hero直下 簡易登録フォーム ─ */}
           <div className="max-w-md">
-            <EmailForm source="takken_lp_hero" />
+            <EmailForm source="takken_lp_hero" betaSignups={BETA_SIGNUPS} />
           </div>
 
-          <div className="mt-8">
+          {/* 登録者数ソーシャルプルーフ */}
+          <div className="mt-5 flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shrink-0" />
+            <p className="text-sm text-white/50">
+              現在 <span className="text-white font-bold">{BETA_SIGNUPS}名</span> がβ版登録中
+            </p>
+          </div>
+
+          <div className="mt-6">
             <a
               href="#features"
               className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
@@ -637,7 +656,7 @@ export default function TakkenLandingPage() {
                 </div>
               </div>
 
-              <EmailForm />
+              <EmailForm betaSignups={BETA_SIGNUPS} />
             </div>
           </div>
         </div>

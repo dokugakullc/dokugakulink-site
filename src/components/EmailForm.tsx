@@ -14,7 +14,13 @@ const PROBLEMS = [
 type ProblemValue = typeof PROBLEMS[number]["value"];
 type Status = "idle" | "loading" | "success" | "duplicated" | "error";
 
-export default function EmailForm({ source = "takken_lp" }: { source?: string }) {
+interface EmailFormProps {
+  source?: string;
+  // 将来 /api/stats から取得に変更予定
+  betaSignups?: number;
+}
+
+export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFormProps) {
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState<ProblemValue | "">("");
   const [status, setStatus] = useState<Status>("idle");
@@ -47,52 +53,105 @@ export default function EmailForm({ source = "takken_lp" }: { source?: string })
     }
   }
 
+  const problemLabel = PROBLEMS.find((p) => p.value === problem)?.label;
+
   if (status === "success") {
     return (
-      <div className="text-center py-8">
-        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-green-400"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+      <div className="space-y-5 py-4">
+        {/* チェックアイコン */}
+        <div className="flex flex-col items-center text-center gap-3">
+          <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="26"
+              height="26"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-green-400"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-white font-bold text-lg">登録ありがとうございます。</p>
+            <p className="text-blue-200 text-sm mt-1">あなたの登録内容は保存されました。</p>
+          </div>
         </div>
-        <p className="text-white font-bold text-xl mb-2">登録完了しました！</p>
-        <p className="text-blue-200 text-sm">リリース時にご連絡いたします。ありがとうございます。</p>
+
+        {/* 登録者数 */}
+        {betaSignups !== undefined && (
+          <div className="bg-white/10 border border-white/20 rounded-2xl px-6 py-5 text-center">
+            <p className="text-xs text-blue-300 mb-1.5">現在のβ版登録者数</p>
+            <p className="text-4xl font-black text-white tabular-nums">
+              {betaSignups}
+              <span className="text-lg font-normal text-blue-300 ml-1">名</span>
+            </p>
+          </div>
+        )}
+
+        {/* 悩みタグ */}
+        {problemLabel && (
+          <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+            <p className="text-xs text-blue-300 mb-1">あなたの悩み</p>
+            <p className="text-sm text-white font-semibold">{problemLabel}</p>
+          </div>
+        )}
+
+        {/* メッセージ */}
+        <div className="text-center">
+          <p className="text-blue-200 text-sm leading-loose">
+            正式リリース時に<br />優先的にご案内します。
+          </p>
+        </div>
       </div>
     );
   }
 
   if (status === "duplicated") {
     return (
-      <div className="text-center py-8">
-        <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-blue-400"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+      <div className="space-y-5 py-4">
+        <div className="flex flex-col items-center text-center gap-3">
+          <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="26"
+              height="26"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-blue-400"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-white font-bold text-lg">登録済みのメールアドレスです</p>
+            <p className="text-blue-200 text-sm mt-1">あなたの登録内容は保存されています。</p>
+          </div>
         </div>
-        <p className="text-white font-bold text-xl mb-2">登録済みのメールアドレスです</p>
-        <p className="text-blue-200 text-sm">すでに登録が完了しています。リリース時にご連絡いたします。</p>
+
+        {betaSignups !== undefined && (
+          <div className="bg-white/10 border border-white/20 rounded-2xl px-6 py-5 text-center">
+            <p className="text-xs text-blue-300 mb-1.5">現在のβ版登録者数</p>
+            <p className="text-4xl font-black text-white tabular-nums">
+              {betaSignups}
+              <span className="text-lg font-normal text-blue-300 ml-1">名</span>
+            </p>
+          </div>
+        )}
+
+        <div className="text-center">
+          <p className="text-blue-200 text-sm leading-loose">
+            正式リリース時に<br />優先的にご案内します。
+          </p>
+        </div>
       </div>
     );
   }
