@@ -23,6 +23,7 @@ interface EmailFormProps {
 export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFormProps) {
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState<ProblemValue | "">("");
+  const [showProblems, setShowProblems] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -58,7 +59,6 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
   if (status === "success") {
     return (
       <div className="space-y-5 py-4">
-        {/* チェックアイコン */}
         <div className="flex flex-col items-center text-center gap-3">
           <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center">
             <svg
@@ -81,7 +81,6 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
           </div>
         </div>
 
-        {/* 登録者数 */}
         {betaSignups !== undefined && (
           <div className="bg-white/10 border border-white/20 rounded-2xl px-6 py-5 text-center">
             <p className="text-xs text-blue-300 mb-1.5">現在のβ版登録者数</p>
@@ -92,7 +91,6 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
           </div>
         )}
 
-        {/* 悩みタグ */}
         {problemLabel && (
           <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xs text-blue-300 mb-1">あなたの悩み</p>
@@ -100,7 +98,6 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
           </div>
         )}
 
-        {/* メッセージ */}
         <div className="text-center">
           <p className="text-blue-200 text-sm leading-loose">
             正式リリース時に<br />優先的にご案内します。
@@ -157,48 +154,70 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* ① メールアドレス（必須・最初） */}
       <div>
-        <p className="text-white/80 text-sm font-medium mb-3">宅建学習で一番困っていること</p>
-        <div className="grid grid-cols-1 gap-2">
-          {PROBLEMS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              disabled={status === "loading"}
-              onClick={() => setProblem(problem === value ? "" : value)}
-              className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm text-left font-medium border transition-colors disabled:opacity-50 ${
-                problem === value
-                  ? "bg-white text-[#0d2545] border-white"
-                  : "bg-white/5 text-white/70 border-white/20 hover:border-white/40"
-              }`}
-            >
-              <span
-                className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
-                  problem === value ? "border-[#0d2545] bg-[#0d2545]" : "border-white/50"
-                }`}
-              >
-                {problem === value && <span className="w-2 h-2 rounded-full bg-white block" />}
-              </span>
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <p className="text-white/80 text-sm font-medium mb-2">メールアドレス</p>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="例：your@email.com"
+          placeholder="メールアドレスを入力"
           required
           disabled={status === "loading"}
           className="w-full px-4 py-3.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
         />
       </div>
 
+      {/* ② 悩み選択（任意・折りたたみ） */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowProblems((v) => !v)}
+          disabled={status === "loading"}
+          className="flex items-center gap-2 text-white/50 text-xs hover:text-white/70 transition-colors disabled:opacity-50"
+        >
+          <span
+            className={`transition-transform duration-200 ${showProblems ? "rotate-90" : ""}`}
+          >
+            ▶
+          </span>
+          今一番困っていること（任意）
+          {problem && (
+            <span className="ml-1 bg-white/10 text-white/80 text-[10px] px-2 py-0.5 rounded-full">
+              選択済み
+            </span>
+          )}
+        </button>
+
+        {showProblems && (
+          <div className="mt-2 grid grid-cols-1 gap-1.5">
+            {PROBLEMS.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                disabled={status === "loading"}
+                onClick={() => setProblem(problem === value ? "" : value)}
+                className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-lg text-sm text-left font-medium border transition-colors disabled:opacity-50 ${
+                  problem === value
+                    ? "bg-white text-[#0d2545] border-white"
+                    : "bg-white/5 text-white/70 border-white/15 hover:border-white/35"
+                }`}
+              >
+                <span
+                  className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${
+                    problem === value ? "border-[#0d2545] bg-[#0d2545]" : "border-white/40"
+                  }`}
+                >
+                  {problem === value && <span className="w-1.5 h-1.5 rounded-full bg-white block" />}
+                </span>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ③ 送信ボタン */}
       <button
         type="submit"
         disabled={status === "loading"}

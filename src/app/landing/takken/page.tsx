@@ -27,7 +27,7 @@ const HERO_COPY = {
         <span className="text-blue-300">また出題。</span>
       </>
     ),
-    sub: "仕事終わりの30分でも、独学合格を目指せる。宅建受験生専用の学習支援アプリ。",
+    sub: "復習を自動化して、合格まで迷わない。",
   },
   B: {
     headline: (
@@ -161,24 +161,24 @@ const faqItems = [
     a: "β版への参加は完全無料です。正式版リリース後の料金については、β版参加者の方に最優先でご案内します。課金が始まるのは「使ってよかった」と感じてもらえる状態になってからです。",
   },
   {
-    q: "いつリリース予定ですか？",
-    a: "2026年内のリリースを目標に開発中です。β版参加者の方には、開発進捗を定期的にご共有します。",
+    q: "いつ使えますか？",
+    a: "2026年夏のβ版リリースを目標に開発中です。登録いただいたメールアドレスへ準備が整い次第ご案内します。正式版は2026年秋を予定しています。",
+  },
+  {
+    q: "登録したら何が届きますか？",
+    a: "β版招待メール（準備が整い次第）、正式リリース情報、開発進捗のご報告をお届けします。それ以外の連絡は行いません。「今一番困っていること」として選択いただいた内容は、機能の開発優先度の判断に活用します。",
+  },
+  {
+    q: "営業メールは来ますか？",
+    a: "一切届きません。登録後の営業・勧誘は行いません。メールアドレスを第三者へ提供・販売することもありません。",
   },
   {
     q: "iPhone・Android両方で使えますか？",
     a: "はい。iOS（iPhone）・Android両OSに対応予定です。同時リリースを目指して開発しています。",
   },
   {
-    q: "宅建以外の資格にも対応予定ですか？",
+    q: "FPや簿記にも対応しますか？",
     a: "宅建士の次は、FP・簿記・行政書士への展開を計画しています。β版参加者のご要望を優先的に開発へ反映します。",
-  },
-  {
-    q: "登録したら営業メールは届きますか？",
-    a: "一切届きません。お送りするのは「β版招待」「リリース情報」「開発進捗レポート」の3種類のみです。登録後の営業・勧誘は行いません。",
-  },
-  {
-    q: "登録情報は何に使いますか？",
-    a: "メールアドレスはリリース連絡にのみ使用します。「学習の悩み」はアプリ開発の優先度判断に活用します。第三者への提供・販売は一切行いません。",
   },
 ];
 
@@ -380,7 +380,7 @@ export default function TakkenLandingPage() {
               { value: `${STATS.problems}問`, label: "収録予定問題数", sub: "過去問ベース" },
               { value: "4分野", label: "対象範囲", sub: "宅建全範囲カバー" },
               { value: `${STATS.features}機能`, label: "開発予定機能", sub: "随時追加" },
-              { value: `${STATS.devProgress}%`, label: "全体進捗", sub: "開発中" },
+              { value: `${STATS.devProgress}%`, label: "全体進捗", sub: "開発中・β版準備中" },
             ].map(({ value, label, sub }) => (
               <div key={label} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100">
                 <p className="text-3xl md:text-4xl font-black text-[#0d2545] mb-1">{value}</p>
@@ -427,7 +427,7 @@ export default function TakkenLandingPage() {
                         : "bg-gray-100 text-gray-500"
                     }`}
                   >
-                    {done ? "完成" : beta ? "β版で体験予定" : "開発中"}
+                    {done ? "実装済み" : beta ? "β版提供予定" : "今後追加予定"}
                   </span>
                 </div>
               ))}
@@ -448,6 +448,20 @@ export default function TakkenLandingPage() {
           </div>
         </div>
         <AppStoreCarousel />
+
+        {/* カルーセル直下CTA — 高関心ユーザーを逃さない */}
+        <div className="mx-auto max-w-xl px-6 lg:px-8 mt-10 text-center">
+          <p className="text-base md:text-lg font-bold text-[#0d2545] mb-2">
+            この学習体験を、β版で試してみませんか？
+          </p>
+          <p className="text-sm text-gray-500 mb-6">先着100名限定 · 参加費無料</p>
+          <a
+            href="#beta"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#0d2545] text-white text-sm font-bold rounded-xl hover:bg-[#142f5a] transition-colors"
+          >
+            無料でβ版に参加する →
+          </a>
+        </div>
       </section>
 
       {/* ━━━ 7. Before / After ━━━ */}
@@ -512,19 +526,28 @@ export default function TakkenLandingPage() {
         <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Why Free</p>
           <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-10">なぜ、無料なのか？</h2>
-          <div className="bg-[#f5f7fa] rounded-2xl p-8 md:p-12 text-left space-y-5 text-sm md:text-base text-gray-700 leading-loose">
-            <p>私たちがβ版を無料で提供する理由はシンプルです。</p>
+          <div className="bg-[#f5f7fa] rounded-2xl p-8 md:p-12 text-left space-y-6 text-sm md:text-base text-gray-700 leading-loose">
             <p>
-              <span className="font-bold text-[#0d2545]">まず、合格する人を増やしたい。</span><br />
-              そのために、実際に使ってもらいながら、本当に役立つプロダクトを作り上げていく必要があります。
+              <span className="font-bold text-[#0d2545]">正式リリース前に、実際の受験生の声を反映したいからです。</span><br />
+              使ってもらいながら、本当に役立つプロダクトを作り上げていく必要があります。
             </p>
-            <p>
-              β版参加者からのフィードバックは、開発に直接反映されます。<br />
-              あなたの声が、次の宅建受験生を助けることになります。
-            </p>
-            <p className="font-bold text-[#0d2545]">
-              課金が始まるのは、「使ってよかった」と思える状態になってからです。
-            </p>
+            <div className="border-l-4 border-blue-200 pl-5 space-y-3">
+              <p className="flex items-start gap-2">
+                <span className="text-green-600 font-bold shrink-0 mt-0.5">✓</span>
+                <span>β版参加者からのフィードバックは、開発に直接反映されます。</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-green-600 font-bold shrink-0 mt-0.5">✓</span>
+                <span>
+                  <span className="font-bold text-[#0d2545]">営業メールを送るためではありません。</span><br />
+                  リリース時と重要なお知らせ以外の連絡は行いません。
+                </span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-green-600 font-bold shrink-0 mt-0.5">✓</span>
+                <span>課金が始まるのは、「使ってよかった」と思える状態になってからです。</span>
+              </p>
+            </div>
           </div>
         </div>
       </section>
