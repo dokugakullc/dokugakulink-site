@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HomeScreen, ProblemScreen, AnalysisScreen, ReviewScreen } from "@/components/AppMockup";
 import AppStoreCarousel from "@/components/AppStoreCarousel";
 import EmailForm from "@/components/EmailForm";
+import LPTracker from "@/components/LPTracker";
 
 // ─── 開発進捗数値（随時更新） ────────────────────────────────────────────────
 // ※ registered は削除。固定値は信頼性を損なうため表示しない。
@@ -215,8 +216,10 @@ export default function TakkenLandingPage() {
 
   return (
     <div>
+      <LPTracker heroVariant={HERO_VARIANT} />
+
       {/* ━━━ 1. Hero ━━━ */}
-      <section className="bg-[#0d2545] text-white relative overflow-hidden">
+      <section id="hero" className="bg-[#0d2545] text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 via-transparent to-transparent pointer-events-none" />
         <div className="mx-auto max-w-5xl px-6 lg:px-8 py-16 md:py-24 relative">
           {/* 対象者明示 — 広告流入ユーザーが3秒以内に宅建アプリだと分かるように */}

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { sendGAEvent } from "@/lib/gtag";
 
 // Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
@@ -21,6 +22,8 @@ export default function EmailForm({ source = "takken_lp" }: { source?: string })
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
+    sendGAEvent("cta_click", { source, problem: problem || "" });
+    sendGAEvent("registration_submit", { source, problem: problem || "" });
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -32,7 +35,13 @@ export default function EmailForm({ source = "takken_lp" }: { source?: string })
         setStatus("error");
         return;
       }
-      setStatus(data.duplicated ? "duplicated" : "success");
+      if (data.duplicated) {
+        sendGAEvent("registration_duplicate", { source, problem: problem || "" });
+        setStatus("duplicated");
+      } else {
+        sendGAEvent("registration_success", { source, problem: problem || "" });
+        setStatus("success");
+      }
     } catch {
       setStatus("error");
     }
