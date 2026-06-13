@@ -13,8 +13,6 @@ const STATS = {
   devProgress: 82,
 };
 
-// β版登録者数 — 将来 /api/stats エンドポイントから取得に変更予定
-const BETA_SIGNUPS = 23;
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Hero ABテスト ──────────────────────────────────────────────────────────
@@ -259,18 +257,10 @@ export default function TakkenLandingPage() {
 
           {/* ─ Hero直下 簡易登録フォーム ─ */}
           <div className="max-w-md">
-            <EmailForm source="takken_lp_hero" betaSignups={BETA_SIGNUPS} />
+            <EmailForm source="takken_lp_hero" />
           </div>
 
-          {/* 登録者数ソーシャルプルーフ */}
-          <div className="mt-5 flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shrink-0" />
-            <p className="text-sm text-white/50">
-              現在 <span className="text-white font-bold">{BETA_SIGNUPS}名</span> がβ版登録中
-            </p>
-          </div>
-
-          <div className="mt-6">
+          <div className="mt-8">
             <a
               href="#features"
               className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
@@ -656,7 +646,7 @@ export default function TakkenLandingPage() {
                 </div>
               </div>
 
-              <EmailForm betaSignups={BETA_SIGNUPS} />
+              <EmailForm />
             </div>
           </div>
         </div>
