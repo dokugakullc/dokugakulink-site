@@ -15,8 +15,10 @@ const SLIDES = [
     slideName: "review",
     badge: "SRS記憶法",
     badgeClass: "bg-orange-400 text-white",
-    headline: "忘れた頃に、\nまた出題。",
-    benefit: "記憶が薄れるタイミングで自動出題。「復習しなきゃ」という悩みが完全に消えます。",
+    stat: "3",
+    statUnit: "問",
+    statLabel: "復習タイミング到来",
+    headline: "忘れた頃に、また出題。",
     Screen: ReviewScreen,
     accentClass: "from-[#0d2545] to-[#0a1937]",
   },
@@ -25,8 +27,10 @@ const SLIDES = [
     slideName: "today_problems",
     badge: "毎日の課題",
     badgeClass: "bg-blue-400 text-white",
-    headline: "今日やるべき問題が\n開いた瞬間に分かる",
-    benefit: "今日の目標が即座に表示。「どこから始めよう」という迷いがゼロになります。",
+    stat: "20",
+    statUnit: "問",
+    statLabel: "今日やるべき問題",
+    headline: "今日やるべき問題が分かる。",
     Screen: HomeScreen,
     accentClass: "from-[#0d2545] to-blue-900",
   },
@@ -35,8 +39,10 @@ const SLIDES = [
     slideName: "weakness_analysis",
     badge: "苦手分析",
     badgeClass: "bg-amber-400 text-white",
-    headline: "苦手が見えるから\n点数が伸びる",
-    benefit: "分野別の正答率が自動で可視化。弱点を把握して、効率よく点数を上げられます。",
+    stat: "55",
+    statUnit: "%",
+    statLabel: "弱点分野の正答率",
+    headline: "苦手をなくして点数を伸ばす。",
     Screen: AnalysisScreen,
     accentClass: "from-[#0d2545] to-[#0a1a2e]",
   },
@@ -45,8 +51,10 @@ const SLIDES = [
     slideName: "pass_prediction",
     badge: "合格予測",
     badgeClass: "bg-green-400 text-white",
-    headline: "今の実力が\nリアルタイムに分かる",
-    benefit: "現在の学習状況から合格確率を自動計算。ゴールまでの距離が常に見えます。",
+    stat: "68",
+    statUnit: "%",
+    statLabel: "現在の合格可能性",
+    headline: "今の実力が見える。",
     Screen: PredictionScreen,
     accentClass: "from-blue-900 to-[#0d2545]",
   },
@@ -55,8 +63,10 @@ const SLIDES = [
     slideName: "roadmap",
     badge: "学習設計",
     badgeClass: "bg-purple-400 text-white",
-    headline: "合格までの\n道筋が見える",
-    benefit: "試験日から逆算した学習計画を自動生成。やるべきことが常に明確になります。",
+    stat: "87",
+    statUnit: "日",
+    statLabel: "試験まで残り",
+    headline: "合格まで迷わない。",
     Screen: RoadmapScreen,
     accentClass: "from-[#0d2545] to-[#1a0d45]",
   },
@@ -112,7 +122,7 @@ export default function AppStoreCarousel() {
           paddingRight: "max(16px, calc(50% - 155px))",
         }}
       >
-        {SLIDES.map(({ id, badge, badgeClass, headline, benefit, Screen, accentClass }, i) => (
+        {SLIDES.map(({ id, badge, badgeClass, stat, statUnit, statLabel, headline, Screen, accentClass }, i) => (
           <div
             key={id}
             onClick={() => scrollTo(i)}
@@ -120,25 +130,31 @@ export default function AppStoreCarousel() {
               i === active ? "scale-100" : "scale-[0.97]"
             }`}
           >
-            {/* Gradient top — app screenshot area */}
-            <div className={`bg-gradient-to-b ${accentClass} flex flex-col items-center pt-5 pb-0 px-4`}>
-              <div className="flex items-center gap-2 mb-4 self-start">
+            {/* Gradient top */}
+            <div className={`bg-gradient-to-b ${accentClass} flex flex-col items-center pt-4 pb-0 px-4`}>
+              {/* Badge + Stat row */}
+              <div className="flex items-start justify-between w-full mb-3">
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${badgeClass}`}>
                   {badge}
                 </span>
+                <div className="text-right">
+                  <p className="text-white font-black text-[26px] leading-none tabular-nums">
+                    {stat}<span className="text-[13px] font-bold ml-0.5">{statUnit}</span>
+                  </p>
+                  <p className="text-white/50 text-[8px] mt-0.5">{statLabel}</p>
+                </div>
               </div>
-              {/* Phone mockup — no bottom rounding so it bleeds into the white section */}
+              {/* Phone mockup */}
               <div className="relative">
                 <Screen />
               </div>
             </div>
 
-            {/* Text section */}
-            <div className="bg-white px-6 py-5">
-              <h3 className="text-[15px] font-bold text-[#0d2545] mb-2 leading-snug whitespace-pre-line">
+            {/* Headline only — no description */}
+            <div className="bg-white px-5 py-4">
+              <h3 className="text-[15px] font-bold text-[#0d2545] leading-snug">
                 {headline}
               </h3>
-              <p className="text-[11px] text-gray-500 leading-relaxed">{benefit}</p>
             </div>
           </div>
         ))}
@@ -160,7 +176,6 @@ export default function AppStoreCarousel() {
         ))}
       </div>
 
-      {/* Swipe hint — visible only on mobile, disappears after first interaction */}
       <p className="text-center text-[11px] text-gray-400 mt-3 md:hidden select-none">
         ← スワイプして確認 →
       </p>

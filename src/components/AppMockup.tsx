@@ -52,13 +52,13 @@ export function HomeScreen() {
           <div className="bg-white rounded-2xl p-3 shadow-sm">
             <p className="text-gray-400 text-[9px] mb-1">合格予測スコア</p>
             <div className="flex items-end justify-between">
-              <p className="font-bold text-[#0d2545] text-[24px] leading-none">
-                68<span className="text-[12px] font-normal text-gray-400">%</span>
+              <p className="font-black text-[#0d2545] text-[30px] leading-none tabular-nums">
+                68<span className="text-[13px] font-bold text-[#0d2545]/60">%</span>
               </p>
-              <p className="text-green-600 font-semibold text-[9px]">↑ 前週比 +2%</p>
+              <p className="text-green-600 font-bold text-[9px]">↑ +2%</p>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-[5px] mt-2">
-              <div className="bg-green-500 rounded-full h-full w-[68%]" />
+            <div className="w-full bg-gray-100 rounded-full h-[6px] mt-2">
+              <div className="rounded-full h-full w-[68%]" style={{ background: "linear-gradient(to right, #3b82f6, #22c55e)" }} />
             </div>
           </div>
 
@@ -165,17 +165,20 @@ export function AnalysisScreen() {
           </div>
 
           <div className="bg-[#0d2545] rounded-2xl p-3">
-            <p className="text-blue-200 text-[9px]">合格予測率</p>
-            <p className="text-white font-bold text-[28px] leading-tight mt-0.5">
-              68<span className="text-[14px] font-normal text-blue-300">%</span>
-            </p>
-            <p className="text-blue-300 text-[9px] mt-0.5">合格ラインまであと 7%</p>
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="text-blue-200 text-[9px]">合格予測率</p>
+                <p className="text-white font-black text-[34px] leading-tight tabular-nums">
+                  68<span className="text-[15px] font-bold text-blue-300">%</span>
+                </p>
+              </div>
+              <p className="text-amber-300 font-bold text-[9px] mb-1">あと 7%</p>
+            </div>
           </div>
 
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
-            <p className="text-amber-700 font-semibold text-[9px]">弱点分野</p>
-            <p className="text-amber-800 font-bold text-[11px] mt-0.5">法令上の制限 55%</p>
-            <p className="text-amber-600 text-[8px] mt-0.5">重点的に復習しましょう</p>
+            <p className="text-amber-700 font-semibold text-[8px]">最重点弱点</p>
+            <p className="text-amber-800 font-black text-[13px] mt-0.5">法令制限 <span className="text-amber-600">55%</span></p>
           </div>
         </div>
       </div>
@@ -194,11 +197,11 @@ export function ReviewScreen() {
     <PhoneFrame>
       <div className="h-full flex flex-col bg-[#f5f7fa]">
         <div className="bg-[#0d2545] px-4 py-4">
-          <p className="text-white font-bold text-[11px]">要復習リスト</p>
-          <div className="flex items-center gap-2 mt-1.5">
-            <span className="bg-orange-400 rounded-full px-2 py-0.5 text-white font-bold text-[9px]">3問</span>
-            <p className="text-blue-200 text-[9px]">忘却タイミング到来</p>
+          <div className="flex items-center justify-between">
+            <p className="text-white font-bold text-[11px]">要復習リスト</p>
+            <span className="bg-orange-400 rounded-full px-2.5 py-1 text-white font-black text-[12px] tabular-nums">3問</span>
           </div>
+          <p className="text-orange-300 text-[9px] mt-1">忘却タイミング到来</p>
         </div>
 
         <div className="flex-1 px-3 py-3 space-y-2 overflow-hidden">
@@ -296,8 +299,13 @@ export function RoadmapScreen() {
     <PhoneFrame>
       <div className="h-full flex flex-col bg-[#f5f7fa]">
         <div className="bg-[#0d2545] px-4 py-4">
-          <p className="text-white font-bold text-[11px]">学習ロードマップ</p>
-          <p className="text-blue-200 text-[9px] mt-0.5">試験日まで 87日</p>
+          <div className="flex items-center justify-between">
+            <p className="text-white font-bold text-[11px]">学習ロードマップ</p>
+            <div className="text-right">
+              <p className="text-white font-black text-[18px] leading-none tabular-nums">87<span className="text-[10px] font-bold text-blue-300">日</span></p>
+              <p className="text-blue-300 text-[7px]">試験まで</p>
+            </div>
+          </div>
         </div>
         <div className="flex-1 px-3 py-3 space-y-1.5 overflow-hidden">
           {steps.map(({ label, done, current, score }, i) => (
