@@ -100,12 +100,12 @@ const beforeAfterItems = [
 ];
 
 const devFeatures = [
-  { name: "問題データベース構築", done: true },
-  { name: "学習履歴管理", done: true },
-  { name: "復習タイミング自動計算", done: true },
-  { name: "分野別分析ダッシュボード", done: false },
-  { name: "合格予測スコア", done: false },
-  { name: "通知・リマインダー", done: false },
+  { name: "問題データベース構築", done: true, beta: false },
+  { name: "学習履歴管理", done: true, beta: false },
+  { name: "復習タイミング自動計算", done: true, beta: false },
+  { name: "分野別分析ダッシュボード", done: false, beta: true },
+  { name: "合格予測スコア", done: false, beta: true },
+  { name: "通知・リマインダー", done: false, beta: false },
 ];
 
 const mockupFeatures = [
@@ -141,9 +141,9 @@ const mockupFeatures = [
 
 const betaPerks = [
   { icon: "🚀", title: "正式版を優先利用", desc: "正式リリース時、最速でご案内します" },
-  { icon: "💬", title: "改善要望を開発に反映", desc: "あなたのフィードバックが機能に直接なります" },
-  { icon: "📬", title: "開発進捗を先行共有", desc: "非公開の開発状況をリアルタイムでお届け" },
-  { icon: "🧪", title: "リリース前テスト参加", desc: "正式版前のテストに真っ先に参加できます" },
+  { icon: "💬", title: "要望を開発に反映", desc: "あなたのフィードバックが機能に直接なります" },
+  { icon: "📬", title: "進捗を先行共有", desc: "非公開の開発状況をリアルタイムでお届け" },
+  { icon: "🧪", title: "テスト先行参加", desc: "正式版前のテストに真っ先に参加できます" },
 ];
 
 const faqItems = [
@@ -221,7 +221,7 @@ export default function TakkenLandingPage() {
       {/* ━━━ 1. Hero ━━━ */}
       <section id="hero" className="bg-[#0d2545] text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 via-transparent to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-5xl px-6 lg:px-8 py-16 md:py-24 relative">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8 py-10 md:py-24 relative">
           {/* 対象者明示 — 広告流入ユーザーが3秒以内に宅建アプリだと分かるように */}
           <p className="text-blue-400 text-xs font-black tracking-[0.18em] uppercase mb-4">
             宅建独学者のための学習支援アプリ
@@ -271,11 +271,11 @@ export default function TakkenLandingPage() {
           <div className="grid grid-cols-3 divide-x divide-white/10 text-white text-center">
             <div className="px-4 py-2">
               <p className="text-4xl md:text-5xl font-black tabular-nums">{STATS.problems}<span className="text-2xl font-bold">問</span></p>
-              <p className="text-xs text-blue-300 mt-2">収録予定問題数</p>
+              <p className="text-xs text-blue-300 mt-2 whitespace-nowrap">収録予定</p>
             </div>
             <div className="px-4 py-2">
               <p className="text-4xl md:text-5xl font-black">4<span className="text-2xl font-bold">科目</span></p>
-              <p className="text-xs text-blue-300 mt-2">宅建全範囲対応</p>
+              <p className="text-xs text-blue-300 mt-2 whitespace-nowrap">全範囲対応</p>
             </div>
             <div className="px-4 py-2">
               <p className="text-4xl md:text-5xl font-black tabular-nums">
@@ -400,21 +400,25 @@ export default function TakkenLandingPage() {
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
             <p className="font-bold text-[#0d2545] mb-6">機能開発状況</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {devFeatures.map(({ name, done }) => (
+              {devFeatures.map(({ name, done, beta }) => (
                 <div
                   key={name}
-                  className={`flex items-center gap-3 p-4 rounded-xl ${done ? "bg-green-50" : "bg-gray-50"}`}
+                  className={`flex items-center gap-3 p-4 rounded-xl ${done ? "bg-green-50" : beta ? "bg-blue-50" : "bg-gray-50"}`}
                 >
-                  <span className="text-base shrink-0">{done ? "✅" : "🔄"}</span>
-                  <p className={`text-sm font-medium flex-1 ${done ? "text-gray-700" : "text-gray-400"}`}>
+                  <span className="text-base shrink-0">{done ? "✅" : beta ? "✨" : "🔄"}</span>
+                  <p className={`text-sm font-medium flex-1 ${done ? "text-gray-700" : beta ? "text-blue-700" : "text-gray-400"}`}>
                     {name}
                   </p>
                   <span
                     className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                      done ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-600"
+                      done
+                        ? "bg-green-100 text-green-700"
+                        : beta
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-gray-100 text-gray-500"
                     }`}
                   >
-                    {done ? "完成" : "開発中"}
+                    {done ? "完成" : beta ? "β版で体験予定" : "開発中"}
                   </span>
                 </div>
               ))}
@@ -516,47 +520,7 @@ export default function TakkenLandingPage() {
         </div>
       </section>
 
-      {/* ━━━ 10. 利用者の声（β版準備中プレースホルダー）━━━ */}
-      <section className="py-20 md:py-28 bg-[#f5f7fa]">
-        <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545]">利用者の声</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { name: "20代・会社員", tag: "独学2年目" },
-              { name: "30代・会社員", tag: "初受験" },
-              { name: "40代・会社員", tag: "昨年不合格" },
-            ].map(({ name, tag }) => (
-              <div
-                key={name}
-                className="relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-white/85 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 rounded-2xl">
-                  <span className="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full mb-2">
-                    β版準備中
-                  </span>
-                  <p className="text-xs text-gray-400">リリース後に掲載予定</p>
-                </div>
-                <div className="flex gap-0.5 mb-4">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <span key={s} className="text-yellow-400 text-sm">★</span>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                  ここに実際の声が入ります。β版リリース後に差し替えてください。
-                </p>
-                <div>
-                  <p className="text-xs font-bold text-[#0d2545]">{name}</p>
-                  <p className="text-[10px] text-gray-400">{tag}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ━━━ 11. 創業ストーリー ━━━ */}
+      {/* ━━━ 10. 創業ストーリー ━━━ */}
       <section className="py-20 md:py-28 bg-white">
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -752,6 +716,23 @@ export default function TakkenLandingPage() {
         </div>
       </section>
 
+      {/* ━━━ FAQ後CTA ━━━ */}
+      <section className="py-16 md:py-20 bg-[#f5f7fa]">
+        <div className="mx-auto max-w-xl px-6 lg:px-8 text-center">
+          <p className="text-sm text-gray-500 mb-4">まだ迷っていますか？</p>
+          <h2 className="text-xl md:text-2xl font-bold text-[#0d2545] mb-6">
+            登録は30秒、参加費は無料です。
+          </h2>
+          <a
+            href="#beta"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#0d2545] text-white text-base font-bold rounded-xl hover:bg-[#142f5a] transition-colors"
+          >
+            無料でβ版に参加する →
+          </a>
+          <p className="text-xs text-gray-400 mt-4">クレジットカード不要 · いつでも退会可</p>
+        </div>
+      </section>
+
       {/* ━━━ Footer link bar ━━━ */}
       <div className="bg-[#081a38] border-t border-white/10 py-8">
         <div className="mx-auto max-w-6xl px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -763,6 +744,7 @@ export default function TakkenLandingPage() {
             <Link href="/services/takken" className="hover:text-white transition-colors">サービス詳細</Link>
             <Link href="/company" className="hover:text-white transition-colors">会社概要</Link>
             <Link href="/contact" className="hover:text-white transition-colors">お問い合わせ</Link>
+            <Link href="/legal/tokushoho" className="hover:text-white transition-colors">特定商取引法</Link>
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ const navLinks = [
   { href: "/news", label: "お知らせ" },
   { href: "/contact", label: "お問い合わせ" },
   { href: "/privacy", label: "プライバシーポリシー" },
+  { href: "/legal/tokushoho", label: "特定商取引法に基づく表記" },
 ];
 
 export default function Footer() {

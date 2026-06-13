@@ -17,15 +17,12 @@ export default function Home() {
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6">
-            学びをもっと自由に。<br />
-            人生をもっと豊かに。
+            独学合格を、<br />
+            仕組みで実現する。
           </h1>
-          <div className="mt-8 space-y-1 text-blue-100 text-base md:text-lg leading-loose">
-            <p>洗練された先端技術</p>
-            <p>考え抜かれた学習教材</p>
-            <p>学ぶことが楽しくなる仕組み</p>
-            <p className="mt-4 text-white font-medium">この3つを通じて、学び続ける人を支援します。</p>
-          </div>
+          <p className="mt-8 text-blue-100 text-base md:text-lg leading-loose max-w-xl">
+            dokugaku linkは、学び続ける人のために、資格学習プラットフォームとウェルスコンサルティングを提供する会社です。
+          </p>
           <div className="mt-12 flex flex-wrap gap-4">
             <Link
               href="/business"
