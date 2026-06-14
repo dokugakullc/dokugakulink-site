@@ -1,34 +1,63 @@
 "use client";
 import { useState } from "react";
 
+type Status = "idle" | "sending" | "success" | "error";
+
 export default function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent("お問い合わせ");
-    const body = encodeURIComponent(
-      `お名前: ${name}\nメールアドレス: ${email}\n\nお問い合わせ内容:\n${message}`
-    );
-    window.location.href = `mailto:info@dokugakulink.com?subject=${subject}&body=${body}`;
-    setSent(true);
+    setStatus("sending");
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      const data = (await res.json()) as { success?: boolean; error?: string };
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error ?? "送信に失敗しました");
+      }
+
+      setStatus("success");
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage(err instanceof Error ? err.message : "送信に失敗しました");
+    }
   };
 
-  if (sent) {
+  if (status === "success") {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
-        <p className="text-sm font-medium text-[#0d2545] mb-2">メーラーが開きました</p>
+      <div className="bg-green-50 border border-green-200 rounded-lg p-10 text-center">
+        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <p className="text-base font-bold text-[#0d2545] mb-2">お問い合わせを受け付けました</p>
         <p className="text-sm text-gray-600 leading-loose">
-          入力内容がメーラーに反映されています。送信してお問い合わせください。
+          内容を確認のうえ、ご登録のメールアドレスへご連絡いたします。<br />
+          お問い合わせ内容によっては、回答までにお時間をいただく場合がございます。
         </p>
         <button
-          onClick={() => setSent(false)}
+          onClick={() => {
+            setStatus("idle");
+            setName("");
+            setEmail("");
+            setMessage("");
+          }}
           className="mt-6 text-sm text-blue-700 hover:underline"
         >
-          フォームに戻る
+          新しいお問い合わせをする
         </button>
       </div>
     );
@@ -46,7 +75,8 @@ export default function ContactForm() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition"
+          disabled={status === "sending"}
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition disabled:opacity-50"
           placeholder="山田 太郎"
         />
       </div>
@@ -61,7 +91,8 @@ export default function ContactForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition"
+          disabled={status === "sending"}
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition disabled:opacity-50"
           placeholder="example@email.com"
         />
       </div>
@@ -76,22 +107,25 @@ export default function ContactForm() {
           rows={6}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition resize-none"
+          disabled={status === "sending"}
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition resize-none disabled:opacity-50"
           placeholder="お問い合わせ内容をご記入ください"
         />
       </div>
 
+      {status === "error" && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          {errorMessage}
+        </p>
+      )}
+
       <button
         type="submit"
-        className="w-full bg-[#0d2545] text-white text-sm font-semibold py-3.5 rounded-lg hover:bg-[#142f5a] transition-colors"
+        disabled={status === "sending"}
+        className="w-full bg-[#0d2545] text-white text-sm font-semibold py-3.5 rounded-lg hover:bg-[#142f5a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        送信する
+        {status === "sending" ? "送信中..." : "送信する"}
       </button>
-
-      <p className="text-xs text-gray-400 text-center leading-loose">
-        送信ボタンを押すとメーラーが起動します。
-        ご利用のメールアプリから送信してください。
-      </p>
     </form>
   );
 }

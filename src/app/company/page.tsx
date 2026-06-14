@@ -56,9 +56,11 @@ const features = [
 
 const companyInfo = [
   { label: "会社名", value: "dokugaku link合同会社" },
-  { label: "英語名", value: "Dokugaku Link LLC" },
+  { label: "代表社員", value: "陣内 智徳" },
+  { label: "設立", value: "2025年10月27日" },
+  { label: "法人番号", value: "120003031128" },
   { label: "所在地", value: "〒530-0001\n大阪府大阪市北区梅田1-1-3" },
-  { label: "事業内容", value: "学習プラットフォーム事業\nウェルスコンサルティング事業" },
+  { label: "事業内容", value: "資格取得支援事業\nウェルスコンサルティング事業" },
   { label: "メール", value: "info@dokugakulink.com" },
 ];
 
@@ -83,16 +85,20 @@ export default function CompanyPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 md:divide-x divide-white/10 divide-y md:divide-y-0 border-y border-white/10">
             <div className="px-8 py-12 first:pl-0 last:pr-0">
               <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-4">Mission</p>
-              <p className="text-xl font-bold leading-relaxed">
-                時間やお金の制約によって<br />
-                学ぶ機会を失う人をなくす
+              <p className="text-lg font-bold leading-relaxed mb-3">
+                より良い意思決定を支援する仕組みをつくる
+              </p>
+              <p className="text-sm text-blue-100 leading-loose">
+                学習や資産形成など人生の重要な場面において、複雑な情報を整理し、より良い選択ができる仕組みを提供します。
               </p>
             </div>
             <div className="px-8 py-12">
               <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-4">Vision</p>
-              <p className="text-xl font-bold leading-relaxed">
-                学び続ける人が集まる<br />
-                最高の学習環境をつくる
+              <p className="text-lg font-bold leading-relaxed mb-3">
+                すべての人が、より賢く豊かな選択ができる社会を実現する
+              </p>
+              <p className="text-sm text-blue-100 leading-loose">
+                情報格差や経験の差によって選択肢が狭まることのない社会を目指し、学びと意思決定を支援するサービスを提供し続けます。
               </p>
             </div>
             <div className="px-8 py-12 first:pl-0 last:pr-0">
@@ -129,33 +135,64 @@ export default function CompanyPage() {
         </div>
       </section>
 
-      {/* 創業ストーリー */}
+      {/* 代表者略歴 */}
       <section className="py-20 md:py-28 border-b border-gray-100">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="md:col-span-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-2">Profile</p>
+              <h2 className="text-lg font-bold text-[#0d2545]">代表者略歴</h2>
+            </div>
+            <div className="md:col-span-3">
+              <div className="space-y-5 text-sm text-gray-700 leading-loose">
+                <p className="text-base font-bold text-[#0d2545]">代表社員　陣内 智徳</p>
+                <p>
+                  大阪経済法科大学卒業。
+                </p>
+                <p>
+                  金融機関にて新規出店支援および法人・個人向け営業業務に従事。その後、中堅企業にて事業企画業務を担当し、新規事業の立案や事業運営に携わる。
+                </p>
+                <p>
+                  不動産会社では売買事業および建設事業に従事し、不動産に関する実務経験を積む。
+                </p>
+                <p>
+                  資格学習における継続の難しさや、何を学習すべきか分からないという課題を解決するため、2025年にdokugaku link合同会社を設立。
+                </p>
+                <p>
+                  現在は資格取得支援サービス「ウカレル」の開発を進めるとともに、資産形成および不動産分野に関するコンサルティング事業を展開している。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ウカレル創業ストーリー */}
+      <section className="py-20 md:py-28 bg-[#f5f7fa] border-b border-gray-100">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div className="md:col-span-1">
               <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-2">Story</p>
-              <h2 className="text-lg font-bold text-[#0d2545]">創業ストーリー</h2>
+              <h2 className="text-lg font-bold text-[#0d2545]">なぜウカレルを作ったのか</h2>
             </div>
             <div className="md:col-span-3">
               <div className="space-y-5 text-sm text-gray-700 leading-loose">
                 <p>
-                  私はこれまで、金融機関・不動産業界・資産形成支援の現場で、
-                  人生を変えたいと思いながらも一歩踏み出せない人を数多く見てきた。
+                  金融機関・不動産会社・中堅企業での業務を通じ、資格取得を目指す人が途中で学習を止めてしまうケースを多く見てきました。
                 </p>
-                <p className="text-base font-semibold text-[#0d2545]">
-                  多くの人は能力がないのではない。<br />
-                  続けられる環境がない。学ぶ仕組みがない。
+                <p>その主な原因は3点です。</p>
+                <div className="space-y-1 pl-4">
+                  <p>・何を学べば合格に近づくか分からない</p>
+                  <p>・一度学んだ内容を定期的に復習する仕組みがない</p>
+                  <p>・仕事と並行した学習時間の確保が難しい</p>
+                </div>
+                <p>
+                  これらは意欲の問題ではなく、学習の仕組みが整っていないことが原因と考えます。
                 </p>
                 <p>
-                  そこで、テクノロジーを活用し、学び続ける人を支援する環境を作ろうと考えた。
+                  この課題を解決するため、何をいつ復習すべきかを自動で提案する学習支援アプリ「ウカレル」を開発しています。
                 </p>
-                <div className="border-l-4 border-[#0d2545] pl-5 py-2 mt-6">
-                  <p className="text-base font-bold text-[#0d2545]">
-                    それが、dokugaku link合同会社の始まりである。
-                  </p>
-                </div>
-                <p className="text-right text-gray-400 pt-4">dokugaku link合同会社 代表</p>
+                <p className="text-right text-gray-400 pt-4">dokugaku link合同会社 代表　陣内 智徳</p>
               </div>
             </div>
           </div>
@@ -314,7 +351,7 @@ export default function CompanyPage() {
                 <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">開発中</span>
                 <p className="text-sm font-bold text-[#0d2545] mt-4 mb-2">宅建試験 独学支援アプリ</p>
                 <p className="text-xs text-gray-600 leading-loose">
-                  忘れた頃にもう一度出題する間隔反復の仕組みと、学習継続を支援する体験設計で、
+                  忘れた頃に、また出題する仕組みと、学習継続を支援する体験設計で、
                   独学者の宅建合格率向上を目指すモバイルアプリ。
                 </p>
                 <div className="mt-4">

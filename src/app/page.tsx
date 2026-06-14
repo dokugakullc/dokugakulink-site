@@ -40,40 +40,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Mission */}
-      <section className="bg-white py-24 md:py-32">
-        <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Mission</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-12 leading-tight">
-              なぜ私たちは存在するのか
-            </h2>
-            <div className="space-y-8 text-gray-700 leading-loose text-base">
-              <p>
-                私たちは、「人生を変えたい」「もっと成長したい」と思いながらも、
-                挑戦を諦めてしまう人を数多く見てきました。
-              </p>
-              <div className="border-l-4 border-[#0d2545] pl-6 py-2">
-                <p className="text-xl md:text-2xl font-bold text-[#0d2545] leading-relaxed">
-                  時間がない。<br />
-                  お金がない。<br />
-                  続けられない。
-                </p>
-              </div>
-              <p className="text-lg font-semibold text-[#0d2545]">
-                問題は意志の弱さではありません。<br />
-                学び続けられる仕組みが存在しないことです。
-              </p>
-              <p>
-                私たちはテクノロジーによってその課題を解決します。
-                宅建・FP・行政書士・簿記など、キャリア形成に直結する資格の独学を支援し、
-                学び続ける人が集まる環境を作ります。
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Business */}
       <section className="bg-[#f5f7fa] py-24 md:py-32">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
@@ -84,28 +50,6 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white rounded-lg p-8 border border-gray-200 flex flex-col">
               <p className="text-xs font-mono text-gray-400 mb-4">01</p>
-              <h3 className="text-xl font-bold text-[#0d2545] mb-4 leading-snug">学習プラットフォーム事業</h3>
-              <p className="text-sm text-gray-600 leading-loose mb-6">
-                宅建・FP・行政書士・簿記など、キャリア形成に直結する資格の独学支援サービスを開発しています。
-                継続・復習・進捗可視化の3つで、独学者の合格率向上を目指します。
-              </p>
-              <ul className="text-sm text-gray-600 space-y-2 mb-8">
-                {["継続学習の仕組み化", "最適タイミングでの復習支援", "将来的にはオンライン予備校の実現へ"].map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span className="text-blue-600 mt-0.5 shrink-0">—</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-auto">
-                <Link href="/business#learning" className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-900 transition-colors">
-                  詳細を見る &rarr;
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-8 border border-gray-200 flex flex-col">
-              <p className="text-xs font-mono text-gray-400 mb-4">02</p>
               <h3 className="text-xl font-bold text-[#0d2545] mb-4 leading-snug">ウェルスコンサルティング事業</h3>
               <p className="text-sm text-gray-600 leading-loose mb-6">
                 資産家・地主・事業オーナーの意思決定を支援します。
@@ -125,7 +69,55 @@ export default function Home() {
                 </Link>
               </div>
             </div>
+
+            <div className="bg-white rounded-lg p-8 border border-gray-200 flex flex-col">
+              <p className="text-xs font-mono text-gray-400 mb-4">02</p>
+              <h3 className="text-xl font-bold text-[#0d2545] mb-4 leading-snug">資格取得支援事業</h3>
+              <p className="text-sm text-gray-600 leading-loose mb-6">
+                宅建・FP・行政書士・簿記など、キャリア形成に直結する資格の独学支援サービスを開発しています。
+                継続・復習・進捗可視化の3つで、独学者の合格率向上を目指します。
+              </p>
+              <ul className="text-sm text-gray-600 space-y-2 mb-8">
+                {["継続学習の仕組み化", "最適タイミングでの復習支援", "将来的にはオンライン予備校の実現へ"].map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5 shrink-0">—</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-auto">
+                <Link href="/business#learning" className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-900 transition-colors">
+                  詳細を見る &rarr;
+                </Link>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Mission */}
+      <section className="bg-white py-24 md:py-32">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8 max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Mission</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-8 leading-tight">
+            より良い意思決定を支援する仕組みをつくる
+          </h2>
+          <p className="text-gray-700 leading-loose text-base max-w-2xl">
+            私たちは、学習や資産形成など人生の重要な場面において、複雑な情報を整理し、より良い選択ができる仕組みを提供します。
+          </p>
+        </div>
+      </section>
+
+      {/* Vision */}
+      <section className="bg-[#f5f7fa] py-24 md:py-32">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Vision</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-8 leading-tight">
+            すべての人が、より賢く豊かな選択ができる社会を実現する
+          </h2>
+          <p className="text-gray-700 leading-loose text-base max-w-2xl">
+            情報格差や経験の差によって選択肢が狭まることのない社会を目指し、学びと意思決定を支援するサービスを提供し続けます。
+          </p>
         </div>
       </section>
 
@@ -142,11 +134,14 @@ export default function Home() {
                 </span>
                 <p className="text-xs font-semibold uppercase tracking-widest text-blue-700">Service</p>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-4 leading-tight">
-                宅建独学支援アプリ
+              <p className="text-xl font-bold text-[#0d2545] mb-2 leading-tight">ウカレル</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-2 leading-tight">
+                宅建独学を合格まで導く学習アプリ
               </h2>
-              <p className="text-lg font-bold text-[#0d2545] mb-6 italic">
-                「忘れた頃に、もう一度出題。」
+              <p className="text-sm text-gray-500 mb-2">現在開発中（2026年夏リリース予定）</p>
+              <p className="text-sm font-medium text-blue-700 mb-6">β版事前登録受付中</p>
+              <p className="text-base font-bold text-[#0d2545] mb-6 italic">
+                「忘れた頃に、また出題。」
               </p>
               <div className="space-y-2.5 mb-8">
                 {[
@@ -161,7 +156,7 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-sm text-gray-600 leading-loose mb-8">
-                科学的な間隔反復と学習継続支援の仕組みで、この3つの課題を解決します。
+                記憶定着の考え方として知られる間隔反復学習を参考に、復習タイミングを自動で提案。学習継続支援の仕組みで、この3つの課題を解決します。
               </p>
               <Link
                 href="/landing/takken"
@@ -196,7 +191,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-3">宅地建物取引士試験 独学支援アプリ</h3>
               <p className="text-blue-100 text-sm leading-loose mb-5">
-                「忘れた頃にもう一度出題する仕組み」と「学習継続を支援する体験設計」によって、
+                「忘れた頃に、また出題する仕組み」と「学習継続を支援する体験設計」によって、
                 独学での宅建合格率向上を目指しています。
               </p>
               <Link
@@ -233,7 +228,7 @@ export default function Home() {
                   {[
                     { icon: "↑", label: "学習継続率向上", sub: "続けられる仕組みで離脱率を下げる" },
                     { icon: "↑", label: "独学合格率向上", sub: "効率的な復習で短期合格を支援" },
-                    { icon: "↓", label: "資格学習コスト削減", sub: "予備校不要の独学支援" },
+                    { icon: "↓", label: "資格学習コスト削減", sub: "予備校に通わなくても学びやすい独学環境" },
                   ].map(({ icon, label, sub }) => (
                     <div key={label} className="flex items-start gap-3 bg-white/5 rounded-lg px-4 py-3">
                       <span className="text-blue-300 font-bold text-lg shrink-0 leading-none mt-0.5">{icon}</span>
@@ -312,30 +307,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Vision */}
-      <section className="bg-white py-24 md:py-32 border-t border-gray-100">
-        <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <div className="mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Vision</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545]">私たちが目指す未来</h2>
-          </div>
-          <p className="text-base md:text-lg text-gray-700 leading-loose max-w-2xl mb-16">
-            時間やお金など個人のリソースによって学ぶ機会を失う人をなくしたい。
-            私たちは以下の3つを通じて、学び続ける人が集まる環境を作ります。
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { number: "01", title: "教材", body: "質が高く、独学者のペースに合わせた宅建・FP・行政書士・簿記など資格学習コンテンツの開発・提供" },
-              { number: "02", title: "テクノロジー", body: "継続・復習・進捗可視化を実現する学習支援プラットフォーム" },
-              { number: "03", title: "コミュニティ", body: "同じ志を持つ学習者が繋がり、互いに刺激しあえる場の創出" },
-            ].map(({ number, title, body }) => (
-              <div key={number} className="border-t-2 border-[#0d2545] pt-6">
-                <p className="text-xs font-mono text-gray-400 mb-3">{number}</p>
-                <h3 className="text-lg font-bold text-[#0d2545] mb-3">{title}</h3>
-                <p className="text-sm text-gray-600 leading-loose">{body}</p>
-              </div>
-            ))}
-          </div>
+      {/* CTA */}
+      <section className="bg-white py-16 border-t border-gray-100">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8 text-center">
+          <p className="text-sm text-gray-600 mb-6">ご質問・ご相談はお気軽にどうぞ</p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center px-8 py-3.5 bg-[#0d2545] text-white text-sm font-semibold rounded hover:bg-[#142f5a] transition-colors"
+          >
+            お問い合わせ
+          </Link>
         </div>
       </section>
     </>

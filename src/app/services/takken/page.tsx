@@ -12,8 +12,8 @@ const features = [
   {
     number: "01",
     title: "間隔反復",
-    subtitle: "忘れた頃に、もう一度出題。",
-    body: "人間の記憶は時間とともに薄れていきます。忘れかけたタイミングで再出題することで、最小の時間で最大の定着を実現します。やみくもに反復するのではなく、科学的な間隔で学習を設計します。",
+    subtitle: "忘れた頃に、また出題。",
+    body: "人間の記憶は時間とともに薄れていきます。忘れかけたタイミングで再出題することで、最小の時間で最大の定着を実現します。記憶定着の考え方として知られる間隔反復学習を参考に、復習タイミングを自動で提案します。",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
@@ -63,12 +63,15 @@ export default function TakkenPage() {
             <span className="text-xs font-medium text-blue-300 border border-blue-400/40 px-3 py-1 rounded-full">開発中</span>
             <p className="text-xs font-semibold uppercase tracking-widest text-blue-300">Service</p>
           </div>
-          <p className="text-lg md:text-xl font-bold text-blue-200 mb-4">宅地建物取引士試験 独学支援アプリ</p>
+          <p className="text-2xl font-bold text-white mb-1">ウカレル</p>
+          <p className="text-base md:text-lg font-medium text-blue-200 mb-4">宅建独学を合格まで導く学習アプリ</p>
+          <p className="text-sm text-blue-300 mb-1">現在開発中（2026年夏リリース予定）</p>
+          <p className="text-sm font-medium text-blue-300 mb-8">β版事前登録受付中</p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-8">
-            忘れた頃に、<br />もう一度出題。
+            忘れた頃に、<br />また出題。
           </h1>
           <p className="text-blue-100 text-base md:text-lg max-w-xl leading-loose">
-            間隔反復・理解度分析・学習継続支援の3つで、
+            間隔反復学習を参考にした復習支援・理解度分析・学習継続支援の3つで、
             宅建独学合格を目指すすべての人を支援します。
           </p>
         </div>
@@ -89,7 +92,7 @@ export default function TakkenPage() {
                 問題は能力ではありません。<strong className="text-[#0d2545]">仕組みがないことです。</strong>
               </p>
               <p>
-                科学的な間隔反復アルゴリズムと、独学者のリアルな課題に向き合った体験設計で、
+                記憶定着の考え方として知られる間隔反復学習を参考にした復習タイミングの自動提案と、独学者のリアルな課題に向き合った体験設計で、
                 「続けられる」宅建独学支援アプリを開発しています。
               </p>
             </div>
@@ -110,7 +113,8 @@ export default function TakkenPage() {
               <HomeScreen />
               <div className="text-center">
                 <p className="text-xs font-semibold text-[#0d2545]">ホーム</p>
-                <p className="text-[11px] text-gray-500 mt-0.5">学習状況・合格予測</p>
+                <p className="text-[11px] text-gray-500 mt-0.5">学習状況・合格可能性の参考指標</p>
+                <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">※表示数値は学習状況をもとに算出した参考指標です。実際の試験結果を保証するものではありません。</p>
               </div>
             </div>
             <div className="space-y-3">
@@ -160,7 +164,7 @@ export default function TakkenPage() {
                 <strong className="text-[#0d2545]">仕組みの不在</strong>です。
               </p>
               <p>
-                私たちは「忘れた頃にもう一度出題する」という考え方を軸に、
+                私たちは「忘れた頃に、また出題する」という考え方を軸に、
                 独学者の継続学習を支援するアプリを作っています。
               </p>
             </div>
@@ -317,7 +321,7 @@ export default function TakkenPage() {
           </p>
           <h2 className="text-2xl font-bold mb-4">宅建独学支援アプリ</h2>
           <p className="text-blue-100 text-sm leading-loose mb-8 max-w-md mx-auto">
-            「忘れた頃にもう一度出題する」間隔反復で、独学合格を支援します。
+            「忘れた頃に、また出題する」仕組みで、独学合格を目指す学習継続を支援します。
           </p>
           <Link
             href="/landing/takken"

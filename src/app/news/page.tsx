@@ -66,10 +66,11 @@ export default function NewsPage() {
                   開発中
                 </span>
               </div>
-              <p className="text-sm font-bold text-[#0d2545] mb-2">宅地建物取引士試験 独学支援アプリ</p>
+              <p className="text-sm font-bold text-[#0d2545] mb-1">ウカレル</p>
+              <p className="text-sm font-bold text-[#0d2545] mb-2">宅建独学を合格まで導く学習アプリ</p>
               <p className="text-sm text-gray-600 leading-loose mb-5">
-                「忘れた頃にもう一度出題する」間隔反復の仕組みと継続学習支援で、
-                独学での宅建合格率向上を目指しています。
+                「忘れた頃に、また出題する」仕組みと継続学習支援で、
+                独学での宅建合格率向上を目指しています。現在開発中（2026年夏リリース予定）。
               </p>
               <Link
                 href="/landing/takken"

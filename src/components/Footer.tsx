@@ -22,8 +22,8 @@ export default function Footer() {
             <div className="mt-5 border-l-2 border-blue-400/40 pl-4">
               <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-1">Mission</p>
               <p className="text-sm text-blue-100 leading-loose">
-                時間やお金の制約によって<br />
-                学ぶ機会を失う人をなくす
+                より良い意思決定を支援する<br />
+                仕組みをつくる
               </p>
             </div>
           </div>
