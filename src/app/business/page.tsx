@@ -120,7 +120,7 @@ export default function BusinessPage() {
                 <h3 className="text-sm font-bold text-[#0d2545] uppercase tracking-wider mb-5">
                   サービスの流れ
                 </h3>
-                <div className="flex flex-wrap gap-0 items-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
                     "お問い合わせ",
                     "ヒアリング",
@@ -129,14 +129,12 @@ export default function BusinessPage() {
                     "調査・分析",
                     "成果物提出",
                     "納品",
-                  ].map((step, i, arr) => (
-                    <div key={step} className="flex items-center gap-0">
-                      <div className="bg-[#f5f7fa] border border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-[#0d2545]">
-                        {step}
-                      </div>
-                      {i < arr.length - 1 && (
-                        <span className="text-gray-300 text-lg px-2">→</span>
-                      )}
+                  ].map((step, i) => (
+                    <div key={step} className="border border-gray-200 rounded-lg bg-white px-5 py-4">
+                      <p className="text-xs font-mono text-blue-700 mb-2">
+                        {String(i + 1).padStart(2, "0")}
+                      </p>
+                      <p className="text-sm font-bold text-[#0d2545]">{step}</p>
                     </div>
                   ))}
                 </div>
