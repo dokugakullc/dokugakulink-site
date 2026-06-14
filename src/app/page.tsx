@@ -7,21 +7,16 @@ export default function Home() {
       {/* Hero */}
       <section className="bg-[#0d2545] text-white">
         <div className="mx-auto max-w-6xl px-6 lg:px-8 py-32 md:py-44">
-          <div className="flex flex-wrap items-center gap-3 mb-8">
-            <p className="text-xs font-semibold tracking-widest text-blue-300 uppercase">
-              dokugaku link
-            </p>
-            <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white text-xs font-medium px-3 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-              開発中 — 宅建独学支援アプリ
-            </span>
-          </div>
+          <p className="text-xs font-semibold tracking-widest text-blue-300 uppercase mb-8">
+            dokugaku link合同会社
+          </p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6">
-            独学合格を、<br />
-            仕組みで実現する。
+            より良い意思決定を支援する<br />
+            仕組みをつくる
           </h1>
           <p className="mt-8 text-blue-100 text-base md:text-lg leading-loose max-w-xl">
-            dokugaku linkは、学び続ける人のために、資格学習プラットフォームとウェルスコンサルティングを提供する会社です。
+            資格取得支援と不動産・資産形成コンサルティングを通じて、<br />
+            個人と企業のより良い意思決定を支援しています。
           </p>
           <div className="mt-12 flex flex-wrap gap-4">
             <Link
@@ -34,7 +29,7 @@ export default function Home() {
               href="/company"
               className="inline-flex items-center px-7 py-3.5 border border-white/30 text-white text-sm font-semibold rounded hover:bg-white/10 transition-colors"
             >
-              会社について
+              会社概要を見る
             </Link>
           </div>
         </div>
@@ -167,7 +162,7 @@ export default function Home() {
             </div>
 
             {/* モックアップ */}
-            <div className="flex items-start justify-center gap-4 md:gap-6 overflow-hidden">
+            <div className="flex items-start justify-center gap-4 md:gap-6 py-4">
               <HomeScreen />
               <div className="mt-12 hidden sm:block">
                 <ProblemScreen />

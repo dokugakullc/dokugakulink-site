@@ -131,7 +131,7 @@ export default function AppStoreCarousel() {
             }`}
           >
             {/* Gradient top */}
-            <div className={`bg-gradient-to-b ${accentClass} flex flex-col items-center pt-4 pb-0 px-4`}>
+            <div className={`bg-gradient-to-b ${accentClass} flex flex-col items-center pt-4 pb-4 px-4`}>
               {/* Badge + Stat row */}
               <div className="flex items-start justify-between w-full mb-3">
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${badgeClass}`}>

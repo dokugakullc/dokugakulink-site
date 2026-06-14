@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 function PhoneFrame({ children }: { children: ReactNode }) {
   return (
     <div className="relative mx-auto w-[200px] shrink-0">
-      <div className="bg-gray-900 rounded-[40px] border-[5px] border-gray-800 shadow-2xl">
+      <div className="bg-gray-900 rounded-[40px] border-[5px] border-gray-800 shadow-2xl overflow-hidden">
         <div className="flex justify-center pt-3 bg-gray-900">
           <div className="w-16 h-[14px] bg-black rounded-full" />
         </div>
