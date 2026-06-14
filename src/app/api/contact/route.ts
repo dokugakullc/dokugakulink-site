@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "お問い合わせ内容を入力してください" }, { status: 400 });
   }
 
-  const webhookUrl = process.env.CONTACT_WEBHOOK_URL;
+  const webhookUrl = process.env.CONTACT_WEBHOOK_URL || process.env.GAS_WEBHOOK_URL;
   if (!webhookUrl) {
-    console.error("CONTACT_WEBHOOK_URL is not configured");
+    console.error("CONTACT_WEBHOOK_URL / GAS_WEBHOOK_URL is not configured");
     return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
   }
 
