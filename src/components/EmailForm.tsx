@@ -23,7 +23,6 @@ interface EmailFormProps {
 export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFormProps) {
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState<ProblemValue | "">("");
-  const [showProblems, setShowProblems] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -155,7 +154,7 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* ① メールアドレス（必須・最初） */}
+      {/* ① メールアドレス */}
       <div>
         <input
           type="email"
@@ -164,64 +163,42 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
           placeholder="メールアドレスを入力"
           required
           disabled={status === "loading"}
-          className="w-full px-4 py-3.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
+          className="w-full px-4 py-[18px] rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 text-base focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
         />
       </div>
 
-      {/* ② 悩み選択（任意・折りたたみ） */}
+      {/* ② 悩みカード選択（常時表示） */}
       <div>
-        <button
-          type="button"
-          onClick={() => setShowProblems((v) => !v)}
-          disabled={status === "loading"}
-          className="flex items-center gap-2 text-white/50 text-xs hover:text-white/70 transition-colors disabled:opacity-50"
-        >
-          <span
-            className={`transition-transform duration-200 ${showProblems ? "rotate-90" : ""}`}
-          >
-            ▶
-          </span>
-          今一番困っていること（任意）
-          {problem && (
-            <span className="ml-1 bg-white/10 text-white/80 text-[10px] px-2 py-0.5 rounded-full">
-              選択済み
-            </span>
-          )}
-        </button>
-
-        {showProblems && (
-          <div className="mt-2 grid grid-cols-1 gap-1.5">
-            {PROBLEMS.map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                disabled={status === "loading"}
-                onClick={() => setProblem(problem === value ? "" : value)}
-                className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-lg text-sm text-left font-medium border transition-colors disabled:opacity-50 ${
-                  problem === value
-                    ? "bg-white text-[#0d2545] border-white"
-                    : "bg-white/5 text-white/70 border-white/15 hover:border-white/35"
-                }`}
-              >
-                <span
-                  className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 flex items-center justify-center ${
-                    problem === value ? "border-[#0d2545] bg-[#0d2545]" : "border-white/40"
-                  }`}
-                >
-                  {problem === value && <span className="w-1.5 h-1.5 rounded-full bg-white block" />}
-                </span>
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
+        <p className="text-white/40 text-xs mb-2.5">今一番困っていること（任意）</p>
+        <div className="grid grid-cols-1 gap-2">
+          {PROBLEMS.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              disabled={status === "loading"}
+              onClick={() => setProblem(problem === value ? "" : value)}
+              className={`flex items-center gap-3 w-full px-4 py-3.5 rounded-xl text-sm text-left font-medium border transition-all disabled:opacity-50 ${
+                problem === value
+                  ? "bg-[#007AFF] border-[#007AFF] text-white"
+                  : "bg-white/5 text-white/60 border-white/10 hover:border-white/30 hover:bg-white/10"
+              }`}
+            >
+              <span className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
+                problem === value ? "border-white bg-white" : "border-white/30"
+              }`}>
+                {problem === value && <span className="w-2 h-2 rounded-full bg-[#007AFF] block" />}
+              </span>
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ③ 送信ボタン */}
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full py-4 bg-white text-[#0d2545] text-sm font-bold rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-60"
+        className="w-full py-[18px] bg-white text-[#0d2545] text-base font-bold rounded-xl hover:bg-blue-50 transition-colors disabled:opacity-60"
       >
         {status === "loading" ? "送信中..." : "無料でβ版に参加する →"}
       </button>

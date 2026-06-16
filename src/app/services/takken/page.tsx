@@ -61,6 +61,10 @@ export default function TakkenPage() {
                     </div>
                     <div className="hp2-cnt">今日の10問</div>
                   </div>
+                  {/* iOS home indicator */}
+                  <div style={{textAlign:'center',padding:'10px 0 5px'}}>
+                    <div style={{width:'88px',height:'4px',background:'rgba(0,0,0,.12)',borderRadius:'2px',display:'inline-block'}}></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -190,14 +194,14 @@ export default function TakkenPage() {
             <p className="bar-chart-ttl">宅建試験 50問の内訳</p>
             <div className="bi">
               <div className="bi-top">
-                <span className="bi-lbl">ほとんどの受験生が取れる問題</span>
+                <span className="bi-lbl">基礎問題</span>
                 <span className="bi-num">約20〜25問</span>
               </div>
               <div className="bar-track"><div className="bar-fill c-b" style={{width:'50%'}}></div></div>
             </div>
             <div className="bi">
               <div className="bi-top">
-                <span className="bi-lbl">合否を分ける問題</span>
+                <span className="bi-lbl">応用問題</span>
                 <span className="bi-num">約10〜15問</span>
               </div>
               <div className="bar-track"><div className="bar-fill c-s" style={{width:'28%'}}></div></div>
@@ -215,46 +219,25 @@ export default function TakkenPage() {
             </div>
           </div>
 
-          <div className="math-viz">
-            <div className="math-box">
-              <div className="math-num">20〜25問</div>
-              <div className="math-sub">ほとんどが取れる</div>
+          {/* 積み上げフロー: 基礎 → 応用 → 合格ライン */}
+          <div style={{maxWidth:'320px',margin:'0 auto 44px',textAlign:'center'}}>
+            <div style={{background:'var(--blue-s)',border:'2px solid var(--blue)',borderRadius:'16px',padding:'18px 20px'}}>
+              <div style={{fontSize:'11px',fontWeight:'700',color:'var(--blue)',letterSpacing:'.07em',marginBottom:'4px'}}>基礎問題</div>
+              <div style={{fontSize:'24px',fontWeight:'800',color:'var(--text)',letterSpacing:'-.02em'}}>20〜25問</div>
+              <div style={{fontSize:'11px',color:'var(--t2)',marginTop:'4px'}}>誰でも取るべき問題</div>
             </div>
-            <div className="math-op">+</div>
-            <div className="math-box">
-              <div className="math-num">10〜15問</div>
-              <div className="math-sub">合否を分ける</div>
+            <div style={{fontSize:'22px',color:'var(--t3)',lineHeight:'1.5',padding:'4px 0'}}>↓</div>
+            <div style={{background:'rgba(90,200,250,.1)',border:'2px solid #5AC8FA',borderRadius:'16px',padding:'18px 20px'}}>
+              <div style={{fontSize:'11px',fontWeight:'700',color:'#0080AA',letterSpacing:'.07em',marginBottom:'4px'}}>応用問題</div>
+              <div style={{fontSize:'24px',fontWeight:'800',color:'var(--text)',letterSpacing:'-.02em'}}>10〜15問</div>
+              <div style={{fontSize:'11px',color:'var(--t2)',marginTop:'4px'}}>理解している人だけ取れる問題</div>
             </div>
-            <div className="math-op">=</div>
-            <div className="math-box eq">
-              <div className="math-num">35〜40問</div>
-              <div className="math-sub">合格点レンジ</div>
-            </div>
-          </div>
-
-          {/* フローチャート */}
-          <div style={{maxWidth:'360px',margin:'0 auto 44px',textAlign:'center'}}>
-            <div style={{display:'flex',alignItems:'center',gap:'10px',justifyContent:'center',marginBottom:'0'}}>
-              <div style={{flex:'1',background:'var(--blue-s)',border:'2px solid var(--blue)',borderRadius:'14px',padding:'16px 12px'}}>
-                <div style={{fontSize:'11px',fontWeight:'700',color:'var(--blue)',letterSpacing:'.06em',marginBottom:'5px'}}>定番問題</div>
-                <div style={{fontSize:'22px',fontWeight:'800',color:'var(--text)',letterSpacing:'-.02em'}}>20〜25問</div>
-              </div>
-              <div style={{fontSize:'22px',color:'var(--t2)',fontWeight:'700',flexShrink:0}}>＋</div>
-              <div style={{flex:'1',background:'rgba(90,200,250,.1)',border:'2px solid #5AC8FA',borderRadius:'14px',padding:'16px 12px'}}>
-                <div style={{fontSize:'11px',fontWeight:'700',color:'#0080AA',letterSpacing:'.06em',marginBottom:'5px'}}>合否を分ける問題</div>
-                <div style={{fontSize:'22px',fontWeight:'800',color:'var(--text)',letterSpacing:'-.02em'}}>10〜15問</div>
-              </div>
-            </div>
-            <div style={{fontSize:'24px',color:'var(--t2)',lineHeight:'1.4',padding:'4px 0'}}>↓</div>
-            <div style={{background:'var(--blue)',borderRadius:'14px',padding:'16px 28px',marginBottom:'0'}}>
-              <div style={{fontSize:'26px',fontWeight:'800',color:'#fff',letterSpacing:'-.02em'}}>35〜40問</div>
-            </div>
-            <div style={{fontSize:'24px',color:'var(--t2)',lineHeight:'1.4',padding:'4px 0'}}>↓</div>
-            <div style={{background:'var(--green)',borderRadius:'14px',padding:'16px 28px'}}>
-              <div style={{fontSize:'11px',fontWeight:'700',color:'rgba(255,255,255,.8)',letterSpacing:'.06em',marginBottom:'5px'}}>近年の合格点</div>
+            <div style={{fontSize:'22px',color:'var(--t3)',lineHeight:'1.5',padding:'4px 0'}}>↓</div>
+            <div style={{background:'var(--green)',borderRadius:'16px',padding:'18px 20px'}}>
+              <div style={{fontSize:'11px',fontWeight:'700',color:'rgba(255,255,255,.8)',letterSpacing:'.07em',marginBottom:'4px'}}>合格ライン</div>
               <div style={{fontSize:'26px',fontWeight:'800',color:'#fff',letterSpacing:'-.02em'}}>34〜38点</div>
+              <div style={{fontSize:'11px',color:'rgba(255,255,255,.7)',marginTop:'4px'}}>積み上げれば届きます</div>
             </div>
-            <p style={{fontSize:'14px',color:'var(--t2)',marginTop:'14px',fontWeight:'600',lineHeight:'1.7'}}>定番問題と合否を分ける問題を取れば<br />合格圏内が見えてくる</p>
           </div>
 
           <p className="ess-close" style={{textAlign:'center'}}>
@@ -388,7 +371,7 @@ export default function TakkenPage() {
             これらは無料で確認できます。<br />私たちは分析機能を課金で隠しません。
           </p>
           <div className="pay-box">
-            <div className="pay-box-lbl">課金で解放されるのは</div>
+            <div className="pay-box-lbl">有料プランで解放されるのは</div>
             <div className="pay-box-text">より多く学習する<em>権利</em>です。</div>
           </div>
           <div className="phone">
@@ -440,6 +423,9 @@ export default function TakkenPage() {
             <div className="vol-lbl">昨年の合格者平均</div>
             <div className="vol-num">800<span className="vol-unit">〜</span>1,200<span className="vol-unit">問</span></div>
             <div className="vol-note">合格に必要な学習量の目安</div>
+            <div style={{marginTop:'14px',paddingTop:'14px',borderTop:'1px solid var(--bd)',fontSize:'13px',color:'var(--t2)',lineHeight:'1.75',textAlign:'left'}}>
+              近年の合格者は過去問を中心に800〜1,200問程度解いているケースが多く見られます。
+            </div>
           </div>
           <p className="vol-body">
             ウカレルは<br />
@@ -515,13 +501,12 @@ export default function TakkenPage() {
               毎年出題される重要論点と合否を分ける論点を<br />
               確実に取れば、十分に合格を目指せます。
             </p>
-            <p style={{color:'var(--text)',marginBottom:'28px'}}>
+            <p style={{color:'var(--text)',marginBottom:'0'}}>
               だからウカレルは<br />
               問題数No.1ではなく<br />
               <strong style={{color:'var(--blue)'}}>「何を勉強すれば受かるか分かる」</strong><br />
               ことを目指して開発しています。
             </p>
-            <p style={{fontSize:'14px',color:'var(--t2)',textAlign:'right'}}>ウカレル 開発者</p>
           </div>
         </div>
       </section>
@@ -535,7 +520,7 @@ export default function TakkenPage() {
           <p style={{margin:'0 auto 40px',maxWidth:'480px',color:'rgba(255,255,255,.5)',fontSize:'17px',lineHeight:'1.7'}}>
             メールアドレスを登録するだけ。<br />スパムは送りません。いつでも解除できます。
           </p>
-          <div style={{maxWidth:'480px',margin:'0 auto'}}>
+          <div style={{maxWidth:'480px',margin:'0 auto',background:'#141414',borderRadius:'24px',padding:'36px 32px',boxShadow:'0 24px 64px rgba(0,0,0,.56)'}}>
             <EmailForm source="services_takken" />
           </div>
         </div>
