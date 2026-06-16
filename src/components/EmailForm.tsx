@@ -4,11 +4,11 @@ import { sendGAEvent } from "@/lib/gtag";
 
 // Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
-  { value: "continue", label: "続かない" },
-  { value: "forget", label: "忘れる" },
-  { value: "roadmap", label: "何を勉強すればいいか分からない" },
-  { value: "growth", label: "点数が伸びない" },
-  { value: "motivation", label: "モチベーションが続かない" },
+  { value: "continue", label: "続かない", icon: "😓" },
+  { value: "forget", label: "忘れる", icon: "🧠" },
+  { value: "roadmap", label: "何を勉強すればいいか分からない", icon: "📚" },
+  { value: "growth", label: "点数が伸びない", icon: "📉" },
+  { value: "motivation", label: "モチベーションが続かない", icon: "🔥" },
 ] as const;
 
 type ProblemValue = typeof PROBLEMS[number]["value"];
@@ -171,24 +171,25 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
       <div>
         <p className="text-white/40 text-xs mb-2.5">今一番困っていること（任意）</p>
         <div className="grid grid-cols-1 gap-2">
-          {PROBLEMS.map(({ value, label }) => (
+          {PROBLEMS.map(({ value, label, icon }) => (
             <button
               key={value}
               type="button"
               disabled={status === "loading"}
               onClick={() => setProblem(problem === value ? "" : value)}
-              className={`flex items-center gap-3 w-full px-4 py-3.5 rounded-xl text-sm text-left font-medium border transition-all disabled:opacity-50 ${
+              className={`flex items-center gap-3 w-full px-4 py-4 rounded-xl text-sm text-left font-medium border transition-all disabled:opacity-50 ${
                 problem === value
                   ? "bg-[#007AFF] border-[#007AFF] text-white"
-                  : "bg-white/5 text-white/60 border-white/10 hover:border-white/30 hover:bg-white/10"
+                  : "bg-white/5 text-white/60 border-white/10 hover:border-[#007AFF]/40 hover:bg-white/[.12]"
               }`}
             >
+              <span className="text-base shrink-0">{icon}</span>
+              <span className="flex-1">{label}</span>
               <span className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
                 problem === value ? "border-white bg-white" : "border-white/30"
               }`}>
                 {problem === value && <span className="w-2 h-2 rounded-full bg-[#007AFF] block" />}
               </span>
-              {label}
             </button>
           ))}
         </div>

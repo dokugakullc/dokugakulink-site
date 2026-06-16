@@ -62,10 +62,10 @@
 /* Hero Phone Frames — iPhone-like ratio (narrow + tall) */
 .lp-root .hero-mocks { display: flex; flex-direction: column; gap: 10px; width: 266px; }
 .lp-root .hero-mocks .hphone:nth-child(2n) { margin-left: 0; }
-.lp-root .hphone { background: #1C1C1E; border-radius: 42px; padding: 10px 8px 18px; box-shadow: 0 24px 60px rgba(0,0,0,.46); width: 254px; min-height: 430px; display: flex; flex-direction: column; }
+.lp-root .hphone { background: #1C1C1E; border-radius: 38px; padding: 6px 6px 12px; box-shadow: 0 24px 60px rgba(0,0,0,.46); width: 254px; min-height: 500px; display: flex; flex-direction: column; }
 /* Divider within combined phone body */
 .lp-root .hp-divider { font-size: 10px; font-weight: 700; color: var(--t2); letter-spacing: .04em; margin: 10px 0 8px; padding-top: 8px; border-top: 1px solid var(--bd); }
-.lp-root .hphone-s { background: #F2F2F7; border-radius: 34px; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
+.lp-root .hphone-s { background: #F2F2F7; border-radius: 32px; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
 .lp-root .hphone-top { background: #fff; padding: 7px 14px 4px; display: flex; justify-content: space-between; align-items: center; }
 .lp-root .hphone-time { font-size: 11px; font-weight: 700; color: var(--text); }
 .lp-root .hphone-nav { background: #fff; border-bottom: 1px solid var(--bd); padding: 5px 13px 7px; text-align: center; }
@@ -86,6 +86,15 @@
 /* 試験まで◯日 — tertiary context */
 .lp-root .hp-days { display: flex; align-items: baseline; gap: 5px; margin-bottom: 6px; }
 .lp-root .hp-days-val { font-size: 13px; font-weight: 700; color: var(--t2); }
+/* Mini 2-column info cards */
+.lp-root .hp-mini-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 6px; }
+.lp-root .hp-mini-card { background: #fff; border-radius: 8px; padding: 7px 9px; }
+.lp-root .hp-mini-lbl { font-size: 9px; font-weight: 600; color: var(--t2); letter-spacing: .03em; margin-bottom: 2px; }
+.lp-root .hp-mini-val { font-size: 13px; font-weight: 800; color: var(--text); line-height: 1; }
+/* 苦手カテゴリ warning card */
+.lp-root .hp-weak-card { background: rgba(255,149,0,.08); border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.lp-root .hp-weak-lbl { font-size: 9px; font-weight: 600; color: var(--amber); letter-spacing: .03em; }
+.lp-root .hp-weak-val { font-size: 12px; font-weight: 700; color: var(--text); }
 
 /* Phone 2: 今日やるべき問題 */
 .lp-root .hp2-subj { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 8px; }

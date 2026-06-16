@@ -35,7 +35,6 @@ export default function TakkenPage() {
                   </div>
                   <div className="hphone-nav"><div className="hphone-nav-t">現在地</div></div>
                   <div className="hphone-bd">
-                    {/* 推定得点: secondary reference */}
                     <div className="hp-lbl">推定得点</div>
                     <div className="hp-score-sm">31<span className="hp1-denom"> / 50点</span></div>
                     <div className="hp1-track"><div className="hp1-fill" style={{width:'62%'}}></div></div>
@@ -44,13 +43,22 @@ export default function TakkenPage() {
                       <span className="hp-dist-lbl">合格圏まで</span>
                       <span className="hp-dist-val">あと5点</span>
                     </div>
-                    {/* 試験まで: tertiary context */}
-                    <div className="hp-days">
-                      <span className="hp-dist-lbl">試験まで</span>
-                      <span className="hp-days-val">126日</span>
+                    {/* Mini cards: 理解度 + 試験まで */}
+                    <div className="hp-mini-row">
+                      <div className="hp-mini-card">
+                        <div className="hp-mini-lbl">理解度</div>
+                        <div className="hp-mini-val">67%</div>
+                      </div>
+                      <div className="hp-mini-card">
+                        <div className="hp-mini-lbl">試験まで</div>
+                        <div className="hp-mini-val">126日</div>
+                      </div>
                     </div>
-                    {/* 将来実装: 合格可能性 */}
-                    {/* <div className="hp-prob"><span className="hp-dist-lbl">合格可能性</span><span className="hp-dist-val">72%</span></div> */}
+                    {/* 苦手カテゴリ */}
+                    <div className="hp-weak-card">
+                      <div className="hp-weak-lbl">苦手カテゴリ</div>
+                      <div className="hp-weak-val">権利関係</div>
+                    </div>
                     <div className="hp-divider">今日やるべき問題</div>
                     <div className="hp2-subj">
                       <div className="hp2-dot"></div>
@@ -219,26 +227,35 @@ export default function TakkenPage() {
             </div>
           </div>
 
-          {/* 積み上げフロー: 基礎 → 応用 → 合格ライン */}
-          <div style={{maxWidth:'320px',margin:'0 auto 44px',textAlign:'center'}}>
-            <div style={{background:'var(--blue-s)',border:'2px solid var(--blue)',borderRadius:'16px',padding:'18px 20px'}}>
+          {/* 積み上げフロー: 基礎 → 応用 → 合計得点 → 合格ライン */}
+          <div style={{maxWidth:'320px',margin:'0 auto 16px',textAlign:'center'}}>
+            <div style={{background:'var(--blue-s)',border:'2px solid var(--blue)',borderRadius:'16px',padding:'16px 20px'}}>
               <div style={{fontSize:'11px',fontWeight:'700',color:'var(--blue)',letterSpacing:'.07em',marginBottom:'4px'}}>基礎問題</div>
               <div style={{fontSize:'24px',fontWeight:'800',color:'var(--text)',letterSpacing:'-.02em'}}>20〜25問</div>
               <div style={{fontSize:'11px',color:'var(--t2)',marginTop:'4px'}}>誰でも取るべき問題</div>
             </div>
-            <div style={{fontSize:'22px',color:'var(--t3)',lineHeight:'1.5',padding:'4px 0'}}>↓</div>
-            <div style={{background:'rgba(90,200,250,.1)',border:'2px solid #5AC8FA',borderRadius:'16px',padding:'18px 20px'}}>
+            <div style={{fontSize:'22px',color:'var(--t3)',lineHeight:'1.4',padding:'2px 0'}}>↓</div>
+            <div style={{background:'rgba(90,200,250,.1)',border:'2px solid #5AC8FA',borderRadius:'16px',padding:'16px 20px'}}>
               <div style={{fontSize:'11px',fontWeight:'700',color:'#0080AA',letterSpacing:'.07em',marginBottom:'4px'}}>応用問題</div>
               <div style={{fontSize:'24px',fontWeight:'800',color:'var(--text)',letterSpacing:'-.02em'}}>10〜15問</div>
               <div style={{fontSize:'11px',color:'var(--t2)',marginTop:'4px'}}>理解している人だけ取れる問題</div>
             </div>
-            <div style={{fontSize:'22px',color:'var(--t3)',lineHeight:'1.5',padding:'4px 0'}}>↓</div>
-            <div style={{background:'var(--green)',borderRadius:'16px',padding:'18px 20px'}}>
-              <div style={{fontSize:'11px',fontWeight:'700',color:'rgba(255,255,255,.8)',letterSpacing:'.07em',marginBottom:'4px'}}>合格ライン</div>
+            <div style={{fontSize:'22px',color:'var(--t3)',lineHeight:'1.4',padding:'2px 0'}}>↓</div>
+            <div style={{background:'var(--bg2)',border:'2px solid var(--bd)',borderRadius:'16px',padding:'16px 20px'}}>
+              <div style={{fontSize:'11px',fontWeight:'700',color:'var(--t2)',letterSpacing:'.07em',marginBottom:'4px'}}>合計得点目安</div>
+              <div style={{fontSize:'24px',fontWeight:'800',color:'var(--text)',letterSpacing:'-.02em'}}>35〜40点</div>
+              <div style={{fontSize:'11px',color:'var(--t2)',marginTop:'4px'}}>基礎 + 応用の積み上げ</div>
+            </div>
+            <div style={{fontSize:'22px',color:'var(--t3)',lineHeight:'1.4',padding:'2px 0'}}>↓</div>
+            <div style={{background:'var(--green)',borderRadius:'16px',padding:'16px 20px'}}>
+              <div style={{fontSize:'11px',fontWeight:'700',color:'rgba(255,255,255,.8)',letterSpacing:'.07em',marginBottom:'4px'}}>近年の合格ライン</div>
               <div style={{fontSize:'26px',fontWeight:'800',color:'#fff',letterSpacing:'-.02em'}}>34〜38点</div>
               <div style={{fontSize:'11px',color:'rgba(255,255,255,.7)',marginTop:'4px'}}>積み上げれば届きます</div>
             </div>
           </div>
+          <p style={{textAlign:'center',fontSize:'14px',color:'var(--t2)',lineHeight:'1.75',maxWidth:'320px',margin:'0 auto 44px'}}>
+            基礎問題だけでは足りません。<br />応用問題まで取れると合格圏に入ります。
+          </p>
 
           <p className="ess-close" style={{textAlign:'center'}}>
             難問を追いかける必要はありません。<br /><br />
@@ -372,7 +389,7 @@ export default function TakkenPage() {
           </p>
           <div className="pay-box">
             <div className="pay-box-lbl">有料プランで解放されるのは</div>
-            <div className="pay-box-text">より多く学習する<em>権利</em>です。</div>
+            <div className="pay-box-text">学習量の上限です。</div>
           </div>
           <div className="phone">
             <div className="p-screen">
@@ -425,6 +442,7 @@ export default function TakkenPage() {
             <div className="vol-note">合格に必要な学習量の目安</div>
             <div style={{marginTop:'14px',paddingTop:'14px',borderTop:'1px solid var(--bd)',fontSize:'13px',color:'var(--t2)',lineHeight:'1.75',textAlign:'left'}}>
               近年の合格者は過去問を中心に800〜1,200問程度解いているケースが多く見られます。
+              <div style={{marginTop:'8px',fontSize:'12px',color:'var(--t3)'}}>※個人差があります</div>
             </div>
           </div>
           <p className="vol-body">
