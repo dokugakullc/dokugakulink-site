@@ -75,7 +75,7 @@ export default async function NewsDetailPage({ params }: Props) {
             </Link>
             {article.tag === "開発中" && (
               <Link
-                href="/landing/takken"
+                href="/services/takken"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#0d2545] text-white text-sm font-semibold rounded-lg hover:bg-[#142f5a] transition-colors"
               >
                 リリース通知を受け取る

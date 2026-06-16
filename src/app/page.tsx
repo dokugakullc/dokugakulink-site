@@ -154,7 +154,7 @@ export default function Home() {
                 記憶定着の考え方として知られる間隔反復学習を参考に、復習タイミングを自動で提案。学習継続支援の仕組みで、この3つの課題を解決します。
               </p>
               <Link
-                href="/landing/takken"
+                href="/services/takken"
                 className="inline-flex items-center px-7 py-3.5 bg-[#0d2545] text-white text-sm font-semibold rounded hover:bg-[#142f5a] transition-colors"
               >
                 詳しく見る &rarr;

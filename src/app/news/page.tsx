@@ -73,7 +73,7 @@ export default function NewsPage() {
                 独学での宅建合格率向上を目指しています。現在開発中（2026年夏リリース予定）。
               </p>
               <Link
-                href="/landing/takken"
+                href="/services/takken"
                 className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-900 transition-colors"
               >
                 詳細を見る・リリース通知を受け取る →
