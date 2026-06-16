@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   { href: "/", label: "ホーム" },
@@ -12,6 +13,8 @@ const navLinks = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isLP = pathname === "/services/takken";
 
   return (
     <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
@@ -26,17 +29,27 @@ export default function Header() {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="text-sm text-gray-600 hover:text-[#0d2545] transition-colors"
+          <div className="hidden md:flex items-center gap-6">
+            <nav className="flex items-center gap-8">
+              {navLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="text-sm text-gray-600 hover:text-[#0d2545] transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+            {isLP && (
+              <a
+                href="#register"
+                className="px-5 py-2.5 bg-[#007AFF] text-white text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
               >
-                {label}
-              </Link>
-            ))}
-          </nav>
+                β版先行登録
+              </a>
+            )}
+          </div>
 
           <button
             className="md:hidden p-2 -mr-2"

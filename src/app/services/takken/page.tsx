@@ -3,9 +3,22 @@ import "./lp.css";
 import EmailForm from "@/components/EmailForm";
 
 export const metadata: Metadata = {
-  title: "ウカレル — 宅建独学を合格まで導く学習アプリ",
+  title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
   description:
-    "何を勉強すれば受かるか分かる宅建合格ナビゲーションアプリ。現在地・苦手分野・今日やるべき問題を見える化。2026年試験対応・法改正対応済み。",
+    "何を勉強すれば受かるか分かる。現在地・苦手分野・今日やるべき問題を見える化する宅建合格ナビゲーションアプリ。",
+  openGraph: {
+    title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
+    description:
+      "何を勉強すれば受かるか分かる。現在地・苦手分野・今日やるべき問題を見える化する宅建合格ナビゲーションアプリ。",
+    url: "https://www.dokugakulink.com/services/takken",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
+    description:
+      "何を勉強すれば受かるか分かる。現在地・苦手分野・今日やるべき問題を見える化する宅建合格ナビゲーションアプリ。",
+  },
 };
 
 export default function TakkenPage() {
@@ -466,7 +479,7 @@ export default function TakkenPage() {
             <div className="badge"><div className="badge-dot"></div>初回30日無料</div>
             <div className="badge"><div className="badge-dot"></div>全機能利用可能</div>
           </div>
-          <div className="plan-grid">
+          <div className="plan-grid" id="plan-grid">
             <div className="plan">
               <div className="plan-type">TRIAL</div>
               <div className="plan-price">初回30日<br />無料</div>
@@ -500,6 +513,15 @@ export default function TakkenPage() {
               </ul>
             </div>
           </div>
+
+          {/* P1-2: 料金カード直下CTA */}
+          <div style={{textAlign:'center',marginTop:'48px'}}>
+            <a href="#register" className="btn btn-lg">β版先行登録する</a>
+            <p style={{marginTop:'14px',fontSize:'14px',color:'var(--t3)',fontWeight:'500'}}>
+              初回30日無料 · クレジットカード不要
+            </p>
+          </div>
+
         </div>
       </section>
 
@@ -556,6 +578,11 @@ export default function TakkenPage() {
           </div>
         </div>
       </section>
+
+      {/* P1-1: SP固定下部CTA（lp.cssでmax-width:768pxのみ表示） */}
+      <div className="lp-sp-cta">
+        <a href="#register" className="lp-sp-cta-btn">β版先行登録（無料）</a>
+      </div>
 
     </div>
   );

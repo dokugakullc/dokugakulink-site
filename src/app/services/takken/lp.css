@@ -336,3 +336,49 @@
   .lp-root .math-num { font-size: 17px; }
   .lp-root .hiw-grid { grid-template-columns: 1fr; }
 }
+
+/* SP固定下部CTA */
+.lp-sp-cta {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* 固定バー分の余白を最終セクションに確保 */
+  .lp-root {
+    padding-bottom: 80px;
+  }
+  .lp-sp-cta {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 12px 20px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
+  }
+  .lp-sp-cta-btn {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    background: #007AFF;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+    padding: 16px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: background 0.18s;
+  }
+  .lp-sp-cta-btn:active {
+    background: #0055CC;
+  }
+}
