@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "プライバシーポリシー",
   description:
-    "独学リンク合同会社のプライバシーポリシーページです。個人情報の取り扱いについてご確認いただけます。",
+    "dokugaku link合同会社のプライバシーポリシーページです。個人情報の取り扱いについてご確認いただけます。",
 };
 
 const sections = [
@@ -70,7 +70,7 @@ const sections = [
       <p>
         個人情報の取り扱いに関するご質問・ご請求は、下記までお問い合わせください。
         <br /><br />
-        独学リンク合同会社<br />
+        dokugaku link合同会社<br />
         〒530-0001 大阪府大阪市北区梅田1-1-3<br />
         メール：
         <a
@@ -98,7 +98,7 @@ export default function PrivacyPage() {
 
       <div className="mx-auto max-w-4xl px-6 lg:px-8 py-16">
         <p className="text-sm text-gray-600 leading-loose mb-12">
-          独学リンク合同会社（以下「弊社」）は、お客様の個人情報の保護を重要な責務と認識し、
+          dokugaku link合同会社（以下「弊社」）は、お客様の個人情報の保護を重要な責務と認識し、
           以下のとおりプライバシーポリシーを定めます。
         </p>
 
@@ -113,7 +113,7 @@ export default function PrivacyPage() {
 
         <p className="text-xs text-gray-400 mt-12 pt-8 border-t border-gray-100">
           制定日：2025年1月1日<br />
-          独学リンク合同会社
+          dokugaku link合同会社
         </p>
       </div>
     </div>
