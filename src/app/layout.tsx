@@ -27,6 +27,14 @@ export const metadata: Metadata = {
     "宅建", "宅建士", "独学", "資格取得", "学習支援", "FP", "ファイナンシャルプランナー",
     "行政書士", "簿記", "資産形成", "不動産", "ウェルスコンサルティング", "独学合格",
   ],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
     type: "website",
     locale: "ja_JP",
