@@ -60,9 +60,11 @@
 .lp-root .hero-cta   { grid-column: 1; grid-row: 2; padding-top: 36px; }
 
 /* Hero Phone Frames */
-.lp-root .hero-mocks { display: flex; flex-direction: column; gap: 10px; width: 276px; }
-.lp-root .hero-mocks .hphone:nth-child(2n) { margin-left: 18px; }
-.lp-root .hphone { background: #1C1C1E; border-radius: 26px; padding: 6px 6px 10px; box-shadow: 0 14px 44px rgba(0,0,0,.34); width: 258px; }
+.lp-root .hero-mocks { display: flex; flex-direction: column; gap: 10px; width: 316px; }
+.lp-root .hero-mocks .hphone:nth-child(2n) { margin-left: 0; }
+.lp-root .hphone { background: #1C1C1E; border-radius: 26px; padding: 6px 6px 10px; box-shadow: 0 14px 44px rgba(0,0,0,.34); width: 304px; }
+/* Divider within combined phone body */
+.lp-root .hp-divider { font-size: 10px; font-weight: 700; color: var(--t2); letter-spacing: .04em; margin: 10px 0 8px; padding-top: 8px; border-top: 1px solid var(--bd); }
 .lp-root .hphone-s { background: #F2F2F7; border-radius: 21px; overflow: hidden; }
 .lp-root .hphone-top { background: #fff; padding: 6px 13px 4px; display: flex; justify-content: space-between; align-items: center; }
 .lp-root .hphone-time { font-size: 11px; font-weight: 700; color: var(--text); }
@@ -72,15 +74,18 @@
 
 /* Phone 1: 現在地 */
 .lp-root .hp-lbl { font-size: 10px; font-weight: 600; color: var(--t2); letter-spacing: .04em; margin-bottom: 2px; }
-.lp-root .hp1-score { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -.02em; line-height: 1; margin-bottom: 7px; }
-.lp-root .hp1-denom { font-weight: 600; color: var(--t2); }
-.lp-root .hp1-track { background: #EBEBED; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 9px; }
+/* 推定得点 — secondary reference */
+.lp-root .hp-score-sm { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -.01em; line-height: 1; margin-bottom: 6px; }
+.lp-root .hp1-denom { font-size: 17px; font-weight: 500; color: var(--t2); }
+.lp-root .hp1-track { background: #EBEBED; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 10px; }
 .lp-root .hp1-fill { height: 100%; border-radius: 4px; background: var(--blue); }
-.lp-root .hp1-stats { display: flex; border-top: 1px solid var(--bd); padding-top: 8px; }
-.lp-root .hp1-stat { flex: 1; }
-.lp-root .hp1-stat + .hp1-stat { border-left: 1px solid var(--bd); padding-left: 10px; }
-.lp-root .hp1-val { font-size: 17px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin-top: 2px; }
-.lp-root .hp1-val.b { color: var(--blue); }
+/* 合格圏まであと◯点 — PRIMARY visual element */
+.lp-root .hp-dist { display: flex; align-items: baseline; gap: 5px; margin-bottom: 5px; }
+.lp-root .hp-dist-lbl { font-size: 10px; font-weight: 600; color: var(--t2); letter-spacing: .03em; flex-shrink: 0; }
+.lp-root .hp-dist-val { font-size: 24px; font-weight: 800; color: var(--blue); letter-spacing: -.03em; line-height: 1; }
+/* 試験まで◯日 — tertiary context */
+.lp-root .hp-days { display: flex; align-items: baseline; gap: 5px; margin-bottom: 6px; }
+.lp-root .hp-days-val { font-size: 13px; font-weight: 700; color: var(--t2); }
 
 /* Phone 2: 今日やるべき問題 */
 .lp-root .hp2-subj { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 8px; }
@@ -148,6 +153,15 @@
 .lp-root .d-ct  { margin-left: auto; font-size: 13px; color: var(--t2); font-weight: 500; }
 .lp-root .nav-close { font-size: 18px; color: var(--text); font-weight: 500; line-height: 1.85; max-width: 420px; margin: 0 auto; }
 .lp-root .nav-close strong { font-weight: 700; }
+
+/* New section: ウカレルが迷いをなくす仕組み */
+.lp-root #how-it-works { text-align: center; }
+.lp-root #how-it-works h2 { margin-bottom: 48px; }
+.lp-root .hiw-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; text-align: left; }
+.lp-root .hiw-card { background: var(--bg); border: 1.5px solid var(--bd); border-radius: 20px; padding: 28px 24px; }
+.lp-root .hiw-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+.lp-root .hiw-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.lp-root .hiw-card p { font-size: 14px; color: var(--t2); line-height: 1.65; }
 
 /* S3 essence */
 .lp-root #essence { text-align: center; }
@@ -293,7 +307,7 @@
   .lp-root .hero-left  { grid-column: 1; grid-row: 1; text-align: center; }
   .lp-root .hero-right { grid-column: 1; grid-row: 2; }
   .lp-root .hero-cta   { grid-column: 1; grid-row: 3; text-align: center; padding-top: 0; padding-bottom: 64px; }
-  .lp-root .hero-mocks { width: 100%; max-width: 280px; margin: 0 auto; }
+  .lp-root .hero-mocks { width: 100%; max-width: 320px; margin: 0 auto; }
   .lp-root .hero-mocks .hphone { width: 100%; }
   .lp-root .hero-mocks .hphone:nth-child(2n) { margin-left: 0; }
   .lp-root .cta-badges { justify-content: center; }
@@ -311,4 +325,5 @@
   .lp-root .math-box,
   .lp-root .math-box.eq { padding: 12px 14px; }
   .lp-root .math-num { font-size: 17px; }
+  .lp-root .hiw-grid { grid-template-columns: 1fr; }
 }

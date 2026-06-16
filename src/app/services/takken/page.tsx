@@ -24,11 +24,9 @@ export default function TakkenPage() {
             <p className="hero-sub">宅建独学を合格まで導く学習アプリ</p>
           </div>
 
-          {/* 右: 4つのスマホモック */}
+          {/* 右: 合体スマホモック（現在地 + 今日やるべき問題） */}
           <div className="hero-right">
             <div className="hero-mocks">
-
-              {/* 画面1: 現在地 */}
               <div className="hphone">
                 <div className="hphone-s">
                   <div className="hphone-top">
@@ -37,115 +35,34 @@ export default function TakkenPage() {
                   </div>
                   <div className="hphone-nav"><div className="hphone-nav-t">現在地</div></div>
                   <div className="hphone-bd">
+                    {/* 推定得点: secondary reference */}
                     <div className="hp-lbl">推定得点</div>
-                    <div className="hp1-score">31<span className="hp1-denom"> / 50点</span></div>
+                    <div className="hp-score-sm">31<span className="hp1-denom"> / 50点</span></div>
                     <div className="hp1-track"><div className="hp1-fill" style={{width:'62%'}}></div></div>
-                    <div className="hp1-stats">
-                      <div className="hp1-stat">
-                        <div className="hp-lbl">合格圏まで</div>
-                        <div className="hp1-val b">あと5点</div>
-                      </div>
-                      <div className="hp1-stat">
-                        <div className="hp-lbl">試験まで</div>
-                        <div className="hp1-val">126日</div>
-                      </div>
+                    {/* PRIMARY: 合格圏までの距離 */}
+                    <div className="hp-dist">
+                      <span className="hp-dist-lbl">合格圏まで</span>
+                      <span className="hp-dist-val">あと5点</span>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 画面2: 今日やるべき問題 */}
-              <div className="hphone">
-                <div className="hphone-s">
-                  <div className="hphone-top">
-                    <span className="hphone-time">9:41</span>
-                    <span style={{fontSize:'10px',color:'var(--text)'}}>●●●</span>
-                  </div>
-                  <div className="hphone-nav"><div className="hphone-nav-t">今日やるべき問題</div></div>
-                  <div className="hphone-bd">
+                    {/* 試験まで: tertiary context */}
+                    <div className="hp-days">
+                      <span className="hp-dist-lbl">試験まで</span>
+                      <span className="hp-days-val">126日</span>
+                    </div>
+                    {/* 将来実装: 合格可能性 */}
+                    {/* <div className="hp-prob"><span className="hp-dist-lbl">合格可能性</span><span className="hp-dist-val">72%</span></div> */}
+                    <div className="hp-divider">今日やるべき問題</div>
                     <div className="hp2-subj">
                       <div className="hp2-dot"></div>
                       <div>
-                        <div className="hp2-title">宅建業法<br />重要事項説明</div>
+                        <div className="hp2-title">宅建業法</div>
                         <div className="hp2-sub">正答率 52%</div>
                       </div>
                     </div>
-                    <div className="hp2-badge">要復習</div>
                     <div className="hp2-cnt">今日の10問</div>
                   </div>
                 </div>
               </div>
-
-              {/* 画面3: 苦手ランキング */}
-              <div className="hphone">
-                <div className="hphone-s">
-                  <div className="hphone-top">
-                    <span className="hphone-time">9:41</span>
-                    <span style={{fontSize:'10px',color:'var(--text)'}}>●●●</span>
-                  </div>
-                  <div className="hphone-nav"><div className="hphone-nav-t">苦手ランキング</div></div>
-                  <div className="hphone-bd">
-                    <div className="hp3-row">
-                      <span className="hp3-rank top">①</span>
-                      <span className="hp3-lbl">権利関係</span>
-                      <div className="hp3-bar"><div className="hp3-fill" style={{width:'42%',background:'var(--amber)'}}></div></div>
-                      <span className="hp3-num warn">42%</span>
-                    </div>
-                    <div className="hp3-row">
-                      <span className="hp3-rank">②</span>
-                      <span className="hp3-lbl">税・その他</span>
-                      <div className="hp3-bar"><div className="hp3-fill" style={{width:'75%',background:'var(--blue)'}}></div></div>
-                      <span className="hp3-num">75%</span>
-                    </div>
-                    <div className="hp3-row">
-                      <span className="hp3-rank">③</span>
-                      <span className="hp3-lbl">法令上の制限</span>
-                      <div className="hp3-bar"><div className="hp3-fill" style={{width:'81%',background:'var(--green)'}}></div></div>
-                      <span className="hp3-num">81%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 画面4: 合格ロードマップ */}
-              <div className="hphone">
-                <div className="hphone-s">
-                  <div className="hphone-top">
-                    <span className="hphone-time">9:41</span>
-                    <span style={{fontSize:'10px',color:'var(--text)'}}>●●●</span>
-                  </div>
-                  <div className="hphone-nav"><div className="hphone-nav-t">合格ロードマップ</div></div>
-                  <div className="hphone-bd">
-                    <div className="hp4-header">
-                      <span className="hp4-days-lbl">試験まで</span>
-                      <span className="hp4-days-val">126日</span>
-                    </div>
-                    <div className="hp4-row">
-                      <span className="hp4-when">今やること</span>
-                      <span className="hp4-subj">宅建業法</span>
-                      <span className="hp4-prio hi">優先度 高</span>
-                    </div>
-                    <div className="hp4-row">
-                      <span className="hp4-when">次にやること</span>
-                      <span className="hp4-subj">法令上の制限</span>
-                      <span className="hp4-prio mid">優先度 中</span>
-                    </div>
-                    <div className="hp4-row">
-                      <span className="hp4-when">その後</span>
-                      <span className="hp4-subj">権利関係</span>
-                      <span className="hp4-prio mid">優先度 中</span>
-                    </div>
-                    <div className="hp4-prog">
-                      <div className="hp4-prog-labels">
-                        <span>現在地</span>
-                        <span>合格</span>
-                      </div>
-                      <div className="hp4-prog-track"><div className="hp4-prog-fill"></div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
 
@@ -235,6 +152,31 @@ export default function TakkenPage() {
             独学で最も難しいのは<br />勉強することではありません。<br /><br />
             <strong>何を勉強するかを判断することです。</strong>
           </p>
+        </div>
+      </section>
+
+      {/* How it works: ウカレルが迷いをなくす仕組み */}
+      <section id="how-it-works" className="alt">
+        <div className="wrap">
+          <p className="eyebrow" style={{textAlign:'center'}}>ウカレルの仕組み</p>
+          <h2 style={{textAlign:'center'}}>ウカレルが迷いをなくす仕組み</h2>
+          <div className="hiw-grid">
+            <div className="hiw-card">
+              <span className="hiw-icon">📉</span>
+              <h3>苦手ランキング</h3>
+              <p>苦手な論点を自動分析</p>
+            </div>
+            <div className="hiw-card">
+              <span className="hiw-icon">📋</span>
+              <h3>今日やるべき問題</h3>
+              <p>今優先して解くべき問題を提案</p>
+            </div>
+            <div className="hiw-card">
+              <span className="hiw-icon">🗺️</span>
+              <h3>合格ロードマップ</h3>
+              <p>試験日から逆算して学習を案内</p>
+            </div>
+          </div>
         </div>
       </section>
 
