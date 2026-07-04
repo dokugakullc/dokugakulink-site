@@ -133,10 +133,13 @@ export default function Home() {
               <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-2 leading-tight">
                 宅建独学を合格まで導く学習アプリ
               </h2>
-              <p className="text-sm text-gray-500 mb-2">現在開発中（2026年夏リリース予定）</p>
+              <p className="text-sm text-gray-500 mb-2">現在β版を準備中</p>
               <p className="text-sm font-medium text-blue-700 mb-6">β版事前登録受付中</p>
               <p className="text-base font-bold text-[#0d2545] mb-6 italic">
                 「忘れた頃に、また出題。」
+              </p>
+              <p className="text-sm font-semibold text-[#0d2545] mb-6">
+                復習を自動化して、合格まで迷わない。
               </p>
               <div className="space-y-2.5 mb-8">
                 {[
@@ -151,7 +154,8 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-sm text-gray-600 leading-loose mb-8">
-                記憶定着の考え方として知られる間隔反復学習を参考に、復習タイミングを自動で提案。学習継続支援の仕組みで、この3つの課題を解決します。
+                ウカレルは、独学で資格取得を目指す社会人のための合格ナビゲーションアプリです。
+                Phase 1では宅地建物取引士試験に対応し、将来的にFP・簿記・行政書士へ展開します。
               </p>
               <Link
                 href="/services/takken"

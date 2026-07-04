@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const navLinks = [
   { href: "/", label: "ホーム" },
   { href: "/business", label: "事業内容" },
+  { href: "/services/takken", label: "ウカレル" },
   { href: "/company", label: "会社概要" },
   { href: "/news", label: "お知らせ" },
   { href: "/contact", label: "お問い合わせ" },

@@ -3,7 +3,7 @@ import Link from "next/link";
 const navLinks = [
   { href: "/", label: "ホーム" },
   { href: "/business", label: "事業内容" },
-  { href: "/services/takken", label: "宅建独学支援アプリ" },
+  { href: "/services/takken", label: "ウカレル" },
   { href: "/company", label: "会社概要" },
   { href: "/news", label: "お知らせ" },
   { href: "/contact", label: "お問い合わせ" },
@@ -50,8 +50,22 @@ export default function Footer() {
                 <p className="text-xs text-gray-500 mb-1">所在地</p>
                 <p className="text-sm text-gray-300 leading-loose">
                   〒530-0001<br />
-                  大阪府大阪市北区梅田1-1-3
+                  大阪市北区梅田1-1-3<br />
+                  大阪駅前第3ビル29階1-1-1号室
                 </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">電話番号</p>
+                <a
+                  href="tel:0676521304"
+                  className="text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  06-7652-1304
+                </a>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">受付時間</p>
+                <p className="text-sm text-gray-300">平日 10:00〜18:00</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">メール</p>

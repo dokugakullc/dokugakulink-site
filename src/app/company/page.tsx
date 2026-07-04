@@ -58,10 +58,13 @@ const companyInfo = [
   { label: "会社名", value: "dokugaku link合同会社" },
   { label: "代表社員", value: "陣内 智徳" },
   { label: "設立", value: "2025年10月27日" },
-  { label: "法人番号", value: "120003031128" },
-  { label: "所在地", value: "〒530-0001\n大阪府大阪市北区梅田1-1-3" },
-  { label: "事業内容", value: "資格取得支援事業\nウェルスコンサルティング事業" },
+  { label: "法人番号", value: "2120003031128" },
+  { label: "所在地", value: "〒530-0001\n大阪市北区梅田1-1-3\n大阪駅前第3ビル29階1-1-1号室" },
+  { label: "事業内容", value: "ウェルスコンサルティング事業\n資格取得支援事業" },
   { label: "メール", value: "info@dokugakulink.com" },
+  { label: "電話番号", value: "06-7652-1304" },
+  { label: "受付時間", value: "平日 10:00〜18:00" },
+  { label: "適格請求書発行事業者登録番号", value: "未登録（免税事業者）" },
 ];
 
 export default function CompanyPage() {
@@ -384,6 +387,8 @@ export default function CompanyPage() {
                     <dd className="text-sm text-gray-900 leading-loose whitespace-pre-line">
                       {label === "メール" ? (
                         <a href={`mailto:${value}`} className="text-blue-700 hover:underline">{value}</a>
+                      ) : label === "電話番号" ? (
+                        <a href="tel:0676521304" className="text-blue-700 hover:underline">{value}</a>
                       ) : value}
                     </dd>
                   </div>

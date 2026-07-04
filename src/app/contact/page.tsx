@@ -36,6 +36,8 @@ export default function ContactPage() {
             info@dokugakulink.com
           </a>
           <p className="text-xs text-gray-400 mt-4 leading-loose">
+            電話番号：<a href="tel:0676521304" className="hover:text-[#0d2545]">06-7652-1304</a><br />
+            受付時間：平日 10:00〜18:00<br />
             お問い合わせ内容によっては、回答までにお時間をいただく場合がございます。
           </p>
         </div>

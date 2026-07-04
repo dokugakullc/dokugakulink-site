@@ -16,11 +16,9 @@ type Status = "idle" | "loading" | "success" | "duplicated" | "error";
 
 interface EmailFormProps {
   source?: string;
-  // 将来 /api/stats から取得に変更予定
-  betaSignups?: number;
 }
 
-export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFormProps) {
+export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState<ProblemValue | "">("");
   const [status, setStatus] = useState<Status>("idle");
@@ -80,16 +78,6 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
           </div>
         </div>
 
-        {betaSignups !== undefined && (
-          <div className="bg-white/10 border border-white/20 rounded-2xl px-6 py-5 text-center">
-            <p className="text-xs text-blue-300 mb-1.5">現在のβ版登録者数</p>
-            <p className="text-4xl font-black text-white tabular-nums">
-              {betaSignups}
-              <span className="text-lg font-normal text-blue-300 ml-1">名</span>
-            </p>
-          </div>
-        )}
-
         {problemLabel && (
           <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xs text-blue-300 mb-1">あなたの悩み</p>
@@ -132,16 +120,6 @@ export default function EmailForm({ source = "takken_lp", betaSignups }: EmailFo
             <p className="text-blue-200 text-sm mt-1">あなたの登録内容は保存されています。</p>
           </div>
         </div>
-
-        {betaSignups !== undefined && (
-          <div className="bg-white/10 border border-white/20 rounded-2xl px-6 py-5 text-center">
-            <p className="text-xs text-blue-300 mb-1.5">現在のβ版登録者数</p>
-            <p className="text-4xl font-black text-white tabular-nums">
-              {betaSignups}
-              <span className="text-lg font-normal text-blue-300 ml-1">名</span>
-            </p>
-          </div>
-        )}
 
         <div className="text-center">
           <p className="text-blue-200 text-sm leading-loose">

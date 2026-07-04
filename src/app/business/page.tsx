@@ -19,7 +19,7 @@ export default function BusinessPage() {
             事業内容
           </h1>
           <p className="text-blue-100 text-base mt-6 max-w-xl leading-loose">
-            不動産・資産形成コンサルティングと<br className="hidden sm:block" />資格取得支援の2つの事業を展開しています。
+            ウェルスコンサルティングと<br className="hidden sm:block" />資格取得支援の2つの事業を展開しています。
           </p>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function BusinessPage() {
                   対象顧客
                 </h3>
                 <p className="text-sm text-gray-600 leading-loose mb-5">
-                  現在、<strong className="text-[#0d2545]">1億円〜5億円規模の資産を保有する資産家・地主・企業オーナー</strong>を中心に、
+                  現在、<strong className="text-[#0d2545]">資産家・地主・事業オーナー</strong>を中心に、
                   個別プロジェクト単位でご支援しています。
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -157,8 +157,7 @@ export default function BusinessPage() {
                     </div>
                   ))}
                 </div>
-                <p className="text-sm text-gray-500 mb-1">建設業・不動産業を中心に支援実績あり</p>
-                <p className="text-sm text-gray-500">累計支援件数 5件（2026年6月現在）</p>
+                <p className="text-sm text-gray-500">ご相談内容に応じ、個別プロジェクト単位で支援します。</p>
               </div>
 
               {/* 私たちが提供しないもの */}
@@ -267,13 +266,12 @@ export default function BusinessPage() {
                     <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">開発中</span>
                   </div>
                   <p className="text-xl font-bold text-[#0d2545] mb-1">ウカレル</p>
-                  <p className="text-base font-bold text-[#0d2545] mb-1">宅建独学を合格まで導く学習アプリ</p>
-                  <p className="text-sm text-gray-500 mb-1">現在開発中（2026年夏リリース予定）</p>
+                  <p className="text-base font-bold text-[#0d2545] mb-1">独学社会人のための合格ナビゲーションアプリ</p>
+                  <p className="text-sm text-gray-500 mb-1">現在β版を準備中</p>
                   <p className="text-sm font-medium text-blue-700 mb-4">β版事前登録受付中</p>
                   <p className="text-sm text-gray-600 leading-loose mb-5">
-                    宅建試験を独学で目指す方に向けた、継続学習を支援するモバイルアプリです。
-                    「忘れた頃に、また出題する」仕組みと、学習継続を後押しする体験設計で
-                    独学での合格率向上を目指しています。
+                    ウカレルは、独学で資格取得を目指す社会人のための合格ナビゲーションアプリです。
+                    Phase 1では宅地建物取引士試験に対応し、将来的にFP・簿記・行政書士へ展開します。
                   </p>
                   <ul className="space-y-2">
                     {[

@@ -6,7 +6,7 @@ export const contentType = "image/png";
 async function fetchFont(): Promise<ArrayBuffer | null> {
   try {
     const chars =
-      "何を勉強すれば受かるか分かる宅建独学合格まで導く学習アプリナビゲーション現在地苦手分野今日やるべき問題見える化β版先行登録受付中無料30日1000問厳選あと5点圏dokugakulink.com";
+      "ウカレル忘れた頃にまた出題復習を自動化して合格まで迷わない継続復習進捗可視化β版先行登録受付中dokugakulink.com";
     const cssRes = await fetch(
       `https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&text=${encodeURIComponent(chars)}&display=block`,
       { headers: { "User-Agent": "Mozilla/5.0 (compatible; bot)" } }
@@ -24,11 +24,11 @@ export default async function Image() {
   const font = await fetchFont();
   const fontFamily = font ? '"Noto Sans JP", sans-serif' : "sans-serif";
 
-  const features = ["現在地・苦手分野を見える化", "今日やるべき問題が分かる", "合格可能性をリアルタイム確認"];
+  const features = ["今日やるべき問題が分かる", "忘れた頃に復習を提案", "学習の進捗を見える化"];
   const stats = [
-    { num: "あと5", unit: "点", label: "合格圏まで" },
-    { num: "1,000", unit: "問", label: "厳選問題" },
-    { num: "30", unit: "日", label: "初回無料" },
+    { num: "継続", unit: "", label: "学習の仕組み化" },
+    { num: "復習", unit: "", label: "タイミングを提案" },
+    { num: "進捗", unit: "", label: "現在地を可視化" },
   ];
 
   return new ImageResponse(
@@ -80,7 +80,7 @@ export default async function Image() {
               }}
             >
               <span style={{ color: "#93c5fd", fontSize: 17, fontWeight: 700 }}>
-                宅建独学合格ナビゲーションアプリ
+                ウカレル
               </span>
             </div>
           </div>

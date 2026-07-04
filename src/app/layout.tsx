@@ -12,9 +12,9 @@ const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
 });
 
-const siteTitle = "dokugaku link合同会社 | 学びをもっと自由に、人生をもっと豊かに";
+const siteTitle = "dokugaku link合同会社 | より良い意思決定を支援する仕組みをつくる";
 const siteDescription =
-  "dokugaku link合同会社は、宅建・FP・行政書士・簿記などの資格独学支援アプリ開発と、資産形成・不動産のウェルスコンサルティング事業を展開。学習継続・独学合格率向上を支援します。";
+  "dokugaku link合同会社は、独立した立場で資産形成・不動産の意思決定を支援するウェルスコンサルティング事業と、資格取得支援事業を展開しています。";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.dokugakulink.com"),

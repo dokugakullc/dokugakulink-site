@@ -52,13 +52,12 @@ export function HomeScreen() {
           <div className="bg-white rounded-2xl p-3 shadow-sm">
             <p className="text-gray-400 text-[9px] mb-1">合格予測スコア</p>
             <div className="flex items-end justify-between">
-              <p className="font-black text-[#0d2545] text-[30px] leading-none tabular-nums">
-                68<span className="text-[13px] font-bold text-[#0d2545]/60">%</span>
+              <p className="font-bold text-[#0d2545] text-[15px] leading-none">
+                学習後に表示
               </p>
-              <p className="text-green-600 font-bold text-[9px]">↑ +2%</p>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-[6px] mt-2">
-              <div className="rounded-full h-full w-[68%]" style={{ background: "linear-gradient(to right, #3b82f6, #22c55e)" }} />
+              <div className="rounded-full h-full w-0" style={{ background: "linear-gradient(to right, #3b82f6, #22c55e)" }} />
             </div>
           </div>
 
@@ -168,9 +167,7 @@ export function AnalysisScreen() {
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-blue-200 text-[9px]">合格予測率</p>
-                <p className="text-white font-black text-[34px] leading-tight tabular-nums">
-                  68<span className="text-[15px] font-bold text-blue-300">%</span>
-                </p>
+                <p className="text-white font-bold text-[16px] leading-tight">学習後に算出</p>
               </div>
               <p className="text-amber-300 font-bold text-[9px] mb-1">あと 7%</p>
             </div>
@@ -227,7 +224,6 @@ export function ReviewScreen() {
 }
 
 export function PredictionScreen() {
-  const bars = [50, 55, 58, 62, 63, 65, 68];
   return (
     <PhoneFrame>
       <div className="h-full flex flex-col bg-[#f5f7fa]">
@@ -239,15 +235,13 @@ export function PredictionScreen() {
           <div className="bg-white rounded-2xl p-4 shadow-sm">
             <p className="text-gray-400 text-[9px] mb-2">現在の合格可能性</p>
             <div className="flex items-end gap-1 mb-3">
-              <p className="text-[#0d2545] font-black text-[38px] leading-none">68</p>
-              <p className="text-[#0d2545] text-[16px] font-bold mb-1">%</p>
-              <p className="text-green-500 text-[8px] font-semibold mb-2 ml-1">↑ +2%</p>
+              <p className="text-[#0d2545] font-bold text-[16px] leading-none">学習後に算出</p>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-[6px] mb-1.5">
               <div
                 className="h-full rounded-full"
                 style={{
-                  width: "68%",
+                  width: "0%",
                   background: "linear-gradient(to right, #3b82f6, #22c55e)",
                 }}
               />
@@ -260,25 +254,13 @@ export function PredictionScreen() {
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3">
-            <p className="text-blue-700 font-semibold text-[9px]">あと 7% で合格ライン</p>
-            <p className="text-blue-600 text-[8px] mt-0.5">法令制限の強化で到達可能</p>
+            <p className="text-blue-700 font-semibold text-[9px]">学習履歴から現在地を分析</p>
+            <p className="text-blue-600 text-[8px] mt-0.5">次に取り組む分野を提案します</p>
           </div>
 
           <div className="bg-white rounded-2xl p-3 shadow-sm">
-            <p className="text-gray-400 text-[9px] mb-2">週間推移</p>
-            <div className="flex items-end gap-1 h-10">
-              {bars.map((v, i) => (
-                <div
-                  key={i}
-                  className={`flex-1 rounded-sm ${i === bars.length - 1 ? "bg-blue-600" : "bg-blue-200"}`}
-                  style={{ height: `${(v / 80) * 100}%` }}
-                />
-              ))}
-            </div>
-            <div className="flex justify-between mt-1">
-              <p className="text-gray-400 text-[7px]">6週前</p>
-              <p className="text-blue-600 font-bold text-[7px]">今週</p>
-            </div>
+            <p className="text-gray-400 text-[9px] mb-2">学習推移</p>
+            <p className="text-[#0d2545] text-[10px] font-medium">学習開始後に表示されます</p>
           </div>
         </div>
       </div>
@@ -302,8 +284,7 @@ export function RoadmapScreen() {
           <div className="flex items-center justify-between">
             <p className="text-white font-bold text-[11px]">学習ロードマップ</p>
             <div className="text-right">
-              <p className="text-white font-black text-[18px] leading-none tabular-nums">87<span className="text-[10px] font-bold text-blue-300">日</span></p>
-              <p className="text-blue-300 text-[7px]">試験まで</p>
+              <p className="text-white font-bold text-[10px] leading-none">試験日設定後に表示</p>
             </div>
           </div>
         </div>

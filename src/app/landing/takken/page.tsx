@@ -3,17 +3,17 @@ import "../../services/takken/lp.css";
 import EmailForm from "@/components/EmailForm";
 
 export const metadata: Metadata = {
-  title: "宅建独学合格アプリ | β版先行登録 先着100名無料",
+  title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
   description:
-    "何を勉強すれば受かるか分かる宅建合格ナビゲーションアプリ。現在地・苦手分野・今日やるべき問題を見える化。2026年試験対応・法改正対応済み。β版先着100名無料。",
+    "復習を自動化して、合格まで迷わない。独学で資格取得を目指す社会人のための合格ナビゲーションアプリ。",
   keywords: [
     "宅建", "宅建士", "宅建アプリ", "独学", "宅建勉強法",
     "宅建過去問", "宅建一問一答", "宅建合格", "宅建 独学 アプリ", "宅建 スマホ",
   ],
   openGraph: {
-    title: "宅建独学合格アプリ | β版先行登録 先着100名無料",
+    title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
     description:
-      "模試30〜35点で伸び悩む宅建受験生へ。何を勉強すれば受かるか分かる宅建学習アプリ。β版先着100名無料。",
+      "復習を自動化して、合格まで迷わない。独学で資格取得を目指す社会人のための合格ナビゲーションアプリ。",
     url: "https://www.dokugakulink.com/landing/takken",
     siteName: "dokugaku link",
     locale: "ja_JP",
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "宅建独学合格アプリ | β版先行登録 先着100名無料",
-    description: "模試30〜35点で伸び悩む宅建受験生へ。β版先着100名無料。",
+    title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
+    description: "復習を自動化して、合格まで迷わない。",
     images: ["https://www.dokugakulink.com/landing/takken/opengraph-image"],
   },
 };
@@ -48,7 +48,7 @@ export default function TakkenLandingPage() {
             <div className="pill">2026年宅建試験対応 · β版先行受付中</div>
             <h1>何を勉強すれば受かるか<br />分かれば受かる試験です。</h1>
             <p className="hero-tag">忘れた頃に、また出題。</p>
-            <p className="hero-sub">宅建独学を合格まで導く学習アプリ</p>
+            <p className="hero-sub">復習を自動化して、合格まで迷わない。</p>
           </div>
 
           {/* 右: 合体スマホモック（現在地 + 今日やるべき問題） */}
@@ -63,22 +63,22 @@ export default function TakkenLandingPage() {
                   <div className="hphone-nav"><div className="hphone-nav-t">現在地</div></div>
                   <div className="hphone-bd">
                     <div className="hp-lbl">推定得点</div>
-                    <div className="hp-score-sm">31<span className="hp1-denom"> / 50点</span></div>
-                    <div className="hp1-track"><div className="hp1-fill" style={{width:'62%'}}></div></div>
+                    <div className="hp-score-sm">学習後に表示</div>
+                    <div className="hp1-track"><div className="hp1-fill" style={{width:'0%'}}></div></div>
                     {/* PRIMARY: 合格圏までの距離 */}
                     <div className="hp-dist">
                       <span className="hp-dist-lbl">合格圏まで</span>
-                      <span className="hp-dist-val">あと5点</span>
+                      <span className="hp-dist-val">分析中</span>
                     </div>
                     {/* Mini cards: 理解度 + 試験まで */}
                     <div className="hp-mini-row">
                       <div className="hp-mini-card">
                         <div className="hp-mini-lbl">理解度</div>
-                        <div className="hp-mini-val">67%</div>
+                        <div className="hp-mini-val">分析中</div>
                       </div>
                       <div className="hp-mini-card">
                         <div className="hp-mini-lbl">試験まで</div>
-                        <div className="hp-mini-val">126日</div>
+                        <div className="hp-mini-val">設定後に表示</div>
                       </div>
                     </div>
                     {/* 苦手カテゴリ */}
@@ -91,10 +91,10 @@ export default function TakkenLandingPage() {
                       <div className="hp2-dot"></div>
                       <div>
                         <div className="hp2-title">宅建業法</div>
-                        <div className="hp2-sub">正答率 52%</div>
+                        <div className="hp2-sub">学習履歴から提案</div>
                       </div>
                     </div>
-                    <div className="hp2-cnt">今日の10問</div>
+                    <div className="hp2-cnt">今日の15問</div>
                   </div>
                   {/* iOS home indicator */}
                   <div style={{textAlign:'center',padding:'10px 0 5px'}}>
@@ -109,10 +109,10 @@ export default function TakkenLandingPage() {
           <div className="hero-cta">
             <a href="#register" className="btn btn-lg">β版先行登録</a>
             <div className="cta-badges">
-              <div className="badge"><div className="badge-dot"></div>初回30日無料</div>
+              <div className="badge"><div className="badge-dot"></div>β版無料</div>
               <div className="badge"><div className="badge-dot"></div>全機能利用可能</div>
             </div>
-            <p style={{marginTop:'14px',fontSize:'14px',color:'var(--t3)',fontWeight:'500'}}>2026年夏リリース予定</p>
+            <p style={{marginTop:'14px',fontSize:'14px',color:'var(--t3)',fontWeight:'500'}}>β版準備中</p>
           </div>
 
         </div>
@@ -147,16 +147,16 @@ export default function TakkenLandingPage() {
           <div className="dash">
             <div className="dash-head">
               <div className="dash-head-lbl">現在の実力</div>
-              <div className="dash-score">31<sub>点</sub></div>
+              <div className="dash-score">分析中</div>
             </div>
             <div className="dash-row">
               <div className="dash-cell">
                 <div className="d-lbl">合格まで</div>
-                <div className="d-val a">あと5点</div>
+                <div className="d-val a">学習後に表示</div>
               </div>
               <div className="dash-cell">
                 <div className="d-lbl">理解度</div>
-                <div className="d-val">67%</div>
+                <div className="d-val">学習後に表示</div>
               </div>
             </div>
             <div className="dash-row">
@@ -166,23 +166,23 @@ export default function TakkenLandingPage() {
               </div>
               <div className="dash-cell">
                 <div className="d-lbl">正答率</div>
-                <div className="d-val">52%</div>
+                <div className="d-val">学習後に表示</div>
               </div>
             </div>
             <div className="dash-row">
               <div className="dash-cell">
                 <div className="d-lbl">試験まで</div>
-                <div className="d-val">126<span style={{fontSize:'14px',fontWeight:'600',color:'var(--t2)'}}>日</span></div>
+                <div className="d-val">設定後に表示</div>
               </div>
               <div className="dash-cell">
                 <div className="d-lbl">予測学習数</div>
-                <div className="d-val g">420<span style={{fontSize:'14px',fontWeight:'600',color:'var(--t2)'}}>問</span></div>
+                <div className="d-val g">学習後に表示</div>
               </div>
             </div>
             <div className="dash-today">
               <div className="d-lbl">今日やるべきこと</div>
               <div className="dash-today-row">
-                <div className="d-dot"></div>宅建業法<span className="d-ct">10問</span>
+                <div className="d-dot"></div>今日の15問<span className="d-ct">出題</span>
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@ export default function TakkenLandingPage() {
             <div className="bi">
               <div className="bi-top">
                 <span className="bi-lbl">難問</span>
-                <span className="bi-num">約5〜10問</span>
+                <span className="bi-num">重要論点</span>
               </div>
               <div className="bar-track"><div className="bar-fill c-g" style={{width:'16%'}}></div></div>
             </div>
@@ -335,12 +335,12 @@ export default function TakkenLandingPage() {
       <section id="approach" className="alt">
         <div className="wrap">
           <p className="eyebrow" style={{textAlign:'center'}}>ウカレルの問題設計</p>
-          <h2 style={{textAlign:'center'}}>問題数No.1は<br />目指しません。</h2>
+          <h2 style={{textAlign:'center'}}>問題数の多さは<br />目指しません。</h2>
           <p className="approach-body">
             <strong>5,000問は必要ありません。</strong><br /><br />
             宅建50問のうち、毎年出題される重要論点と合否を分ける論点を中心に、
             合格に必要な問題だけを厳選しています。<br /><br />
-            問題数No.1ではなく、<strong>合格に直結する問題を確実に取れること</strong>を目指して設計しています。
+            問題数を競うのではなく、<strong>合格に直結する問題を確実に取れること</strong>を目指して設計しています。
           </p>
           <div className="stats-3">
             <div className="stat-card">
@@ -428,17 +428,17 @@ export default function TakkenLandingPage() {
               <div className="p-body">
                 <div className="p-card">
                   <div className="p-lbl">推定得点</div>
-                  <div className="p-big">31<sub>点</sub></div>
-                  <div className="p-track"><div className="p-fill" style={{width:'62%'}}></div></div>
+                  <div className="p-big">分析中</div>
+                  <div className="p-track"><div className="p-fill" style={{width:'0%'}}></div></div>
                 </div>
                 <div className="p-row">
                   <div className="p-mini">
                     <div className="p-mini-lbl">合格圏まで</div>
-                    <div className="p-mini-val a">あと5点</div>
+                    <div className="p-mini-val a">学習後に表示</div>
                   </div>
                   <div className="p-mini">
                     <div className="p-mini-lbl">理解度</div>
-                    <div className="p-mini-val">67<span style={{fontSize:'11px'}}>%</span></div>
+                    <div className="p-mini-val">学習後に表示</div>
                   </div>
                 </div>
                 <div className="p-hl">
@@ -464,12 +464,11 @@ export default function TakkenLandingPage() {
           <p className="eyebrow" style={{textAlign:'center'}}>学習量について</p>
           <h2>合格するには<br />十分な学習量も必要です</h2>
           <div className="vol-stat">
-            <div className="vol-lbl">昨年の合格者平均</div>
-            <div className="vol-num">800<span className="vol-unit">〜</span>1,200<span className="vol-unit">問</span></div>
-            <div className="vol-note">合格に必要な学習量の目安</div>
+            <div className="vol-lbl">学習量の見通し</div>
+            <div className="vol-num">自動<span className="vol-unit">で予測</span></div>
+            <div className="vol-note">あなたの学習履歴をもとに表示します</div>
             <div style={{marginTop:'14px',paddingTop:'14px',borderTop:'1px solid var(--bd)',fontSize:'13px',color:'var(--t2)',lineHeight:'1.75',textAlign:'left'}}>
-              近年の合格者は過去問を中心に800〜1,200問程度解いているケースが多く見られます。
-              <div style={{marginTop:'8px',fontSize:'12px',color:'var(--t3)'}}>※個人差があります</div>
+              根拠のない一律の目標値は表示せず、学習状況に応じた見通しを案内します。
             </div>
           </div>
           <p className="vol-body">
@@ -486,19 +485,19 @@ export default function TakkenLandingPage() {
           <p className="eyebrow" style={{textAlign:'center'}}>料金プラン</p>
           <h2 style={{textAlign:'center'}}>まずは無料で<br />体験してください</h2>
           <p className="price-lead">
-            初回30日間は全問題・全機能を完全開放。<br />
-            あなたに合う学習方法か、じっくり試してください。
+            現在のβ版は無料です。<br />
+            正式版の価格は、決定次第このサイトで表示します。
           </p>
           <div className="cta-badges" style={{marginBottom:'40px'}}>
-            <div className="badge"><div className="badge-dot"></div>初回30日無料</div>
-            <div className="badge"><div className="badge-dot"></div>全機能利用可能</div>
+            <div className="badge"><div className="badge-dot"></div>β版無料</div>
+            <div className="badge"><div className="badge-dot"></div>正式価格は未定</div>
           </div>
           <div className="plan-grid">
             <div className="plan">
-              <div className="plan-type">TRIAL</div>
-              <div className="plan-price">初回30日<br />無料</div>
-              <div className="plan-period">登録後30日間</div>
-              <p className="plan-desc">すべての機能を制限なく使えます。</p>
+              <div className="plan-type">BETA</div>
+              <div className="plan-price">無料</div>
+              <div className="plan-period">β版提供期間中</div>
+              <p className="plan-desc">準備が整い次第、登録者へご案内します。</p>
               <hr className="dv" />
               <ul className="plan-list">
                 <li><span className="chk">✓</span> 全問題（1,000問）</li>
@@ -509,13 +508,12 @@ export default function TakkenLandingPage() {
               </ul>
             </div>
             <div className="plan featured">
-              <div className="plan-badge">試験日まで学習を継続</div>
-              <div className="plan-type">宅建プラン</div>
-              <div className="plan-price">¥580<sub>/月</sub></div>
-              <div className="plan-period">試験日まで自由に学習を継続</div>
-              <div className="plan-perday">1日あたり約19円</div>
+              <div className="plan-badge">正式版</div>
+              <div className="plan-type">提供予定</div>
+              <div className="plan-price">価格未定</div>
+              <div className="plan-period">決定次第表示します</div>
               <p className="plan-desc">
-                無料期間終了後も<br />自由演習・過去問・模試・無制限復習を利用できます。
+                提供内容と価格は、正式版の公開前にご案内します。
               </p>
               <hr className="dv" />
               <ul className="plan-list">
@@ -548,7 +546,7 @@ export default function TakkenLandingPage() {
             </p>
             <p style={{color:'var(--text)',marginBottom:'0'}}>
               だからウカレルは<br />
-              問題数No.1ではなく<br />
+              問題数を競うのではなく<br />
               <strong style={{color:'var(--blue)'}}>「何を勉強すれば受かるか分かる」</strong><br />
               ことを目指して開発しています。
             </p>
@@ -561,7 +559,7 @@ export default function TakkenLandingPage() {
         <div className="wrap">
           <p className="eyebrow" style={{color:'rgba(90,200,250,0.8)'}}>β版先行登録</p>
           <h2 style={{color:'#fff',marginBottom:'12px'}}>β版リリース時に<br />最初にご案内します。</h2>
-          <p style={{margin:'8px auto 6px',fontSize:'14px',color:'#5AC8FA',fontWeight:'600'}}>2026年夏リリース予定</p>
+          <p style={{margin:'8px auto 6px',fontSize:'14px',color:'#5AC8FA',fontWeight:'600'}}>β版準備中</p>
           <p style={{margin:'0 auto 40px',maxWidth:'480px',color:'rgba(255,255,255,.5)',fontSize:'17px',lineHeight:'1.7'}}>
             メールアドレスを登録するだけ。<br />スパムは送りません。いつでも解除できます。
           </p>
@@ -578,7 +576,7 @@ export default function TakkenLandingPage() {
           <p className="fcta-sub">まずは30日無料で体験してください。</p>
           <a href="#register" className="btn btn-lg">β版先行登録</a>
           <div className="cta-badges" style={{marginTop:'20px'}}>
-            <div className="badge" style={{background:'rgba(255,255,255,.1)',color:'#fff'}}><div className="badge-dot"></div>初回30日無料</div>
+            <div className="badge" style={{background:'rgba(255,255,255,.1)',color:'#fff'}}><div className="badge-dot"></div>β版無料</div>
             <div className="badge" style={{background:'rgba(255,255,255,.1)',color:'#fff'}}><div className="badge-dot"></div>全機能利用可能</div>
           </div>
         </div>

@@ -6,7 +6,7 @@ export const contentType = "image/png";
 async function fetchFont(): Promise<ArrayBuffer | null> {
   try {
     const chars =
-      "忘れた頃にまた出題宅建独学者のための学習支援アプリβ版参加受付中間隔反復苦手分析合格可能性予測先着名無料305問687日dokugakulink.com";
+      "ウカレル忘れた頃にまた出題復習を自動化して合格まで迷わないβ版参加受付中継続復習進捗可視化dokugakulink.com";
     const cssRes = await fetch(
       `https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&text=${encodeURIComponent(chars)}&display=block`,
       { headers: { "User-Agent": "Mozilla/5.0 (compatible; bot)" } }
@@ -24,11 +24,11 @@ export default async function Image() {
   const font = await fetchFont();
   const fontFamily = font ? '"Noto Sans JP", sans-serif' : "sans-serif";
 
-  const features = ["間隔反復", "苦手分析", "合格可能性予測"];
+  const features = ["継続学習", "復習支援", "進捗可視化"];
   const stats = [
-    { num: "305", unit: "問", label: "収録予定" },
-    { num: "68", unit: "%", label: "合格可能性" },
-    { num: "87", unit: "日", label: "試験まで" },
+    { num: "継続", unit: "", label: "学習の仕組み化" },
+    { num: "復習", unit: "", label: "タイミングを提案" },
+    { num: "進捗", unit: "", label: "現在地を可視化" },
   ];
 
   return new ImageResponse(
@@ -85,7 +85,7 @@ export default async function Image() {
               }}
             >
               <span style={{ color: "#93c5fd", fontSize: 18, fontWeight: 700 }}>
-                宅建独学者のための学習支援アプリ
+                ウカレル
               </span>
             </div>
           </div>

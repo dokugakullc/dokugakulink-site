@@ -71,14 +71,17 @@ const sections = [
         個人情報の取り扱いに関するご質問・ご請求は、下記までお問い合わせください。
         <br /><br />
         dokugaku link合同会社<br />
-        〒530-0001 大阪府大阪市北区梅田1-1-3<br />
+        〒530-0001 大阪市北区梅田1-1-3<br />
+        大阪駅前第3ビル29階1-1-1号室<br />
         メール：
         <a
           href="mailto:info@dokugakulink.com"
           className="text-blue-700 hover:underline"
         >
           info@dokugakulink.com
-        </a>
+        </a><br />
+        電話番号：<a href="tel:0676521304" className="text-blue-700 hover:underline">06-7652-1304</a><br />
+        受付時間：平日 10:00〜18:00
       </p>
     ),
   },
