@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "お問い合わせ",
   description:
     "dokugaku link合同会社へのお問い合わせページです。事業・サービスに関するご質問・ご相談をお気軽にどうぞ。",
+  alternates: {
+    canonical: "/contact",
+  },
 };
 
 export default function ContactPage() {
@@ -36,7 +39,7 @@ export default function ContactPage() {
             info@dokugakulink.com
           </a>
           <p className="text-xs text-gray-400 mt-4 leading-loose">
-            電話番号：<a href="tel:0676521304" className="hover:text-[#0d2545]">06-7652-1304</a><br />
+            電話番号：<a href="tel:06-7652-1304" className="hover:text-[#0d2545]">06-7652-1304</a><br />
             受付時間：平日 10:00〜18:00<br />
             お問い合わせ内容によっては、回答までにお時間をいただく場合がございます。
           </p>

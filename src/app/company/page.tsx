@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "会社概要",
   description:
     "dokugaku link合同会社の会社概要。ミッション・ビジョン・バリュー・創業ストーリー・ロードマップ・会社情報をご紹介します。",
+  alternates: {
+    canonical: "/company",
+  },
 };
 
 const milestones = [
@@ -57,7 +60,7 @@ const features = [
 const companyInfo = [
   { label: "会社名", value: "dokugaku link合同会社" },
   { label: "代表社員", value: "陣内 智徳" },
-  { label: "設立", value: "2025年10月27日" },
+  { label: "設立", value: "2025年10月27日（令和7年10月27日）" },
   { label: "法人番号", value: "2120003031128" },
   { label: "所在地", value: "〒530-0001\n大阪市北区梅田1-1-3\n大阪駅前第3ビル29階1-1-1号室" },
   { label: "事業内容", value: "ウェルスコンサルティング事業\n資格取得支援事業" },
@@ -388,7 +391,7 @@ export default function CompanyPage() {
                       {label === "メール" ? (
                         <a href={`mailto:${value}`} className="text-blue-700 hover:underline">{value}</a>
                       ) : label === "電話番号" ? (
-                        <a href="tel:0676521304" className="text-blue-700 hover:underline">{value}</a>
+                        <a href="tel:06-7652-1304" className="text-blue-700 hover:underline">{value}</a>
                       ) : value}
                     </dd>
                   </div>

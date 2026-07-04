@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "宅建", "宅建士", "宅建アプリ", "独学", "宅建勉強法",
     "宅建過去問", "宅建一問一答", "宅建合格", "宅建 独学 アプリ", "宅建 スマホ",
   ],
+  alternates: {
+    canonical: "/landing/takken",
+  },
   openGraph: {
     title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
     description:

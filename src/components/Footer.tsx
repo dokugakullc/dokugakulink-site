@@ -8,6 +8,7 @@ const navLinks = [
   { href: "/news", label: "お知らせ" },
   { href: "/contact", label: "お問い合わせ" },
   { href: "/privacy", label: "プライバシーポリシー" },
+  { href: "/terms", label: "利用規約" },
   { href: "/legal/tokushoho", label: "特定商取引法に基づく表記" },
 ];
 
@@ -57,7 +58,7 @@ export default function Footer() {
               <div>
                 <p className="text-xs text-gray-500 mb-1">電話番号</p>
                 <a
-                  href="tel:0676521304"
+                  href="tel:06-7652-1304"
                   className="text-sm text-gray-300 hover:text-white transition-colors"
                 >
                   06-7652-1304

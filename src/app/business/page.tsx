@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "事業内容",
   description:
     "dokugaku link合同会社の事業内容。不動産・資産形成コンサルティングと、宅建・FP・行政書士・簿記などの独学支援アプリ開発を展開しています。",
+  alternates: {
+    canonical: "/business",
+  },
 };
 
 export default function BusinessPage() {

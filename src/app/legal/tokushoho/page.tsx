@@ -4,6 +4,9 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "特定商取引法に基づく表記",
   description: "dokugaku link合同会社の特定商取引法に基づく表記ページです。",
+  alternates: {
+    canonical: "/legal/tokushoho",
+  },
 };
 
 type LegalItem = {
@@ -74,7 +77,7 @@ export default function TokushohoPage() {
                     {value}
                   </a>
                 ) : isPhone ? (
-                  <a href="tel:0676521304" className="text-blue-700 hover:text-blue-900 transition-colors">
+                  <a href="tel:06-7652-1304" className="text-blue-700 hover:text-blue-900 transition-colors">
                     {value}
                   </a>
                 ) : (

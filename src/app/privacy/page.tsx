@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "プライバシーポリシー",
   description:
     "dokugaku link合同会社のプライバシーポリシーページです。個人情報の取り扱いについてご確認いただけます。",
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 const sections = [
@@ -80,7 +83,7 @@ const sections = [
         >
           info@dokugakulink.com
         </a><br />
-        電話番号：<a href="tel:0676521304" className="text-blue-700 hover:underline">06-7652-1304</a><br />
+        電話番号：<a href="tel:06-7652-1304" className="text-blue-700 hover:underline">06-7652-1304</a><br />
         受付時間：平日 10:00〜18:00
       </p>
     ),
