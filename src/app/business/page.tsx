@@ -35,6 +35,12 @@ export default function BusinessPage() {
               </h2>
             </div>
             <div className="md:col-span-3 space-y-14">
+              <div className="border-l-4 border-[#0d2545] pl-5 py-2">
+                <p className="text-sm text-gray-600 leading-loose">
+                  資産家・地主・事業オーナーの意思決定を支援します。
+                  金融商品や不動産の販売を目的とせず、独立した立場から資産形成・不動産の調査・分析・比較を行います。
+                </p>
+              </div>
 
               {/* なぜ始めたのか */}
               <div>
@@ -78,7 +84,7 @@ export default function BusinessPage() {
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {[
-                    { label: "資産家", body: "不動産・金融資産を1億円以上保有し、運用・活用を検討されている方" },
+                    { label: "資産家", body: "不動産・金融資産の運用・活用を検討されている方" },
                     { label: "地主", body: "土地・収益物件を複数保有し、最適な活用方法を模索されている方" },
                     { label: "企業オーナー", body: "事業経営と資産管理を並行して行い、意思決定の質を高めたい方" },
                   ].map(({ label, body }) => (
