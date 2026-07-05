@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/landing/takken",
   },
+  icons: {
+    icon: [
+      { url: "/favicon-ukareru.svg", type: "image/svg+xml" },
+      { url: "/favicon-ukareru.ico", sizes: "32x32" },
+    ],
+    apple: { url: "/apple-touch-icon-ukareru.png", sizes: "180x180" },
+    shortcut: "/favicon-ukareru.ico",
+  },
   openGraph: {
     title: "ウカレル｜宅建独学を合格まで導く学習アプリ",
     description:
