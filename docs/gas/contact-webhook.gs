@@ -64,6 +64,16 @@ function doGet() {
   return json({ ok: true });
 }
 
+// 手動実行用テスト（エディタのドロップダウンで選び ▶実行 する）
+// 初回の権限承認 & support@ の受信確認に使う。
+function testSend() {
+  MailApp.sendEmail({
+    to: SUPPORT_TO,
+    subject: '【テスト送信】ウカレル お問い合わせGAS',
+    body: 'これはGAS単体の送信テストです。このメールが届けば送信・受信ともに正常です。'
+  });
+}
+
 function json(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
