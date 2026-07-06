@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "@/components/ContactForm";
+import SupportEmail from "@/components/SupportEmail";
 
 const SUPPORT_EMAIL = "support@dokugakulink.com";
+
+// 更新時はここだけ変更すればページ全体に反映されます
+const appInfo: { term: string; value: string }[] = [
+  { term: "アプリ名", value: "ウカレル" },
+  { term: "対応OS", value: "iOS 13.0 以上" },
+  { term: "最新バージョン", value: "v1.0.0" },
+  { term: "最終更新日", value: "2026年7月" },
+];
 
 export const metadata: Metadata = {
   title: "お問い合わせ・サポート",
@@ -79,6 +88,30 @@ const faqs: Faq[] = [
     ),
   },
   {
+    q: "機種変更した場合はどうなりますか？",
+    a: (
+      <p>
+        同じアカウントでログインすると、学習データを引き継げます。機種変更の前に、アカウント登録（メール／Google／Apple）を済ませておくことをおすすめします。
+      </p>
+    ),
+  },
+  {
+    q: "オフラインでも利用できますか？",
+    a: (
+      <p>
+        一部の機能のご利用にはインターネット接続が必要です。購入情報の同期や最新データの取得の際は、接続された環境でのご利用をおすすめします。
+      </p>
+    ),
+  },
+  {
+    q: "返金はできますか？",
+    a: (
+      <p>
+        App Store で購入されたサブスクリプションの返金は、Apple のポリシーに従います。返金のお申し込みは Apple へ直接お願いいたします。
+      </p>
+    ),
+  },
+  {
     q: "不具合を見つけました",
     a: (
       <p>
@@ -114,6 +147,12 @@ const faqPlainText: Record<string, string> = {
     "毎年の試験範囲・法改正に合わせて、問題や解説を継続的にアップデートしています。",
   "対応端末を教えてください": "iOS 13 以上に対応しています。iPhone・iPad どちらでもご利用いただけます。",
   "データは引き継げますか？": "同じアカウントでログインすると、学習履歴を引き継げます。",
+  "機種変更した場合はどうなりますか？":
+    "同じアカウントでログインすると、学習データを引き継げます。機種変更の前にアカウント登録を済ませておくことをおすすめします。",
+  "オフラインでも利用できますか？":
+    "一部の機能のご利用にはインターネット接続が必要です。購入情報の同期や最新データの取得の際は接続された環境でのご利用をおすすめします。",
+  "返金はできますか？":
+    "App Store で購入されたサブスクリプションの返金は Apple のポリシーに従います。返金のお申し込みは Apple へお願いいたします。",
   "不具合を見つけました": `ご迷惑をおかけしております。発生した状況を添えて ${SUPPORT_EMAIL} までご連絡ください。`,
 };
 
@@ -184,13 +223,8 @@ export default function ContactPage() {
                 </span>
                 <h3 className="text-base font-bold text-[#0d2545]">メールサポート</h3>
               </div>
-              <a
-                href={`mailto:${SUPPORT_EMAIL}`}
-                className="inline-block text-lg font-semibold text-[#0d2545] hover:text-blue-700 transition-colors break-all"
-              >
-                {SUPPORT_EMAIL}
-              </a>
-              <p className="text-sm text-gray-600 leading-loose mt-3">
+              <SupportEmail email={SUPPORT_EMAIL} />
+              <p className="text-sm text-gray-600 leading-loose mt-4">
                 不具合報告・ご質問・ご要望などはこちらまでご連絡ください。
               </p>
             </div>
@@ -274,8 +308,32 @@ export default function ContactPage() {
         </div>
       </section>
 
+      {/* アプリ情報 */}
+      <section aria-labelledby="app-info" className="border-b border-gray-100">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8 py-16 md:py-20">
+          <h2 id="app-info" className="text-xl font-bold text-[#0d2545]">
+            アプリ情報
+          </h2>
+          <div className="mt-8 max-w-2xl rounded-2xl border border-gray-200 overflow-hidden">
+            <dl className="divide-y divide-gray-100">
+              {appInfo.map((row) => (
+                <div
+                  key={row.term}
+                  className="flex flex-col gap-1 px-6 py-4 sm:flex-row sm:items-center sm:gap-4"
+                >
+                  <dt className="w-full shrink-0 text-sm font-semibold text-gray-500 sm:w-40">
+                    {row.term}
+                  </dt>
+                  <dd className="text-sm font-semibold text-[#0d2545]">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
       {/* サポート情報 */}
-      <section aria-labelledby="support-info" className="border-b border-gray-100">
+      <section aria-labelledby="support-info" className="bg-[#f5f7fa] border-b border-gray-100">
         <div className="mx-auto max-w-5xl px-6 lg:px-8 py-16 md:py-20">
           <h2 id="support-info" className="text-xl font-bold text-[#0d2545]">
             サポート情報
@@ -311,7 +369,7 @@ export default function ContactPage() {
       </section>
 
       {/* お問い合わせフォーム */}
-      <section aria-labelledby="contact-form" className="bg-[#f5f7fa] border-b border-gray-100">
+      <section aria-labelledby="contact-form" className="border-b border-gray-100">
         <div className="mx-auto max-w-2xl px-6 lg:px-8 py-16 md:py-20">
           <h2 id="contact-form" className="text-xl font-bold text-[#0d2545] scroll-mt-24">
             お問い合わせフォーム
@@ -326,7 +384,7 @@ export default function ContactPage() {
       </section>
 
       {/* 関連リンク */}
-      <section aria-labelledby="related-links" className="border-b border-gray-100">
+      <section aria-labelledby="related-links" className="bg-[#f5f7fa] border-b border-gray-100">
         <div className="mx-auto max-w-5xl px-6 lg:px-8 py-16 md:py-20">
           <h2 id="related-links" className="text-xl font-bold text-[#0d2545]">
             関連リンク
