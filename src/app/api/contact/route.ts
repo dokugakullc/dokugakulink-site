@@ -50,6 +50,18 @@ export async function POST(req: NextRequest) {
       throw new Error(`Webhook returned ${res.status}`);
     }
 
+    // Webhook（GAS）がJSONで success を返す場合は、その結果も検証する。
+    // 非JSON／success フィールドなしの場合は 2xx を成功とみなす（後方互換）。
+    let data: { success?: boolean; error?: string } | null = null;
+    try {
+      data = (await res.json()) as { success?: boolean; error?: string };
+    } catch {
+      data = null;
+    }
+    if (data && data.success === false) {
+      throw new Error(data.error ?? "Webhook reported failure");
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Contact webhook failed:", err);
