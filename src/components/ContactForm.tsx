@@ -9,6 +9,7 @@ export default function ContactForm() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [reference, setReference] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,12 +23,13 @@ export default function ContactForm() {
         body: JSON.stringify({ name, email, message }),
       });
 
-      const data = (await res.json()) as { success?: boolean; error?: string };
+      const data = (await res.json()) as { success?: boolean; error?: string; reference?: string };
 
       if (!res.ok || !data.success) {
         throw new Error(data.error ?? "送信に失敗しました");
       }
 
+      setReference(data.reference ?? "");
       setStatus("success");
     } catch (err) {
       setStatus("error");
@@ -45,12 +47,18 @@ export default function ContactForm() {
         </div>
         <p className="text-base font-bold text-[#0d2545] mb-2">お問い合わせを受け付けました</p>
         <p className="text-sm text-gray-600 leading-loose">
-          内容を確認のうえ、ご登録のメールアドレスへご連絡いたします。<br />
-          お問い合わせ内容によっては、回答までにお時間をいただく場合がございます。
+          ご登録のメールアドレスに受付完了メールをお送りしました。<br />
+          通常2営業日以内にご返信いたします。
         </p>
+        {reference && (
+          <p className="mt-4 inline-block rounded-lg bg-gray-50 border border-gray-200 px-4 py-2 text-xs text-gray-500">
+            受付番号：<span className="font-semibold text-[#0d2545]">{reference}</span>
+          </p>
+        )}
         <button
           onClick={() => {
             setStatus("idle");
+            setReference("");
             setName("");
             setEmail("");
             setMessage("");
