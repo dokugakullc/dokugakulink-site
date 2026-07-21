@@ -15,7 +15,7 @@ const navLinks = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const isLP = pathname === "/services/takken";
+  const isLP = pathname === "/services/takken" || pathname === "/landing/takken";
 
   return (
     <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
@@ -47,7 +47,7 @@ export default function Header() {
                 href="#register"
                 className="px-5 py-2.5 bg-[#007AFF] text-white text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
               >
-                β版先行登録
+                リリース通知を受け取る
               </a>
             )}
           </div>
