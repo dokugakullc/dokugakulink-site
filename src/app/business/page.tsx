@@ -276,8 +276,8 @@ export default function BusinessPage() {
                   </div>
                   <p className="text-xl font-bold text-[#0d2545] mb-1">ウカレル</p>
                   <p className="text-base font-bold text-[#0d2545] mb-1">独学社会人のための合格ナビゲーションアプリ</p>
-                  <p className="text-sm text-gray-500 mb-1">現在β版を準備中</p>
-                  <p className="text-sm font-medium text-blue-700 mb-4">β版事前登録受付中</p>
+                  <p className="text-sm text-gray-500 mb-1">リリース準備中</p>
+                  <p className="text-sm font-medium text-blue-700 mb-4">事前登録受付中</p>
                   <p className="text-sm text-gray-600 leading-loose mb-5">
                     ウカレルは、独学で資格取得を目指す社会人のための合格ナビゲーションアプリです。
                     Phase 1では宅地建物取引士試験に対応し、将来的にFP・簿記・行政書士へ展開します。

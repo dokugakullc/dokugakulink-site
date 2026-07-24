@@ -146,26 +146,20 @@ export default function CompanyPage() {
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="md:col-span-1">
-              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-2">Profile</p>
-              <h2 className="text-lg font-bold text-[#0d2545]">代表者略歴</h2>
+              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-2">Background</p>
+              <h2 className="text-lg font-bold text-[#0d2545]">私たちの背景</h2>
             </div>
             <div className="md:col-span-3">
               <div className="space-y-5 text-sm text-gray-700 leading-loose">
-                <p className="text-base font-bold text-[#0d2545]">代表社員　陣内 智徳</p>
+                <p className="text-base font-bold text-[#0d2545]">創業の背景</p>
                 <p>
-                  大阪経済法科大学卒業。
+                  dokugaku link合同会社は、金融機関での営業・新規出店支援、中堅企業での事業企画、不動産会社での売買・建設事業といった実務経験を背景に、2025年に設立されました。
                 </p>
                 <p>
-                  金融機関にて新規出店支援および法人・個人向け営業業務に従事。その後、中堅企業にて事業企画業務を担当し、新規事業の立案や事業運営に携わる。
+                  金融と不動産の現場で培った定量分析・リスク評価・事業運営の知見を、資格取得支援と資産形成の意思決定支援に活かしています。
                 </p>
                 <p>
-                  不動産会社では売買事業および建設事業に従事し、不動産に関する実務経験を積む。
-                </p>
-                <p>
-                  資格学習における継続の難しさや、何を学習すべきか分からないという課題を解決するため、2025年にdokugaku link合同会社を設立。
-                </p>
-                <p>
-                  現在は資格取得支援サービス「ウカレル」の開発を進めるとともに、資産形成および不動産分野に関するコンサルティング事業を展開している。
+                  資格学習における継続の難しさや、何を学習すべきか分からないという課題を解決するため、資格取得支援サービス「ウカレル」の開発を進めるとともに、資産形成および不動産分野に関するコンサルティング事業を展開しています。
                 </p>
               </div>
             </div>
@@ -198,7 +192,7 @@ export default function CompanyPage() {
                 <p>
                   この課題を解決するため、何をいつ復習すべきかを自動で提案する学習支援アプリ「ウカレル」を開発しています。
                 </p>
-                <p className="text-right text-gray-400 pt-4">dokugaku link合同会社 代表　陣内 智徳</p>
+                <p className="text-right text-gray-400 pt-4">dokugaku link合同会社</p>
               </div>
             </div>
           </div>
@@ -357,7 +351,7 @@ export default function CompanyPage() {
                 <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">開発中</span>
                 <p className="text-sm font-bold text-[#0d2545] mt-4 mb-2">宅建試験 独学支援アプリ</p>
                 <p className="text-xs text-gray-600 leading-loose">
-                  忘れた頃に、また出題する仕組みと、学習継続を支援する体験設計で、
+                  今日やるべき学習が分かる仕組みと、学習継続を支援する体験設計で、
                   独学者の宅建合格率向上を目指すモバイルアプリ。
                 </p>
                 <div className="mt-4">
