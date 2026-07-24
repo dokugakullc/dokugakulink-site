@@ -12,33 +12,44 @@ const SHOTS = [
   { file: "06_result", alt: "演習結果を振り返る画面。", cap: "解いた学習を振り返り、積み重ねが見える。" },
 ] as const;
 
-// モバイルでは左右スワイプ + ドットタップで移動できるカルーセル、
-// PC（>640px）では CSS グリッド（3列）のまま。自動スクロールはしない。
+// 全ブレークポイント共通のカルーセル。
+// - スワイプ: タッチ/トラックパッドはネイティブ横スクロール（scroll-snap）
+// - ドラッグ: マウスはポインタで掴んでスクロール（PC対応）
+// - 左右矢印 / ドット: タップで対象画面へ中央寄せ
+// - 自動スクロールはしない
 export default function LpShotsCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const targetRef = useRef(0); // 連続クリックでも正しく進むよう最新の目標indexを保持
+  const drag = useRef({ active: false, startX: 0, startScroll: 0, moved: 0 });
+
+  // スクロール位置から中央のスライドを特定してドット/強調を同期
+  const nearestIndex = () => {
+    const track = trackRef.current;
+    if (!track) return 0;
+    const items = Array.from(track.children) as HTMLElement[];
+    const center = track.scrollLeft + track.clientWidth / 2;
+    let idx = 0;
+    let best = Infinity;
+    items.forEach((el, i) => {
+      const c = el.offsetLeft + el.offsetWidth / 2;
+      const d = Math.abs(c - center);
+      if (d < best) {
+        best = d;
+        idx = i;
+      }
+    });
+    return idx;
+  };
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-
     const sync = () => {
-      const items = Array.from(track.children) as HTMLElement[];
-      if (items.length === 0) return;
-      const center = track.scrollLeft + track.clientWidth / 2;
-      let idx = 0;
-      let best = Infinity;
-      items.forEach((el, i) => {
-        const elCenter = el.offsetLeft + el.offsetWidth / 2;
-        const d = Math.abs(elCenter - center);
-        if (d < best) {
-          best = d;
-          idx = i;
-        }
-      });
+      const idx = nearestIndex();
+      targetRef.current = idx;
       setActive(idx);
     };
-
     track.addEventListener("scroll", sync, { passive: true });
     sync();
     return () => track.removeEventListener("scroll", sync);
@@ -47,11 +58,11 @@ export default function LpShotsCarousel() {
   const goTo = (i: number) => {
     const track = trackRef.current;
     if (!track) return;
-    const el = track.children[i] as HTMLElement | undefined;
+    const clamped = Math.max(0, Math.min(SHOTS.length - 1, i));
+    const el = track.children[clamped] as HTMLElement | undefined;
     if (!el) return;
-    // タップ時は即座にドットを反映（スクロール完了を待たない）
-    setActive(i);
-    // rect ベースで現在のスクロール位置に依存せず中央寄せする
+    targetRef.current = clamped;
+    setActive(clamped); // タップ時は即座に反映（スクロール完了を待たない）
     const trackRect = track.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
     const delta =
@@ -59,28 +70,92 @@ export default function LpShotsCarousel() {
     track.scrollBy({ left: delta, behavior: "smooth" });
   };
 
+  // マウスのドラッグでスクロール（タッチ/ペンはネイティブに任せる）
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return;
+    const track = trackRef.current;
+    if (!track) return;
+    drag.current = { active: true, startX: e.clientX, startScroll: track.scrollLeft, moved: 0 };
+    track.style.scrollSnapType = "none";
+    track.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!drag.current.active) return;
+    const track = trackRef.current;
+    if (!track) return;
+    const dx = e.clientX - drag.current.startX;
+    drag.current.moved = Math.max(drag.current.moved, Math.abs(dx));
+    track.scrollLeft = drag.current.startScroll - dx;
+  };
+  const endDrag = () => {
+    if (!drag.current.active) return;
+    const track = trackRef.current;
+    if (!track) return;
+    drag.current.active = false;
+    const idx = nearestIndex();
+    track.style.scrollSnapType = "";
+    goTo(idx); // ドラッグ後は最寄りのスライドへスナップ
+  };
+  // ドラッグ直後の誤クリックを抑止
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (drag.current.moved > 6) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   return (
-    <div className="uk-shots-wrap">
-      <div className="uk-shots" ref={trackRef}>
-        {SHOTS.map(({ file, alt, cap }) => (
-          <figure key={file} className="uk-shot">
-            <div className="uk-phone uk-phone-sm">
-              <Image
-                src={`/screenshots/ukareru/${file}.webp`}
-                alt={alt}
-                width={828}
-                height={1792}
-                loading="lazy"
-                sizes="(max-width: 640px) 80vw, 300px"
-                className="uk-phone-img"
-              />
-            </div>
-            <figcaption className="uk-shot-cap">{cap}</figcaption>
-          </figure>
-        ))}
+    <div className="uk-carousel">
+      <div className="uk-shots-viewport">
+        <button
+          type="button"
+          className="uk-arrow uk-arrow-prev"
+          aria-label="前の画面へ"
+          onClick={() => goTo(targetRef.current - 1)}
+          disabled={active === 0}
+        >
+          <span aria-hidden="true">‹</span>
+        </button>
+
+        <div
+          className="uk-shots"
+          ref={trackRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onClickCapture={onClickCapture}
+        >
+          {SHOTS.map(({ file, alt, cap }, i) => (
+            <figure key={file} className={`uk-shot ${i === active ? "is-active" : ""}`}>
+              <div className="uk-phone uk-phone-sm">
+                <Image
+                  src={`/screenshots/ukareru/${file}.webp`}
+                  alt={alt}
+                  width={828}
+                  height={1792}
+                  loading="lazy"
+                  draggable={false}
+                  sizes="(max-width: 640px) 78vw, 360px"
+                  className="uk-phone-img"
+                />
+              </div>
+              <figcaption className="uk-shot-cap">{cap}</figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="uk-arrow uk-arrow-next"
+          aria-label="次の画面へ"
+          onClick={() => goTo(targetRef.current + 1)}
+          disabled={active === SHOTS.length - 1}
+        >
+          <span aria-hidden="true">›</span>
+        </button>
       </div>
 
-      {/* ドットインジケータ（モバイルのみ表示・CSS 制御） */}
       <div className="uk-shots-dots" aria-label="アプリ画面の切り替え">
         {SHOTS.map(({ file }, i) => (
           <button
