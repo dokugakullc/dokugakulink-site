@@ -69,8 +69,8 @@ export default function NewsPage() {
               <p className="text-sm font-bold text-[#0d2545] mb-1">ウカレル</p>
               <p className="text-sm font-bold text-[#0d2545] mb-2">宅建独学を合格まで導く学習アプリ</p>
               <p className="text-sm text-gray-600 leading-loose mb-5">
-                「忘れた頃に、また出題する」仕組みと継続学習支援で、
-                独学での宅建合格率向上を目指しています。現在β版を準備中です。
+                今日やるべき学習が分かる仕組みと継続学習支援で、
+                独学での宅建合格率向上を目指しています。現在リリースに向けて準備中です。
               </p>
               <Link
                 href="/services/takken"
