@@ -2,16 +2,7 @@ import Image from "next/image";
 import EmailForm from "@/components/EmailForm";
 import CtaLink from "@/components/CtaLink";
 import LPInit from "@/components/LPInit";
-
-// アプリ体験セクション（実 App Store スクリーンショット + ベネフィット文）
-const SHOTS = [
-  { file: "01_home", alt: "ウカレルのホーム画面。今日やるべき学習が表示されている。", cap: "今日やるべき学習が、ひと目で分かる。" },
-  { file: "02_probability", alt: "合格可能性・現在地を表示する画面。", cap: "正解数だけでなく、合格までの現在地を確認。" },
-  { file: "03_analysis", alt: "苦手分野を分析する画面。", cap: "苦手な分野を把握し、次の学習へつなげる。" },
-  { file: "04_quiz", alt: "問題演習の画面。", cap: "一問ずつ、理解しながら進められる。" },
-  { file: "05_explanation", alt: "解説画面。", cap: "解説で、なぜそうなるかまで理解できる。" },
-  { file: "06_result", alt: "演習結果を振り返る画面。", cap: "解いた学習を振り返り、積み重ねが見える。" },
-] as const;
+import LpShotsCarousel from "@/components/LpShotsCarousel";
 
 const FAQ = [
   {
@@ -127,25 +118,8 @@ export default function UkareruLP({ source }: { source: string }) {
       <section id="experience" className="alt">
         <div className="wrap-wide">
           <p className="eyebrow" style={{ textAlign: "center" }}>アプリ体験</p>
-          <h2 style={{ textAlign: "center" }}>迷わず学習を続けられる、<br />5つの画面。</h2>
-          <div className="uk-shots">
-            {SHOTS.map(({ file, alt, cap }) => (
-              <figure key={file} className="uk-shot">
-                <div className="uk-phone uk-phone-sm">
-                  <Image
-                    src={`/screenshots/ukareru/${file}.webp`}
-                    alt={alt}
-                    width={828}
-                    height={1792}
-                    loading="lazy"
-                    sizes="(max-width: 640px) 80vw, 300px"
-                    className="uk-phone-img"
-                  />
-                </div>
-                <figcaption className="uk-shot-cap">{cap}</figcaption>
-              </figure>
-            ))}
-          </div>
+          <h2 style={{ textAlign: "center" }}>迷わず学習を続けられる、<br />アプリ画面。</h2>
+          <LpShotsCarousel />
         </div>
       </section>
 
