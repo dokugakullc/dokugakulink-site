@@ -1,18 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const ALLOWED_SOURCES = ["takken_lp", "takken_lp_hero", "fp_lp", "boki_lp", "gyosei_lp"] as const;
+const ALLOWED_SOURCES = [
+  "takken_lp",
+  "takken_lp_hero",
+  "landing_takken",
+  "services_takken",
+  "fp_lp",
+  "boki_lp",
+  "gyosei_lp",
+] as const;
 
 // 英語スラッグで統一 — Google Sheetsで集計しやすい形式
 const ALLOWED_PROBLEMS = ["continue", "forget", "roadmap", "growth", "motivation"] as const;
 
+// 広告帰属として保存を許可するキー（PII は含めない）
+const ATTRIBUTION_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "fbclid",
+  "landing_url",
+  "referrer",
+] as const;
+
 type GasResponse = { success: boolean; duplicated?: boolean; error?: string };
 
 function deriveInterest(source: string): string {
-  if (source.startsWith("takken")) return "takken";
-  if (source.startsWith("fp")) return "fp";
-  if (source.startsWith("boki")) return "boki";
-  if (source.startsWith("gyosei")) return "gyosei";
+  if (source.includes("takken")) return "takken";
+  if (source.includes("fp")) return "fp";
+  if (source.includes("boki")) return "boki";
+  if (source.includes("gyosei")) return "gyosei";
   return "";
+}
+
+// クライアントから来た帰属情報を許可キーだけに詰め替える（構造的にPII混入を防ぐ）
+function sanitizeAttribution(input: unknown): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (typeof input !== "object" || input === null) return out;
+  const src = input as Record<string, unknown>;
+  for (const key of ATTRIBUTION_KEYS) {
+    const v = src[key];
+    if (typeof v === "string" && v.trim()) {
+      out[key] = v.trim().replace(/[\r\n\t]/g, " ").slice(0, 200);
+    }
+  }
+  return out;
 }
 
 export async function POST(req: NextRequest) {
@@ -27,7 +61,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "リクエストが不正です" }, { status: 400 });
   }
 
-  const { email, problem, source } = body as Record<string, unknown>;
+  const { email, problem, source, attribution } = body as Record<string, unknown>;
 
   if (typeof email !== "string" || !email.trim()) {
     return NextResponse.json({ error: "メールアドレスを入力してください" }, { status: 400 });
@@ -49,6 +83,7 @@ export async function POST(req: NextRequest) {
 
   // interest はソースから自動導出（LP別に固定値）
   const interest = deriveInterest(normalizedSource);
+  const attr = sanitizeAttribution(attribution);
 
   const gasUrl = process.env.GAS_WEBHOOK_URL;
   if (!gasUrl) {
@@ -69,6 +104,7 @@ export async function POST(req: NextRequest) {
         problem: normalizedProblem,
         source: normalizedSource,
         userAgent: userAgent.slice(0, 300),
+        ...attr,
       }),
     });
 

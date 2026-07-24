@@ -140,13 +140,13 @@ export default function Home() {
               <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-2 leading-tight">
                 宅建独学を合格まで導く学習アプリ
               </h2>
-              <p className="text-sm text-gray-500 mb-2">現在β版を準備中</p>
-              <p className="text-sm font-medium text-blue-700 mb-6">β版事前登録受付中</p>
+              <p className="text-sm text-gray-500 mb-2">リリース準備中</p>
+              <p className="text-sm font-medium text-blue-700 mb-6">事前登録受付中</p>
               <p className="text-base font-bold text-[#0d2545] mb-6 italic">
-                「忘れた頃に、また出題。」
+                「今日の15問が、未来を変える。」
               </p>
               <p className="text-sm font-semibold text-[#0d2545] mb-6">
-                復習を自動化して、合格まで迷わない。
+                独学でも、迷わない。
               </p>
               <div className="space-y-2.5 mb-8">
                 {[
@@ -197,7 +197,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold mb-3">宅地建物取引士試験 独学支援アプリ</h3>
               <p className="text-blue-100 text-sm leading-loose mb-5">
-                「忘れた頃に、また出題する仕組み」と「学習継続を支援する体験設計」によって、
+                「今日やるべき学習が分かる仕組み」と「学習継続を支援する体験設計」によって、
                 独学での宅建合格率向上を目指しています。
               </p>
               <Link

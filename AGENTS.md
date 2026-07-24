@@ -30,11 +30,16 @@ Roadmap、Brand Guidelines、Legal文書を読むこと。
 
 - ローカル: `/Users/tomonorijinnai/dokugakulink-site/`
 - GitHub: `dokugakullc/dokugakulink-site`
-- ウカレルLP: `src/app/services/takken/`
-- 互換ルート: `src/app/landing/takken/`
+- ウカレルLP本体（共有コンポーネント）: `src/components/UkareruLP.tsx`
+  - `src/app/landing/takken/`（**Meta広告・SNSの正本遷移先**。正本URL=`/landing/takken`）
+  - `src/app/services/takken/`（サイト内「ウカレル」紹介ページ。ヘッダー/フッター/トップの導線先）
+  - 両ルートは同一の `UkareruLP` を描画する。**URL・route・canonical は不変**（新規route/redirect禁止）。
 
 `/Users/tomonorijinnai/takken-app/docs/` は静的・法的ページ系、
 `takken_app/web/` はFlutter Web用であり、公式LPの正本ではない。
+
+現フェーズ（App Store公開前）の目的は**ウェイティングリスト登録**。リリース後も同じURLを継続利用する。
+経緯・決定は Obsidian `50_Website/01_Decision_Log.md` DEC-WEB-2026-07-21、URL戦略は `50_Website/LPs/Takken_LP.md` を参照。
 
 ## 作業ルール
 

@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import MicrosoftClarity from "@/components/MicrosoftClarity";
+import MetaPixel from "@/components/MetaPixel";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -100,6 +101,7 @@ export default function RootLayout({
         />
         <GoogleAnalytics />
         <MicrosoftClarity />
+        <MetaPixel />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

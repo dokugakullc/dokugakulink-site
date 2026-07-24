@@ -382,3 +382,130 @@
     background: #0055CC;
   }
 }
+
+/* ============================================================
+   ウカレル 事前登録LP（uk-）— 2026-07 Meta広告向け改修
+   ============================================================ */
+.lp-root { --navy: #0d2545; --navy-2: #14315a; }
+
+/* Hero */
+.lp-root .uk-hero { padding: 72px 0 72px; }
+.lp-root .uk-hero-inner { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+.lp-root .uk-hero-copy h1 { margin-bottom: 18px; color: var(--navy); }
+.lp-root .uk-hero-copy .hero-tag { font-size: clamp(18px,3vw,24px); line-height: 1.3; margin-bottom: 16px; }
+.lp-root .uk-hero-copy .hero-sub { font-size: 16px; line-height: 1.8; }
+.lp-root .uk-hero-cta { margin-top: 32px; }
+.lp-root .uk-hero-visual { display: flex; justify-content: center; }
+
+/* Phone frame (shared) */
+.lp-root .uk-phone { width: 260px; max-width: 62vw; background: #1C1C1E; border-radius: 40px; padding: 8px; box-shadow: 0 24px 60px rgba(13,37,69,.28); }
+.lp-root .uk-phone-img { display: block; width: 100%; height: auto; border-radius: 32px; }
+.lp-root .uk-phone-sm { width: 100%; max-width: 260px; box-shadow: 0 16px 40px rgba(13,37,69,.20); }
+
+/* Value list */
+.lp-root .uk-value-list { list-style: none; max-width: 560px; margin: 36px auto 0; display: grid; gap: 14px; }
+.lp-root .uk-value-list li { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 700; color: var(--text); background: var(--bg2); border-radius: 14px; padding: 16px 20px; }
+.lp-root .uk-check { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: var(--blue); color: #fff; font-size: 13px; font-weight: 800; }
+
+/* Screenshot gallery — 全ブレークポイント共通カルーセル（ドラッグ/矢印/ドット・自動なし） */
+.lp-root .uk-carousel { position: relative; margin-top: 48px; }
+.lp-root .uk-shots-viewport { position: relative; }
+.lp-root .uk-shots {
+  --shot-w: 380px;
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* 左右に半端分の余白を持たせ、先頭/末尾スライドも中央寄せできるようにする */
+  padding: 8px calc(50% - var(--shot-w) / 2) 12px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.lp-root .uk-shots:active { cursor: grabbing; }
+.lp-root .uk-shots::-webkit-scrollbar { display: none; }
+.lp-root .uk-shot {
+  flex: 0 0 var(--shot-w);
+  scroll-snap-align: center;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; margin: 0;
+  transform: scale(.92);
+  opacity: .5;
+  transition: transform .4s ease, opacity .4s ease;
+}
+.lp-root .uk-shot.is-active { transform: scale(1); opacity: 1; }
+.lp-root .uk-shot-cap { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.6; max-width: 260px; }
+/* カルーセルではスクショを少し大きく */
+.lp-root .uk-carousel .uk-phone-sm { width: 100%; max-width: 300px; }
+.lp-root .uk-carousel .uk-phone-img { pointer-events: none; }
+
+/* 左右矢印 */
+.lp-root .uk-arrow { position: absolute; top: 46%; transform: translateY(-50%); z-index: 5; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--bd); background: rgba(255,255,255,.92); color: var(--navy); font-size: 26px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 20px rgba(13,37,69,.14); transition: background .2s, transform .2s, opacity .2s; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.lp-root .uk-arrow > span { display: block; margin-top: -3px; }
+.lp-root .uk-arrow:hover { background: #fff; transform: translateY(-50%) scale(1.06); }
+.lp-root .uk-arrow:active { transform: translateY(-50%) scale(.96); }
+.lp-root .uk-arrow-prev { left: 6px; }
+.lp-root .uk-arrow-next { right: 6px; }
+.lp-root .uk-arrow:disabled { opacity: .3; cursor: default; box-shadow: none; }
+.lp-root .uk-arrow:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* ドットインジケータ（全ブレークポイント表示） */
+.lp-root .uk-shots-dots { display: flex; justify-content: center; gap: 9px; margin-top: 22px; }
+.lp-root .uk-dot { width: 8px; height: 8px; padding: 0; border: none; border-radius: 50%; background: var(--bd); cursor: pointer; transition: background .2s ease, transform .2s ease; }
+.lp-root .uk-dot.is-active { background: var(--blue); transform: scale(1.3); }
+.lp-root .uk-dot:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* タブレット: 中央を大きく、左右の peek を維持 */
+@media (max-width: 1024px) {
+  .lp-root .uk-shots { --shot-w: 340px; }
+}
+
+/* Recommend list */
+.lp-root .uk-reco-list { list-style: none; max-width: 620px; margin: 36px auto 0; display: grid; gap: 12px; }
+.lp-root .uk-reco-list li { position: relative; font-size: 16px; font-weight: 600; color: var(--text); background: #fff; border: 1px solid var(--bd); border-radius: 14px; padding: 16px 20px 16px 48px; }
+.lp-root .uk-reco-list li::before { content: "✓"; position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--blue); font-weight: 800; }
+
+/* Register (dark) */
+.lp-root .uk-register { background: var(--navy); text-align: center; padding: 88px 0; }
+.lp-root .uk-register h2 { color: #fff; }
+.lp-root .uk-register-lead { margin: 8px auto 36px; max-width: 520px; color: rgba(255,255,255,.62); font-size: 16px; line-height: 1.8; }
+.lp-root .uk-form-card { max-width: 480px; margin: 0 auto; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10); border-radius: 24px; padding: 32px 28px; box-shadow: 0 24px 64px rgba(0,0,0,.32); }
+
+/* FAQ (native details) */
+.lp-root .uk-faq { max-width: 680px; margin: 40px auto 0; display: grid; gap: 12px; }
+.lp-root .uk-faq-item { background: var(--bg2); border-radius: 14px; overflow: hidden; }
+.lp-root .uk-faq-q { list-style: none; cursor: pointer; padding: 20px 52px 20px 22px; font-size: 16px; font-weight: 700; color: var(--text); position: relative; }
+.lp-root .uk-faq-q::-webkit-details-marker { display: none; }
+.lp-root .uk-faq-q::after { content: "+"; position: absolute; right: 22px; top: 50%; transform: translateY(-50%); font-size: 22px; font-weight: 400; color: var(--blue); transition: transform .2s; }
+.lp-root .uk-faq-item[open] .uk-faq-q::after { content: "−"; }
+.lp-root .uk-faq-q:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+.lp-root .uk-faq-a { padding: 0 22px 22px; font-size: 15px; line-height: 1.85; color: var(--t2); }
+
+/* Final CTA */
+.lp-root .uk-final { background: var(--bg2); text-align: center; }
+.lp-root .uk-final h2 { color: var(--navy); margin-bottom: 12px; }
+.lp-root .uk-final-sub { font-size: 16px; color: var(--t2); margin: 0 auto 32px; max-width: 480px; }
+
+/* Sticky mobile CTA */
+.lp-root .uk-sticky-cta { display: none; }
+.lp-root .uk-sticky-btn { display: block; width: 100%; max-width: 480px; margin: 0 auto; text-align: center; padding: 15px 24px; font-size: 16px; }
+
+/* Desktop hero 2-col */
+@media (min-width: 720px) {
+  .lp-root .uk-hero-inner { grid-template-columns: 1.05fr .95fr; gap: 56px; }
+  .lp-root .uk-phone { max-width: 300px; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  /* アプリ体験カルーセル: スマホ幅のスライド寸法 */
+  .lp-root .uk-shots { --shot-w: min(70vw, 270px); gap: 16px; }
+  .lp-root .uk-carousel .uk-phone-sm { max-width: 260px; }
+  .lp-root .uk-arrow { width: 38px; height: 38px; font-size: 22px; }
+  .lp-root .uk-value-list li { font-size: 16px; }
+  /* sticky CTA on mobile only */
+  .lp-root .uk-sticky-cta { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); background: rgba(255,255,255,.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(0,0,0,.08); box-shadow: 0 -2px 20px rgba(0,0,0,.08); }
+  /* keep final CTA clear of the sticky bar */
+  .lp-root .uk-final { padding-bottom: 120px; }
+}
