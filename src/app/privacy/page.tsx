@@ -71,13 +71,6 @@ const sections = [
               Microsoft プライバシーステートメント
             </a>
           </li>
-          <li>
-            Meta Pixel（提供者：Meta Platforms, Inc.）<br />
-            利用目的：広告配信の効果測定および広告施策の改善<br />
-            <a href="https://www.facebook.com/privacy/policy/" className="text-blue-700 hover:underline">
-              Meta プライバシーポリシー
-            </a>
-          </li>
         </ul>
         <p className="mt-4">
           利用者はブラウザの設定によりCookieを無効化できます。ただし、その場合はウェブサイトの一部機能が正常に動作しないことがあります。
