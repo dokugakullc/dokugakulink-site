@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { trackCtaClicked } from "@/lib/track";
+import { resolveVariant } from "@/lib/ab";
 
 const navLinks = [
   { href: "/", label: "ホーム" },
@@ -38,7 +39,9 @@ export default function Header() {
             </span>
             <a
               href="#register"
-              onClick={() => trackCtaClicked({ source: "landing_takken", location: "header" })}
+              onClick={() =>
+                trackCtaClicked({ source: "landing_takken", location: "header", variant: resolveVariant() })
+              }
               className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#007AFF] text-white text-[13px] sm:text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
             >
               無料で事前登録
