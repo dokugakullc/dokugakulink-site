@@ -487,6 +487,24 @@
 .lp-root .uk-final h2 { color: var(--navy); margin-bottom: 12px; }
 .lp-root .uk-final-sub { font-size: 16px; color: var(--t2); margin: 0 auto 32px; max-width: 480px; }
 
+/* Hero proof strip — 実factのみ（虚偽表現禁止） */
+.lp-root .uk-hero-proof { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.lp-root .uk-hero-proof li { flex: 1 1 0; min-width: 90px; background: var(--bg2); border-radius: 14px; padding: 12px 8px; text-align: center; font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.4; white-space: nowrap; }
+.lp-root .uk-proof-n { display: block; font-size: 22px; font-weight: 800; color: var(--blue); letter-spacing: -.02em; line-height: 1.1; }
+
+/* Mid-page CTA band — 体験直後の高意欲タイミング */
+.lp-root .uk-midcta { margin: 44px auto 0; max-width: 560px; text-align: center; background: var(--blue-s); border: 1px solid rgba(0,122,255,.16); border-radius: 22px; padding: 32px 24px; }
+.lp-root .uk-midcta-lead { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 18px; line-height: 1.5; }
+.lp-root .uk-midcta-note { font-size: 13px; color: var(--t2); margin-top: 14px; }
+
+/* Register trust list */
+.lp-root .uk-register-trust { list-style: none; max-width: 480px; margin: 22px auto 0; display: grid; gap: 8px; text-align: left; }
+.lp-root .uk-register-trust li { position: relative; font-size: 13px; color: rgba(255,255,255,.7); padding-left: 24px; line-height: 1.6; }
+.lp-root .uk-register-trust li::before { content: "✓"; position: absolute; left: 4px; top: 0; color: #5AC8FA; font-weight: 800; }
+
+/* Final CTA note */
+.lp-root .uk-final-note { font-size: 13px; color: var(--t3); margin-top: 16px; }
+
 /* Sticky mobile CTA */
 .lp-root .uk-sticky-cta { display: none; }
 .lp-root .uk-sticky-btn { display: block; width: 100%; max-width: 480px; margin: 0 auto; text-align: center; padding: 15px 24px; font-size: 16px; }

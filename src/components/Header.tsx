@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { trackCtaClicked } from "@/lib/track";
 
 const navLinks = [
   { href: "/", label: "ホーム" },
@@ -15,7 +16,38 @@ const navLinks = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const isLP = pathname === "/services/takken" || pathname === "/landing/takken";
+  // 広告LP（Meta広告の正本遷移先）。回遊導線を排し、登録一点に集中させる。
+  const isAdLP = pathname === "/landing/takken";
+  // サイト内のウカレル紹介ページ。ヘッダーCTAは出すが会社ナビは維持する。
+  const isServiceLP = pathname === "/services/takken";
+
+  // 広告LP専用の最小ヘッダー: ブランド表示（サイトへは戻さない）＋単一CTAのみ。
+  if (isAdLP) {
+    return (
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <div className="flex h-14 sm:h-16 items-center justify-between">
+            {/* ブランド（信頼のため表示するが、離脱を生まないよう非遷移） */}
+            <span className="flex flex-col leading-tight select-none">
+              <span className="text-sm sm:text-base font-bold tracking-tight text-[#0d2545]">
+                ウカレル
+              </span>
+              <span className="text-[9px] tracking-widest text-gray-400">
+                dokugaku link
+              </span>
+            </span>
+            <a
+              href="#register"
+              onClick={() => trackCtaClicked({ source: "landing_takken", location: "header" })}
+              className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#007AFF] text-white text-[13px] sm:text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
+            >
+              無料で事前登録
+            </a>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
@@ -42,7 +74,7 @@ export default function Header() {
                 </Link>
               ))}
             </nav>
-            {isLP && (
+            {isServiceLP && (
               <a
                 href="#register"
                 className="px-5 py-2.5 bg-[#007AFF] text-white text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"

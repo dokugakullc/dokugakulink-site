@@ -49,13 +49,18 @@ export default function UkareruLP({ source }: { source: string }) {
             </p>
             <div className="uk-hero-cta">
               <CtaLink source={source} location="hero" className="btn btn-lg">
-                リリース通知を受け取る
+                無料で事前登録する
               </CtaLink>
               <div className="cta-badges">
-                <div className="badge"><span className="badge-dot" />無料で事前登録</div>
-                <div className="badge"><span className="badge-dot" />メールアドレスだけ</div>
+                <div className="badge"><span className="badge-dot" />メールアドレスだけ・30秒</div>
+                <div className="badge"><span className="badge-dot" />しつこい宣伝メールなし</div>
               </div>
             </div>
+            <ul className="uk-hero-proof">
+              <li><span className="uk-proof-n">913</span>問を収録</li>
+              <li><span className="uk-proof-n">30</span>日間無料</li>
+              <li><span className="uk-proof-n">30</span>秒で登録</li>
+            </ul>
           </div>
           <div className="uk-hero-visual">
             <div className="uk-phone">
@@ -120,6 +125,13 @@ export default function UkareruLP({ source }: { source: string }) {
           <p className="eyebrow" style={{ textAlign: "center" }}>アプリ体験</p>
           <h2 style={{ textAlign: "center" }}>迷わず学習を続けられる、<br />アプリ画面。</h2>
           <LpShotsCarousel />
+          <div className="uk-midcta">
+            <p className="uk-midcta-lead">この画面を、いちばんに使ってみませんか？</p>
+            <CtaLink source={source} location="mid" className="btn">
+              無料で事前登録する
+            </CtaLink>
+            <p className="uk-midcta-note">メールアドレスだけ・30秒で完了</p>
+          </div>
         </div>
       </section>
 
@@ -183,6 +195,11 @@ export default function UkareruLP({ source }: { source: string }) {
           <div className="uk-form-card">
             <EmailForm source={source} />
           </div>
+          <ul className="uk-register-trust">
+            <li>登録は無料。App Store 公開のお知らせだけをお送りします。</li>
+            <li>ご登録はいつでも解除できます。</li>
+            <li>運営：dokugaku link合同会社（大阪）</li>
+          </ul>
         </div>
       </section>
 
@@ -206,17 +223,18 @@ export default function UkareruLP({ source }: { source: string }) {
       <section id="final-cta" className="uk-final">
         <div className="wrap">
           <h2>独学は、<br />もっと迷わなくていい。</h2>
-          <p className="uk-final-sub">リリース通知を受け取って、準備を始めましょう。</p>
+          <p className="uk-final-sub">いま事前登録して、リリースをいちばんに受け取りましょう。</p>
           <CtaLink source={source} location="final" className="btn btn-lg">
-            リリース通知を受け取る
+            無料で事前登録する
           </CtaLink>
+          <p className="uk-final-note">メールアドレスだけ・30秒で完了</p>
         </div>
       </section>
 
       {/* モバイル固定 CTA */}
       <div className="uk-sticky-cta">
         <CtaLink source={source} location="sticky" className="btn uk-sticky-btn">
-          リリース通知を受け取る
+          無料で事前登録する
         </CtaLink>
       </div>
     </div>
