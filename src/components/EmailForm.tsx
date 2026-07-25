@@ -2,7 +2,13 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { getAttribution } from "@/lib/utm";
-import { trackFormStarted, trackSubmitted, trackSubmissionFailed } from "@/lib/track";
+import {
+  trackFormStarted,
+  trackSubmitted,
+  trackSubmissionFailed,
+  trackSurveyAnswered,
+} from "@/lib/track";
+import { useVariant, resolveVariant, isAbSource } from "@/lib/ab";
 
 // Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
@@ -29,19 +35,72 @@ interface EmailFormProps {
   source?: string;
 }
 
+// 悩みカードUI（A: フォーム内 / B: 登録完了後 で共用）
+function ProblemCards({
+  selected,
+  onSelect,
+  disabled,
+}: {
+  selected: ProblemValue | "";
+  onSelect: (v: ProblemValue) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-2">
+      {PROBLEMS.map(({ value, label, icon }) => (
+        <button
+          key={value}
+          type="button"
+          disabled={disabled}
+          aria-pressed={selected === value}
+          onClick={() => onSelect(value)}
+          className={`flex items-center gap-3 w-full px-4 py-4 rounded-xl text-sm text-left font-medium border transition-all disabled:opacity-50 ${
+            selected === value
+              ? "bg-[#007AFF] border-[#007AFF] text-white"
+              : "bg-white/5 text-white/60 border-white/10 hover:border-[#007AFF]/40 hover:bg-white/[.12]"
+          }`}
+        >
+          <span className="text-base shrink-0" aria-hidden="true">{icon}</span>
+          <span className="flex-1">{label}</span>
+          <span
+            aria-hidden="true"
+            className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
+              selected === value ? "border-white bg-white" : "border-white/30"
+            }`}
+          >
+            {selected === value && <span className="w-2 h-2 rounded-full bg-[#007AFF] block" />}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState<ProblemValue | "">("");
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [fieldError, setFieldError] = useState<FieldError>("");
+  const [surveyDone, setSurveyDone] = useState(false);
   const startedRef = useRef(false);
+
+  // A/B は広告LP(source=landing_takken)のみ有効。他ルート(services_takken)は常にA・非バケット。
+  const abOn = isAbSource(source);
+  // null(未確定)/A はフォーム内アンケートを表示（＝SSR既定=A）。B は非表示にし完了後へ移設。
+  const variant = useVariant();
+  const isB = abOn && variant === "B";
+
+  // 計測 params（A/B有効時のみ variant を付与）
+  function withVariant(base: Record<string, string>): Record<string, string> {
+    return abOn ? { ...base, variant: resolveVariant() } : base;
+  }
 
   // フォーム入力開始を一度だけ計測
   function markStarted() {
     if (startedRef.current) return;
     startedRef.current = true;
-    trackFormStarted({ source });
+    trackFormStarted(withVariant({ source }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -54,6 +113,9 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
     if (!consent) return setFieldError("consent");
     setFieldError("");
 
+    // B版はアンケートを送信ペイロードに含めない（登録API・保存先は不変・回答は完了後に分析イベントのみ）
+    const submitProblem = isB ? "" : problem;
+
     setStatus("loading");
     try {
       const res = await fetch("/api/register", {
@@ -61,23 +123,31 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: trimmed,
-          problem,
+          problem: submitProblem,
           source,
           attribution: getAttribution(),
         }),
       });
       const data = (await res.json()) as { success?: boolean; duplicated?: boolean };
       if (!res.ok || !data.success) {
-        trackSubmissionFailed({ source });
+        trackSubmissionFailed(withVariant({ source }));
         setStatus("error");
         return;
       }
-      trackSubmitted({ source, duplicated: data.duplicated ? "1" : "0" });
+      trackSubmitted(withVariant({ source, duplicated: data.duplicated ? "1" : "0" }));
       setStatus(data.duplicated ? "duplicated" : "success");
     } catch {
-      trackSubmissionFailed({ source });
+      trackSubmissionFailed(withVariant({ source }));
       setStatus("error");
     }
+  }
+
+  // B版: 登録完了後アンケートの回答（分析イベントのみ・登録APIは呼ばない）
+  function answerSurvey(value: ProblemValue) {
+    if (surveyDone) return;
+    setProblem(value);
+    setSurveyDone(true);
+    trackSurveyAnswered({ source, variant: "B", problem: value });
   }
 
   if (status === "success" || status === "duplicated") {
@@ -127,6 +197,27 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
             ご登録いただいたメールアドレスへお知らせします。
           </p>
         </div>
+
+        {/* B版のみ: 登録完了後の任意アンケート（回答は分析イベントとしてのみ記録） */}
+        {isB && (
+          <div className="pt-5 mt-2 border-t border-white/10">
+            {surveyDone ? (
+              <p className="text-blue-200 text-sm text-center py-2">
+                ご回答ありがとうございます。参考にさせていただきます。
+              </p>
+            ) : (
+              <>
+                <p className="text-white/80 text-sm font-medium text-center mb-1">
+                  今、宅建の学習で一番困っていることは？
+                </p>
+                <p className="text-white/40 text-xs text-center mb-3">
+                  任意です。今後の改善の参考にさせていただきます。
+                </p>
+                <ProblemCards selected={problem} onSelect={answerSurvey} />
+              </>
+            )}
+          </div>
+        )}
       </div>
     );
   }
@@ -159,40 +250,20 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
         />
       </div>
 
-      {/* ② 悩みカード選択（任意） */}
-      <div>
-        <p className="text-white/40 text-xs mb-2.5">今一番困っていること（任意）</p>
-        <div className="grid grid-cols-1 gap-2">
-          {PROBLEMS.map(({ value, label, icon }) => (
-            <button
-              key={value}
-              type="button"
-              disabled={status === "loading"}
-              aria-pressed={problem === value}
-              onClick={() => {
-                markStarted();
-                setProblem(problem === value ? "" : value);
-              }}
-              className={`flex items-center gap-3 w-full px-4 py-4 rounded-xl text-sm text-left font-medium border transition-all disabled:opacity-50 ${
-                problem === value
-                  ? "bg-[#007AFF] border-[#007AFF] text-white"
-                  : "bg-white/5 text-white/60 border-white/10 hover:border-[#007AFF]/40 hover:bg-white/[.12]"
-              }`}
-            >
-              <span className="text-base shrink-0" aria-hidden="true">{icon}</span>
-              <span className="flex-1">{label}</span>
-              <span
-                aria-hidden="true"
-                className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
-                  problem === value ? "border-white bg-white" : "border-white/30"
-                }`}
-              >
-                {problem === value && <span className="w-2 h-2 rounded-full bg-[#007AFF] block" />}
-              </span>
-            </button>
-          ))}
+      {/* ② 悩みカード選択（任意）— A版のみフォーム内に表示。B版は登録完了後に移設。 */}
+      {!isB && (
+        <div>
+          <p className="text-white/40 text-xs mb-2.5">今一番困っていること（任意）</p>
+          <ProblemCards
+            selected={problem}
+            disabled={status === "loading"}
+            onSelect={(v) => {
+              markStarted();
+              setProblem(problem === v ? "" : v);
+            }}
+          />
         </div>
-      </div>
+      )}
 
       {/* ③ プライバシーポリシー同意（必須） */}
       <label className="flex items-start gap-3 text-left cursor-pointer select-none">
