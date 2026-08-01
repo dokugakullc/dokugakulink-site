@@ -20,6 +20,10 @@ export type Inquiry = {
   receivedAt: string;
   reference: string;
   submissionId: string;
+  // 種別・会社名・source（メール件名/本文・保存に使用）。既存テスト互換のため任意。
+  contactType?: string;
+  company?: string;
+  source?: string;
 };
 
 export type EmailKind = "admin" | "user";

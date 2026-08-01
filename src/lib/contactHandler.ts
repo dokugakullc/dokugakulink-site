@@ -2,26 +2,42 @@
 // NextRequest そのものではなく、最小インターフェース（headers.get / json）だけに依存する。
 // これにより next/server や外部送信に接続せず、Route Handler の全分岐をユニットテストできる。
 import {
+  CONTACT_SOURCE,
   HONEYPOT_FIELD,
   RESEND_TIMEOUT_MS,
   isHoneypotTriggered,
   isJsonContentType,
   isRequestOriginAllowed,
   isValidSubmissionId,
+  sanitizeAttribution,
   validateContactInput,
 } from "./formSecurity";
 import { deliverContact, type Inquiry, type SendEmail } from "./contactDelivery";
 import { formatJst, generateReference, generateSubmissionId } from "./contactFormat";
+import type { ContactStoreRecord } from "./contactStorePayload";
+
+// 型は contactStorePayload に集約し、ここから再輸出（既存 import 互換）。
+export type { ContactStoreRecord };
 
 export type HttpRequestLike = {
   headers: { get(name: string): string | null };
   json(): Promise<unknown>;
 };
 
+// contacts GAS へ 1 件保存する（成功で { stored } を解決、失敗で reject）。
+// duplicate=true は「同一 submission_id が既に保存済み」＝安全（記録は存在）。
+export type StoreContact = (
+  record: ContactStoreRecord,
+  ctx: { timeoutMs: number },
+) => Promise<{ stored: boolean; duplicate: boolean }>;
+
 export type ContactHandlerDeps = {
   resendConfigured: boolean;
   sendEmail: SendEmail;
-  // Preview 環境フラグ（route が VERCEL_ENV から注入）。true の間は外部送信を一切行わない。
+  // 保存（contacts GAS）。未設定なら保存せず、従来どおりメールのみで受領を判定する。
+  storeConfigured?: boolean;
+  storeContact?: StoreContact;
+  // Preview 環境フラグ（route が VERCEL_ENV から注入）。true の間は保存も送信も一切行わない。
   isPreview?: boolean;
   timeoutMs?: number;
   now?: () => Date;
@@ -35,6 +51,7 @@ const noop = () => {};
 
 export async function handleContact(req: HttpRequestLike, deps: ContactHandlerDeps): Promise<HandlerResult> {
   const logWarn = deps.logWarn ?? noop;
+  const logError = deps.logError ?? noop;
   const now = (deps.now ?? (() => new Date()))();
   const timeoutMs = deps.timeoutMs ?? RESEND_TIMEOUT_MS;
 
@@ -101,13 +118,60 @@ export async function handleContact(req: HttpRequestLike, deps: ContactHandlerDe
     receivedAt: formatJst(now),
     reference: generateReference(now),
     submissionId,
+    contactType: validated.value.contactType,
+    company: validated.value.company,
+    source: CONTACT_SOURCE, // クライアント値は使わず固定
   };
 
-  // 4) 配送（送信手段は注入）
-  return deliverContact(inquiry, {
+  // 4) 保存を先に確定（contacts シート）。メール成否とは独立。PII・本文はログに出さない。
+  //    duplicate（同一 submission_id）も「記録は存在」＝保存済みとして扱う。
+  let stored = false;
+  if (deps.storeConfigured && deps.storeContact) {
+    const storeRecord: ContactStoreRecord = {
+      name: inquiry.name,
+      email: inquiry.email,
+      company: inquiry.company ?? "",
+      contact_type: inquiry.contactType ?? "",
+      message: inquiry.message,
+      source: inquiry.source ?? CONTACT_SOURCE,
+      submission_id: inquiry.submissionId,
+      reference: inquiry.reference,
+      userAgent: (req.headers.get("user-agent") ?? "").slice(0, 300),
+      attribution: sanitizeAttribution(record.attribution),
+    };
+    try {
+      const r = await deps.storeContact(storeRecord, { timeoutMs });
+      stored = r.stored || r.duplicate;
+    } catch {
+      stored = false;
+      logError("contact: store failed", { reference: inquiry.reference });
+    }
+  }
+
+  // 5) メール通知（運営宛＝主・利用者宛＝副）。保存済みなら通知失敗でも受領は維持。
+  const delivery = await deliverContact(inquiry, {
     resendConfigured: deps.resendConfigured,
     timeoutMs,
     sendEmail: deps.sendEmail,
     logError: deps.logError,
   });
+  const adminNotified = delivery.status === 200;
+  const confirmationEmailSent = Boolean(delivery.body.confirmationEmailSent);
+
+  // 6) 合成: 保存成功なら通知失敗でも success（問い合わせを失わない）。
+  if (stored) {
+    return {
+      status: 200,
+      body: { success: true, reference: inquiry.reference, stored: true, adminNotified, confirmationEmailSent },
+    };
+  }
+
+  // 保存未実施/失敗 → メールを記録の正とみなす（従来動作）。運営宛失敗なら 500。
+  if (delivery.status === 200) {
+    return {
+      status: 200,
+      body: { success: true, reference: inquiry.reference, stored: false, adminNotified: true, confirmationEmailSent },
+    };
+  }
+  return delivery;
 }

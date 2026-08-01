@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleContact } from "@/lib/contactHandler";
+import { handleContact, type StoreContact } from "@/lib/contactHandler";
 import { sendResendEmail, type ResendPayload } from "@/lib/resendClient";
 import type { EmailKind, Inquiry, SendEmail } from "@/lib/contactDelivery";
 import { isPreviewDeployment } from "@/lib/deployEnv";
+import { contactTypeLabel } from "@/lib/formSecurity";
+import { postContactStore, isContactStoreConfigured } from "@/lib/contactStoreClient";
+import { buildContactStoreBody } from "@/lib/contactStorePayload";
 
 const SUPPORT_FROM = "ウカレル サポート <support@dokugakulink.com>";
 const SUPPORT_TO = "support@dokugakulink.com";
@@ -51,7 +54,9 @@ function buildAdminHtml(i: Inquiry): string {
   const inner = `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:sans-serif;">
       ${row("受付番号", escapeHtml(i.reference))}
+      ${row("種別", escapeHtml(contactTypeLabel(i.contactType ?? "")))}
       ${row("お名前", escapeHtml(i.name))}
+      ${i.company ? row("会社名", escapeHtml(i.company)) : ""}
       ${row("メールアドレス", `<a href="mailto:${escapeHtml(i.email)}" style="color:#1d4ed8;text-decoration:none;">${escapeHtml(i.email)}</a>`)}
       ${row("お問い合わせ内容", escapeHtml(i.message).replace(/\n/g, "<br>"))}
       ${row("送信日時", escapeHtml(i.receivedAt))}
@@ -69,8 +74,11 @@ function buildAdminText(i: Inquiry): string {
     "",
     `■ 受付番号\n${i.reference}`,
     "",
+    `■ 種別\n${contactTypeLabel(i.contactType ?? "")}`,
+    "",
     `■ お名前\n${i.name}`,
     "",
+    ...(i.company ? [`■ 会社名\n${i.company}`, ""] : []),
     `■ メールアドレス\n${i.email}`,
     "",
     `■ お問い合わせ内容\n${i.message}`,
@@ -141,7 +149,8 @@ function buildPayload(kind: EmailKind, i: Inquiry): ResendPayload {
       from: SUPPORT_FROM,
       to: [SUPPORT_TO],
       reply_to: i.email,
-      subject: `【ウカレル】新しいお問い合わせ（${i.name}）`,
+      // 件名は contact_type から生成（＋氏名）
+      subject: `【ウカレル】お問い合わせ：${contactTypeLabel(i.contactType ?? "")}（${i.name}）`,
       html: buildAdminHtml(i),
       text: buildAdminText(i),
     };
@@ -158,6 +167,8 @@ function buildPayload(kind: EmailKind, i: Inquiry): ResendPayload {
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
+  const storeUrl = process.env.CONTACT_STORE_URL;
+  const storeSecret = process.env.CONTACT_STORE_SHARED_SECRET;
 
   // 実際の送信: Resend REST を AbortController で実中断＋Idempotency-Key。
   const sendEmail: SendEmail = async (kind, inquiry, ctx) => {
@@ -168,8 +179,19 @@ export async function POST(req: NextRequest) {
     });
   };
 
+  // 実際の保存: contacts GAS へ AbortController で実中断（contactStoreClient）。
+  // 保存 payload は純粋関数で組み立て（allowlist・attribution 平坦化・token を最後に確定）。
+  // token は共有シークレット（サーバー専用・NEXT_PUBLIC 無し・GAS の SHARED_SECRET と同値・値はログへ出さない）。
+  const storeContact: StoreContact = async (record, ctx) => {
+    const body = buildContactStoreBody(record, storeSecret ?? "");
+    return postContactStore(storeUrl ?? "", body, { timeoutMs: ctx.timeoutMs });
+  };
+
   const result = await handleContact(req, {
     resendConfigured: Boolean(apiKey),
+    // URL・Secret の両方が揃ったときだけ保存を有効化（片方でも欠ければ外部 POST しない）。
+    storeConfigured: isContactStoreConfigured(storeUrl, storeSecret),
+    storeContact,
     isPreview: isPreviewDeployment(process.env.VERCEL_ENV),
     sendEmail,
     logError: (message, meta) => console.error(message, meta),

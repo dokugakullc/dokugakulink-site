@@ -5,7 +5,7 @@ import { handleContact, type ContactHandlerDeps } from "../src/lib/contactHandle
 import type { EmailKind, Inquiry } from "../src/lib/contactDelivery";
 import { makeReq } from "./helpers";
 
-const validBody = { name: "山田 太郎", email: "taro@example.com", message: "本文です" };
+const validBody = { name: "山田 太郎", email: "taro@example.com", message: "本文です", contact_type: "service" };
 
 type Sent = { kind: EmailKind; idempotencyKey: string; inquiry: Inquiry };
 
