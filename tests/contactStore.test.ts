@@ -116,6 +116,18 @@ test("submission_id は保存レコードにも載る（冪等キー）", async 
   assert.equal(ctx.stored[0].submission_id, "abcd1234efgh");
 });
 
+test("submissionId 未指定/不正でも Next 側でサーバー生成し、空で GAS へ送らない", async () => {
+  // 未指定 → サーバー生成の非空 ID（GAS の missing_submission_id には決して当たらない）
+  const ctx1: Ctx = { sent: [], stored: [] };
+  await handleContact(makeReq({ body: validBody }), deps(ctx1));
+  assert.match(ctx1.stored[0].submission_id, /^[A-Za-z0-9-]{8,64}$/);
+  assert.notEqual(ctx1.stored[0].submission_id, "");
+  // 不正な submissionId（短すぎ）→ サーバーが作り直す
+  const ctx2: Ctx = { sent: [], stored: [] };
+  await handleContact(makeReq({ body: { ...validBody, submissionId: "x" } }), deps(ctx2));
+  assert.match(ctx2.stored[0].submission_id, /^[A-Za-z0-9-]{8,64}$/);
+});
+
 test("contact_type 未指定 → 400・保存も送信もしない", async () => {
   const ctx: Ctx = { sent: [], stored: [] };
   const { contact_type: _omit, ...noType } = validBody;

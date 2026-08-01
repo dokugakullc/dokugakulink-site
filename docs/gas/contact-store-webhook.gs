@@ -48,7 +48,11 @@ function doPost(e) {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json_({ success: false, error: 'invalid_email' });
     var name = clip_(data.name, 100);
     if (!name) return json_({ success: false, error: 'missing_name' });
+
+    // submission_id は必須（冪等性の保証キー）。空なら拒否＝シートへ書き込まない。
+    // Next.js 側は常に非空の submission_id を送る（無ければサーバーで生成）。
     var submissionId = clip_(data.submission_id, 64);
+    if (!submissionId) return json_({ success: false, error: 'missing_submission_id' });
 
     lock.waitLock(20000);
 
@@ -58,7 +62,7 @@ function doPost(e) {
     ensureHeaders_(sheet);
 
     // 冪等: submission_id 一致は追記しない（再送の二重保存防止）。email では判定しない。
-    if (submissionId && valueExists_(sheet, 'submission_id', submissionId)) {
+    if (valueExists_(sheet, 'submission_id', submissionId)) {
       return json_({ success: true, stored: false, duplicate: true });
     }
 
