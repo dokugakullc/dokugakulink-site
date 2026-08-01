@@ -12,12 +12,20 @@ export async function POST(req: NextRequest) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), ctx.timeoutMs);
     try {
+      // GAS(registration-webhook.gs) は utm_content / fbclid 等を「トップレベル」で読むため、
+      // attribution を平坦化して送る。token は共有シークレット（サーバー専用・NEXT_PUBLIC を
+      // 付けない＝クライアント非公開・GAS の SHARED_SECRET と同値・値はログへ出さない）。
+      const { attribution, ...rest } = payload;
       const res = await fetch(gasUrl ?? "", {
         method: "POST",
         redirect: "follow",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          token: process.env.GAS_SHARED_SECRET ?? "",
+          ...rest,
+          ...attribution,
+        }),
       });
       if (!res.ok) throw new Error(`GAS returned ${res.status}`);
       const data = (await res.json()) as GasResponse;

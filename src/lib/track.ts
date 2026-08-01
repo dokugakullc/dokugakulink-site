@@ -30,11 +30,24 @@ export function trackFormStarted(params: Params): void {
   phCapture("waitlist_form_started", params);
 }
 
-/** 登録完了。Meta 標準イベント Lead は「完了時のみ」発火。 */
+/**
+ * 新規登録完了。Meta 標準イベント Lead は「新規登録時のみ」発火。
+ * 重複登録では呼ばない（trackDuplicate を使う）。
+ */
 export function trackSubmitted(params: Params): void {
   sendGAEvent("waitlist_submitted", params);
   metaTrack("Lead", params);
   phCapture("waitlist_submitted", params);
+}
+
+/**
+ * 重複登録（既に登録済みのメールアドレス）。画面上は受付済みとして扱うが、
+ * 二重計上を避けるため Meta 標準イベント Lead は発火させない。
+ * 分析用に GA4 / PostHog の専用イベントのみ記録する。
+ */
+export function trackDuplicate(params: Params): void {
+  sendGAEvent("waitlist_duplicate", params);
+  phCapture("waitlist_duplicate", params);
 }
 
 /** 登録失敗。成功イベントは発火させない。 */
