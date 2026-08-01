@@ -7,6 +7,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import MicrosoftClarity from "@/components/MicrosoftClarity";
 import MetaPixel from "@/components/MetaPixel";
 import PostHog from "@/components/PostHog";
+import { isProductionDeployment } from "@/lib/deployEnv";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -93,6 +94,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Server Component 側で Vercel 環境を判定し、Preview / ローカルでは本番計測を出力しない。
+  // Meta Pixel は Preview にも ID が設定されているため、ID の有無だけでは Preview 閲覧で
+  // 本番 Pixel へ計測が混入してしまう。ここで環境ガードして Preview では一切描画しない。
+  // （GA4 / Clarity は env が Production 限定・PostHog はキー未設定のため現状 Preview では発火しない。
+  //   将来 env が Preview へ広がった場合に備え、同じ enableProductionTracking で括れる設計にしておく。）
+  const enableProductionTracking = isProductionDeployment(process.env.VERCEL_ENV);
+
   return (
     <html lang="ja" className={`${notoSansJP.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-gray-900">
@@ -102,7 +110,7 @@ export default function RootLayout({
         />
         <GoogleAnalytics />
         <MicrosoftClarity />
-        <MetaPixel />
+        {enableProductionTracking && <MetaPixel />}
         <PostHog />
         <Header />
         <main className="flex-1">{children}</main>

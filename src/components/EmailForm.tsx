@@ -10,6 +10,8 @@ import {
   trackSurveyAnswered,
 } from "@/lib/track";
 import { useVariant, resolveVariant, isAbSource } from "@/lib/ab";
+import { HONEYPOT_FIELD } from "@/lib/formSecurity";
+import { createSubmitGuard } from "@/lib/submitGuard";
 
 // Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
@@ -81,10 +83,14 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState<ProblemValue | "">("");
   const [consent, setConsent] = useState(false);
+  // honeypot: 通常の利用者・支援技術には見えない。値が入るのは bot のみ。
+  const [hp, setHp] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [fieldError, setFieldError] = useState<FieldError>("");
   const [surveyDone, setSurveyDone] = useState(false);
   const startedRef = useRef(false);
+  // 同期ロック（React state に依存しない多重送信防止）
+  const submitGuard = useRef(createSubmitGuard()).current;
 
   // A/B は広告LP(source=landing_takken)のみ有効。他ルート(services_takken)は常にA・非バケット。
   const abOn = isAbSource(source);
@@ -106,7 +112,8 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (status === "loading") return; // 多重送信防止
+    // 同期ロック: 同一tickの多重送信を即時遮断（state 更新の遅延に依存しない）
+    if (submitGuard.isLocked()) return;
 
     const trimmed = email.trim();
     if (!trimmed) return setFieldError("email_empty");
@@ -117,6 +124,8 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
     // B版はアンケートを送信ペイロードに含めない（登録API・保存先は不変・回答は完了後に分析イベントのみ）
     const submitProblem = isB ? "" : problem;
 
+    // 外部送信の直前にロック取得（検証エラーは上で return 済み＝ロックを残さない）
+    submitGuard.lock();
     setStatus("loading");
     try {
       const res = await fetch("/api/register", {
@@ -127,11 +136,13 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
           problem: submitProblem,
           source,
           attribution: getAttribution(),
+          [HONEYPOT_FIELD]: hp, // honeypot（通常は空）
         }),
       });
       const data = (await res.json()) as { success?: boolean; duplicated?: boolean };
       if (!res.ok || !data.success) {
         trackSubmissionFailed(withVariant({ source }));
+        setHp(""); // honeypot 誤検知等で失敗しても再操作できるようリセット
         setStatus("error");
         return;
       }
@@ -145,7 +156,11 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
       }
     } catch {
       trackSubmissionFailed(withVariant({ source }));
+      setHp("");
       setStatus("error");
+    } finally {
+      // 失敗・例外・成功いずれでも解放（エラー後の再試行を妨げない）
+      submitGuard.unlock();
     }
   }
 
@@ -242,6 +257,7 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
           type="email"
           inputMode="email"
           autoComplete="email"
+          maxLength={254}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -293,6 +309,22 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
           に同意します。ご登録いただいたメールアドレスは、リリース案内および重要なお知らせの送信に使用します。
         </span>
       </label>
+
+      {/* honeypot: 視覚・支援技術の双方から隠す（aria-hidden + tabIndex -1 + autoComplete off） */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+        <label htmlFor={HONEYPOT_FIELD}>この欄は入力しないでください</label>
+        <input
+          id={HONEYPOT_FIELD}
+          type="text"
+          name={HONEYPOT_FIELD}
+          tabIndex={-1}
+          autoComplete="off"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          value={hp}
+          onChange={(e) => setHp(e.target.value)}
+        />
+      </div>
 
       {/* ④ 送信ボタン */}
       <button
