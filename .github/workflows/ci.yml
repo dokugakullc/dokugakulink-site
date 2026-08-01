@@ -1,0 +1,55 @@
+name: CI
+
+# マージ前検証: クリーンな GitHub 環境で Node.js 24・lockfile 再現インストール・
+# テスト・ESLint・TypeScript・Production build を自動実行する。
+# デプロイや外部送信（メール/GAS/Pixel）は一切行わない。Secret も参照しない。
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# 最小権限（コード読み取りのみ）。fork 由来 PR でも書き込み権限は付与されない。
+permissions:
+  contents: read
+
+# 同一 PR/ref の古い実行はキャンセルする。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          # CI は Push しないため git 認証情報を残さない。
+          persist-credentials: false
+
+      # actions/setup-node v7.0.0（本番 Vercel と同じ Node 24 に統一）
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install (reproducible from lockfile)
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
