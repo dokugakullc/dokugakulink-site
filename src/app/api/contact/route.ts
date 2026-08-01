@@ -4,6 +4,8 @@ import { sendResendEmail, type ResendPayload } from "@/lib/resendClient";
 import type { EmailKind, Inquiry, SendEmail } from "@/lib/contactDelivery";
 import { isPreviewDeployment } from "@/lib/deployEnv";
 import { contactTypeLabel } from "@/lib/formSecurity";
+import { postContactStore, isContactStoreConfigured } from "@/lib/contactStoreClient";
+import { buildContactStoreBody } from "@/lib/contactStorePayload";
 
 const SUPPORT_FROM = "ウカレル サポート <support@dokugakulink.com>";
 const SUPPORT_TO = "support@dokugakulink.com";
@@ -166,6 +168,7 @@ function buildPayload(kind: EmailKind, i: Inquiry): ResendPayload {
 export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   const storeUrl = process.env.CONTACT_STORE_URL;
+  const storeSecret = process.env.CONTACT_STORE_SHARED_SECRET;
 
   // 実際の送信: Resend REST を AbortController で実中断＋Idempotency-Key。
   const sendEmail: SendEmail = async (kind, inquiry, ctx) => {
@@ -176,37 +179,18 @@ export async function POST(req: NextRequest) {
     });
   };
 
-  // 実際の保存: contacts GAS へ AbortController で実中断。GAS は utm_* / fbclid 等を
-  // トップレベルで読むため attribution を平坦化して送る。token は共有シークレット
-  // （サーバー専用・NEXT_PUBLIC 無し・GAS の SHARED_SECRET と同値・値はログへ出さない）。
+  // 実際の保存: contacts GAS へ AbortController で実中断（contactStoreClient）。
+  // 保存 payload は純粋関数で組み立て（allowlist・attribution 平坦化・token を最後に確定）。
+  // token は共有シークレット（サーバー専用・NEXT_PUBLIC 無し・GAS の SHARED_SECRET と同値・値はログへ出さない）。
   const storeContact: StoreContact = async (record, ctx) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), ctx.timeoutMs);
-    try {
-      const { attribution, ...rest } = record;
-      const res = await fetch(storeUrl ?? "", {
-        method: "POST",
-        redirect: "follow",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          token: process.env.CONTACT_STORE_SHARED_SECRET ?? "",
-          ...rest,
-          ...attribution,
-        }),
-      });
-      if (!res.ok) throw new Error(`contact store ${res.status}`);
-      const data = (await res.json()) as { success?: boolean; stored?: boolean; duplicate?: boolean };
-      if (!data.success) throw new Error("contact store not ok");
-      return { stored: Boolean(data.stored), duplicate: Boolean(data.duplicate) };
-    } finally {
-      clearTimeout(timer);
-    }
+    const body = buildContactStoreBody(record, storeSecret ?? "");
+    return postContactStore(storeUrl ?? "", body, { timeoutMs: ctx.timeoutMs });
   };
 
   const result = await handleContact(req, {
     resendConfigured: Boolean(apiKey),
-    storeConfigured: Boolean(storeUrl),
+    // URL・Secret の両方が揃ったときだけ保存を有効化（片方でも欠ければ外部 POST しない）。
+    storeConfigured: isContactStoreConfigured(storeUrl, storeSecret),
     storeContact,
     isPreview: isPreviewDeployment(process.env.VERCEL_ENV),
     sendEmail,

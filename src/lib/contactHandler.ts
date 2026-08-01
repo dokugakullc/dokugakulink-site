@@ -14,24 +14,14 @@ import {
 } from "./formSecurity";
 import { deliverContact, type Inquiry, type SendEmail } from "./contactDelivery";
 import { formatJst, generateReference, generateSubmissionId } from "./contactFormat";
+import type { ContactStoreRecord } from "./contactStorePayload";
+
+// 型は contactStorePayload に集約し、ここから再輸出（既存 import 互換）。
+export type { ContactStoreRecord };
 
 export type HttpRequestLike = {
   headers: { get(name: string): string | null };
   json(): Promise<unknown>;
-};
-
-// contacts シートへ保存する 1 件分（GAS へ送る形。attribution は route 側で平坦化）。
-export type ContactStoreRecord = {
-  name: string;
-  email: string;
-  company: string;
-  contact_type: string;
-  message: string;
-  source: string;
-  submission_id: string;
-  reference: string;
-  userAgent: string;
-  attribution: Record<string, string>;
 };
 
 // contacts GAS へ 1 件保存する（成功で { stored } を解決、失敗で reject）。

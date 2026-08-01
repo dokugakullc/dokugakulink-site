@@ -161,3 +161,74 @@ test("store 未設定 → 保存せず従来どおりメールのみで受領（
   assert.equal(ctx.stored.length, 0);
   assert.deepEqual(ctx.sent, ["admin", "user"]);
 });
+
+// ── 修正5: 障害マトリクス＋整合の追加固定 ─────────────────────────
+test("submissionId が保存レコードとメール Idempotency-Key で一致（両系統同一の冪等キー）", async () => {
+  let storedId = "";
+  const idemKeys: string[] = [];
+  const r = await handleContact(makeReq({ body: { ...validBody, submissionId: "abcd1234efgh" } }), {
+    resendConfigured: true,
+    storeConfigured: true,
+    storeContact: async (record) => {
+      storedId = record.submission_id;
+      return { stored: true, duplicate: false };
+    },
+    sendEmail: async (_kind, _inquiry, ctx) => {
+      idemKeys.push(ctx.idempotencyKey);
+    },
+    logError: () => {},
+    logWarn: () => {},
+  });
+  assert.equal(r.status, 200);
+  assert.equal(storedId, "abcd1234efgh");
+  // メールの Idempotency-Key は contact:<submissionId>:<kind>。保存レコードと同一 submissionId。
+  assert.equal(idemKeys[0], "contact:abcd1234efgh:admin");
+  assert.equal(idemKeys[1], "contact:abcd1234efgh:user");
+});
+
+test("エラー時に logError へ PII/Secret を出さない（reference のみ）", async () => {
+  const logs: Array<{ message: string; meta: Record<string, unknown> }> = [];
+  const secret = "SHOULD_NOT_APPEAR";
+  await handleContact(
+    makeReq({ body: { ...validBody, submissionId: "abcd1234efgh", token: secret } }),
+    {
+      resendConfigured: true,
+      storeConfigured: true,
+      storeContact: async () => {
+        throw new Error(`boom ${secret} ${validBody.email}`); // 内部エラーに PII/Secret が乗っても
+      },
+      sendEmail: async (kind) => {
+        if (kind === "admin") throw new Error(`admin boom ${validBody.email}`);
+      },
+      logError: (message, meta) => logs.push({ message, meta }),
+      logWarn: () => {},
+    },
+  );
+  assert.ok(logs.length >= 1, "logError が呼ばれる");
+  const flat = JSON.stringify(logs);
+  assert.equal(flat.includes(validBody.email), false, "メールアドレスをログへ出さない");
+  assert.equal(flat.includes(validBody.name), false, "氏名をログへ出さない");
+  assert.equal(flat.includes(validBody.message), false, "本文をログへ出さない");
+  assert.equal(flat.includes(secret), false, "Secret をログへ出さない");
+  // meta は reference のみ
+  for (const l of logs) assert.deepEqual(Object.keys(l.meta), ["reference"]);
+});
+
+test("store timeout（reject）でも虚偽の stored:true を返さない", async () => {
+  const ctx: Ctx = { sent: [], stored: [] };
+  const r = await handleContact(makeReq({ body: validBody }), {
+    ...deps(ctx),
+    storeContact: async () => {
+      throw new DOMException("aborted", "AbortError"); // timeout 相当
+    },
+  });
+  assert.equal(r.body.stored, false); // 保存確定していない
+  assert.equal(r.body.success, true); // メールが記録の正
+});
+
+test("メール timeout（admin reject）でも虚偽の adminNotified:true を返さない（保存済み）", async () => {
+  const ctx: Ctx = { sent: [], stored: [], adminThrows: true };
+  const r = await handleContact(makeReq({ body: validBody }), deps(ctx));
+  assert.equal(r.body.stored, true);
+  assert.equal(r.body.adminNotified, false); // 送信できていないので false
+});
