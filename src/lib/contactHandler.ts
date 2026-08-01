@@ -21,6 +21,8 @@ export type HttpRequestLike = {
 export type ContactHandlerDeps = {
   resendConfigured: boolean;
   sendEmail: SendEmail;
+  // Preview 環境フラグ（route が VERCEL_ENV から注入）。true の間は外部送信を一切行わない。
+  isPreview?: boolean;
   timeoutMs?: number;
   now?: () => Date;
   logError?: (message: string, meta: Record<string, unknown>) => void;
@@ -77,6 +79,14 @@ export async function handleContact(req: HttpRequestLike, deps: ContactHandlerDe
   const validated = validateContactInput(body);
   if (!validated.ok) {
     return { status: 400, body: { error: validated.error } };
+  }
+
+  // 3') Preview 環境ガード（外部副作用の恒久禁止）。
+  //     RESEND_API_KEY が Preview に存在しても送信しない。運営宛・利用者宛の双方を送らず、
+  //     success/reference/confirmationEmailSent を返さない。検証の後段に置くことで、
+  //     honeypot 等の判定順序が Production と変わらず情報漏えいにならないようにする。
+  if (deps.isPreview) {
+    return { status: 503, body: { error: "この環境ではお問い合わせを送信できません。" } };
   }
 
   // submissionId: クライアント提供の冪等キー種。無効ならサーバーで生成（単一リクエスト内で安定）。

@@ -81,6 +81,56 @@ test("Origin なし（fail-open）でも処理は進む", async () => {
   assert.equal(r.status, 200);
 });
 
+test("Preview + APIキーあり → 503・送信0・success/reference/confirmationを返さない", async () => {
+  const sent: Sent[] = [];
+  const r = await handleContact(
+    makeReq({ body: { ...validBody, submissionId: "abcd1234efgh" } }),
+    deps({ isPreview: true, resendConfigured: true, sent }),
+  );
+  assert.equal(r.status, 503);
+  assert.notEqual(r.body.success, true);
+  assert.equal("reference" in r.body, false);
+  assert.equal("confirmationEmailSent" in r.body, false);
+  assert.equal(sent.length, 0);
+  // 環境名・Secret 状態を露出しない
+  assert.equal(/VERCEL|preview|RESEND|secret/i.test(String(r.body.error ?? "")), false);
+});
+
+test("Preview + APIキーなし → 503・送信0", async () => {
+  const sent: Sent[] = [];
+  const r = await handleContact(makeReq({ body: validBody }), deps({ isPreview: true, resendConfigured: false, sent }));
+  assert.equal(r.status, 503);
+  assert.notEqual(r.body.success, true);
+  assert.equal(sent.length, 0);
+});
+
+test("Preview + honeypot → 400（Production と同じ順序・503にならず情報漏えいしない）", async () => {
+  const sent: Sent[] = [];
+  const r = await handleContact(
+    makeReq({ body: { ...validBody, hp_token: "bot" } }),
+    deps({ isPreview: true, sent }),
+  );
+  assert.equal(r.status, 400);
+  assert.equal(sent.length, 0);
+});
+
+test("Production(isPreview=false) + APIキーあり → 通常送信（200）", async () => {
+  const r = await handleContact(makeReq({ body: validBody }), deps({ isPreview: false, resendConfigured: true }));
+  assert.equal(r.status, 200);
+  assert.equal(r.body.success, true);
+});
+
+test("Production + APIキーなし → 500", async () => {
+  const r = await handleContact(makeReq({ body: validBody }), deps({ isPreview: false, resendConfigured: false }));
+  assert.equal(r.status, 500);
+  assert.notEqual(r.body.success, true);
+});
+
+test("VERCEL_ENV 未定義相当（isPreview 省略）→ 既存DI方針（通常処理）", async () => {
+  const r = await handleContact(makeReq({ body: validBody }), deps());
+  assert.equal(r.status, 200); // deps() は isPreview 省略＝false・resendConfigured true
+});
+
 test("運営宛送信失敗 → 500・success を返さない", async () => {
   const r = await handleContact(
     makeReq({ body: validBody }),

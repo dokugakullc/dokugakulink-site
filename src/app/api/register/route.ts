@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleRegister, type PostRegister } from "@/lib/registerHandler";
+import { isPreviewDeployment } from "@/lib/deployEnv";
 
 type GasResponse = { success: boolean; duplicated?: boolean; error?: string };
 
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
 
   const result = await handleRegister(req, {
     gasConfigured: Boolean(gasUrl),
+    isPreview: isPreviewDeployment(process.env.VERCEL_ENV),
     postRegister,
     logError: (message, meta) => console.error(message, meta),
     logWarn: (message, meta) => console.warn(message, meta),

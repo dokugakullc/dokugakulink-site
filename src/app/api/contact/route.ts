@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleContact } from "@/lib/contactHandler";
 import { sendResendEmail, type ResendPayload } from "@/lib/resendClient";
 import type { EmailKind, Inquiry, SendEmail } from "@/lib/contactDelivery";
+import { isPreviewDeployment } from "@/lib/deployEnv";
 
 const SUPPORT_FROM = "ウカレル サポート <support@dokugakulink.com>";
 const SUPPORT_TO = "support@dokugakulink.com";
@@ -169,6 +170,7 @@ export async function POST(req: NextRequest) {
 
   const result = await handleContact(req, {
     resendConfigured: Boolean(apiKey),
+    isPreview: isPreviewDeployment(process.env.VERCEL_ENV),
     sendEmail,
     logError: (message, meta) => console.error(message, meta),
     logWarn: (message, meta) => console.warn(message, meta),

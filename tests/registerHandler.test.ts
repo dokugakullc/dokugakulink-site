@@ -68,6 +68,28 @@ test("正常 → 200・source/interest/attribution を整形して送信", async
   assert.equal("secret" in sent[0].attribution, false);
 });
 
+test("Preview + GAS設定あり → 503・外部保存0", async () => {
+  const sent: RegisterPayload[] = [];
+  const r = await handleRegister(makeReq({ body: validBody }), deps({ isPreview: true, gasConfigured: true, sent }));
+  assert.equal(r.status, 503);
+  assert.notEqual(r.body.success, true);
+  assert.equal(sent.length, 0);
+  assert.equal(/VERCEL|preview|GAS|secret/i.test(String(r.body.error ?? "")), false);
+});
+
+test("Preview + GAS設定なし → 503・外部保存0", async () => {
+  const sent: RegisterPayload[] = [];
+  const r = await handleRegister(makeReq({ body: validBody }), deps({ isPreview: true, gasConfigured: false, sent }));
+  assert.equal(r.status, 503);
+  assert.equal(sent.length, 0);
+});
+
+test("Production(isPreview=false) → 通常処理（200）", async () => {
+  const r = await handleRegister(makeReq({ body: validBody }), deps({ isPreview: false }));
+  assert.equal(r.status, 200);
+  assert.equal(r.body.success, true);
+});
+
 test("postRegister 失敗（タイムアウト含む）→ 500・success を返さない", async () => {
   const r = await handleRegister(
     makeReq({ body: validBody }),

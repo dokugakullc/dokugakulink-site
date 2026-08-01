@@ -29,6 +29,8 @@ export type PostRegister = (
 export type RegisterHandlerDeps = {
   gasConfigured: boolean;
   postRegister: PostRegister;
+  // Preview 環境フラグ（route が VERCEL_ENV から注入）。true の間は外部保存を一切行わない。
+  isPreview?: boolean;
   timeoutMs?: number;
   logError?: (message: string, meta: Record<string, unknown>) => void;
   logWarn?: (message: string, meta: Record<string, unknown>) => void;
@@ -79,6 +81,12 @@ export async function handleRegister(req: HttpRequestLike, deps: RegisterHandler
     return { status: 400, body: { error: validated.error } };
   }
   const { email, source, problem } = validated.value;
+
+  // Preview 環境ガード: GAS 設定の有無に関わらず外部保存しない（将来 Preview に env が
+  // 追加されても保存されないよう恒久的に禁止）。gasConfigured / postRegister より前に返す。
+  if (deps.isPreview) {
+    return { status: 503, body: { error: "この環境では送信できません。" } };
+  }
 
   if (!deps.gasConfigured) {
     logError("register: GAS_WEBHOOK_URL not configured", {});
