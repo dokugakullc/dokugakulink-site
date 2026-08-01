@@ -1,43 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleRegister, type PostRegister } from "@/lib/registerHandler";
 import { isPreviewDeployment } from "@/lib/deployEnv";
-
-type GasResponse = { success: boolean; duplicated?: boolean; error?: string };
+import { buildGasBody } from "@/lib/registerPayload";
+import { postToGas } from "@/lib/gasClient";
 
 export async function POST(req: NextRequest) {
+  // token は共有シークレット（サーバー専用・NEXT_PUBLIC を付けない＝クライアント非公開・
+  // GAS の SHARED_SECRET と同値・値はログへ出さない）。URL または Secret が未設定なら
+  // 外部 POST を行わず 500（gasConfigured=false）で安全に失敗する。
   const gasUrl = process.env.GAS_WEBHOOK_URL;
+  const gasSecret = process.env.GAS_SHARED_SECRET;
 
-  // 実際の送信: GAS へ AbortController で実中断（DL-002）。
-  const postRegister: PostRegister = async (payload, ctx) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), ctx.timeoutMs);
-    try {
-      // GAS(registration-webhook.gs) は utm_content / fbclid 等を「トップレベル」で読むため、
-      // attribution を平坦化して送る。token は共有シークレット（サーバー専用・NEXT_PUBLIC を
-      // 付けない＝クライアント非公開・GAS の SHARED_SECRET と同値・値はログへ出さない）。
-      const { attribution, ...rest } = payload;
-      const res = await fetch(gasUrl ?? "", {
-        method: "POST",
-        redirect: "follow",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          token: process.env.GAS_SHARED_SECRET ?? "",
-          ...rest,
-          ...attribution,
-        }),
-      });
-      if (!res.ok) throw new Error(`GAS returned ${res.status}`);
-      const data = (await res.json()) as GasResponse;
-      if (!data.success) throw new Error(data.error ?? "GAS error");
-      return { duplicated: data.duplicated ?? false };
-    } finally {
-      clearTimeout(timer);
-    }
-  };
+  // 実際の送信: GAS へ AbortController で実中断（DL-002）。ボディ組み立てと送信は抽出済み。
+  const postRegister: PostRegister = (payload, ctx) =>
+    postToGas(gasUrl ?? "", buildGasBody(payload, gasSecret ?? ""), { timeoutMs: ctx.timeoutMs });
 
   const result = await handleRegister(req, {
-    gasConfigured: Boolean(gasUrl),
+    gasConfigured: Boolean(gasUrl && gasSecret),
     isPreview: isPreviewDeployment(process.env.VERCEL_ENV),
     postRegister,
     logError: (message, meta) => console.error(message, meta),
