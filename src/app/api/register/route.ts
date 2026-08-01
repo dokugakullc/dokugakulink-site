@@ -99,6 +99,9 @@ export async function POST(req: NextRequest) {
       redirect: "follow",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        // 共有シークレット（サーバー専用・NEXT_PUBLIC を付けない＝クライアントへ露出しない）。
+        // GAS 側スクリプトプロパティ SHARED_SECRET と同値。値はログへ出さない。
+        token: process.env.GAS_SHARED_SECRET ?? "",
         email: email.trim().toLowerCase(),
         interest,
         problem: normalizedProblem,

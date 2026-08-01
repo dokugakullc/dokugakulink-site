@@ -5,6 +5,7 @@ import { getAttribution } from "@/lib/utm";
 import {
   trackFormStarted,
   trackSubmitted,
+  trackDuplicate,
   trackSubmissionFailed,
   trackSurveyAnswered,
 } from "@/lib/track";
@@ -134,8 +135,14 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
         setStatus("error");
         return;
       }
-      trackSubmitted(withVariant({ source, duplicated: data.duplicated ? "1" : "0" }));
-      setStatus(data.duplicated ? "duplicated" : "success");
+      // 新規登録のみ Meta Lead を発火。重複は専用イベントのみ（Lead 二重計上を防ぐ）。
+      if (data.duplicated) {
+        trackDuplicate(withVariant({ source }));
+        setStatus("duplicated");
+      } else {
+        trackSubmitted(withVariant({ source }));
+        setStatus("success");
+      }
     } catch {
       trackSubmissionFailed(withVariant({ source }));
       setStatus("error");
