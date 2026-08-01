@@ -165,7 +165,7 @@ function buildPayload(kind: EmailKind, i: Inquiry): ResendPayload {
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
-  const storeUrl = process.env.CONTACT_GAS_STORE_URL;
+  const storeUrl = process.env.CONTACT_STORE_URL;
 
   // 実際の送信: Resend REST を AbortController で実中断＋Idempotency-Key。
   const sendEmail: SendEmail = async (kind, inquiry, ctx) => {
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify({
-          token: process.env.CONTACT_GAS_SHARED_SECRET ?? "",
+          token: process.env.CONTACT_STORE_SHARED_SECRET ?? "",
           ...rest,
           ...attribution,
         }),

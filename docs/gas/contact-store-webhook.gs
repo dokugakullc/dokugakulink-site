@@ -9,8 +9,8 @@
  *   submission_id をキーに、同一 submission_id が既にあれば追記しない（再送の二重保存防止）。
  *
  * Owner=info@dokugakulink.com。Script Properties:
- *   SHEET_ID       … 問い合わせ用スプレッドシートID（registrations とは別ファイル推奨）
- *   SHARED_SECRET  … Vercel CONTACT_GAS_SHARED_SECRET と同値（register とは別値）
+ *   CONTACT_STORE_SHEET_ID       … 問い合わせ用スプレッドシートID（registrations とは別ファイル推奨）
+ *   CONTACT_STORE_SHARED_SECRET  … Vercel CONTACT_STORE_SHARED_SECRET と同値（register とは別値）
  *   （任意）SHEET_NAME=contacts / TEST_MARKERS="+test,+lp-test,+meta-test"
  *
  * 返却: { success:boolean, stored:boolean, duplicate?:boolean, error?:string }
@@ -41,7 +41,7 @@ function doPost(e) {
     try { data = JSON.parse(e.postData.contents); } catch (_) { return json_({ success: false, error: 'bad_json' }); }
 
     var props = PropertiesService.getScriptProperties();
-    var secret = props.getProperty('SHARED_SECRET') || '';
+    var secret = props.getProperty('CONTACT_STORE_SHARED_SECRET') || '';
     if (!secret || String(data.token || '') !== secret) return json_({ success: false, error: 'unauthorized' });
 
     var email = String(data.email || '').trim().toLowerCase().slice(0, 254);
@@ -56,7 +56,7 @@ function doPost(e) {
 
     lock.waitLock(20000);
 
-    var ss = SpreadsheetApp.openById(props.getProperty('SHEET_ID'));
+    var ss = SpreadsheetApp.openById(props.getProperty('CONTACT_STORE_SHEET_ID'));
     var sheet = ss.getSheetByName(props.getProperty('SHEET_NAME') || 'contacts') ||
                 ss.insertSheet(props.getProperty('SHEET_NAME') || 'contacts');
     ensureHeaders_(sheet);
