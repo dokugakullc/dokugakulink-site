@@ -1,26 +1,37 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { CONTACT_LIMITS, EMAIL_RE, HONEYPOT_FIELD } from "@/lib/formSecurity";
+import { CONTACT_LIMITS, CONTACT_TYPES, CONTACT_TYPE_VALUES, EMAIL_RE, HONEYPOT_FIELD } from "@/lib/formSecurity";
 import { resolveSubmissionId, type SubmissionState } from "@/lib/submission";
 import { createSubmitGuard } from "@/lib/submitGuard";
+import { captureAttribution, getAttribution } from "@/lib/utm";
 
 type Status = "idle" | "sending" | "success" | "error";
-type FieldKey = "name" | "email" | "message";
+type FieldKey = "name" | "email" | "contactType" | "company" | "message";
 type FieldErrors = Partial<Record<FieldKey, string>>;
 
-const { NAME_MAX, EMAIL_MAX, MESSAGE_MAX } = CONTACT_LIMITS;
+const { NAME_MAX, EMAIL_MAX, MESSAGE_MAX, COMPANY_MAX } = CONTACT_LIMITS;
 
 // クライアント側の検証（サーバー formSecurity と同一基準）。
-function validateFields(values: { name: string; email: string; message: string }): FieldErrors {
+function validateFields(values: {
+  name: string;
+  email: string;
+  contactType: string;
+  company: string;
+  message: string;
+}): FieldErrors {
   const errors: FieldErrors = {};
   const name = values.name.trim();
   const email = values.email.trim();
+  const company = values.company.trim();
   const message = values.message.trim();
   if (!name) errors.name = "お名前を入力してください。";
   else if (name.length > NAME_MAX) errors.name = `お名前は${NAME_MAX}文字以内で入力してください。`;
   if (!email) errors.email = "メールアドレスを入力してください。";
   else if (!EMAIL_RE.test(email)) errors.email = "メールアドレスの形式をご確認ください。";
   else if (email.length > EMAIL_MAX) errors.email = `メールアドレスは${EMAIL_MAX}文字以内で入力してください。`;
+  if (!values.contactType || !CONTACT_TYPE_VALUES.includes(values.contactType))
+    errors.contactType = "お問い合わせ種別を選択してください。";
+  if (company.length > COMPANY_MAX) errors.company = `会社名は${COMPANY_MAX}文字以内で入力してください。`;
   if (!message) errors.message = "お問い合わせ内容を入力してください。";
   else if (message.length > MESSAGE_MAX) errors.message = `お問い合わせ内容は${MESSAGE_MAX}文字以内で入力してください。`;
   return errors;
@@ -33,6 +44,8 @@ function newSubmissionId(): string {
 export default function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [contactType, setContactType] = useState("");
+  const [company, setCompany] = useState("");
   const [message, setMessage] = useState("");
   // honeypot（通常は空）。値が入るのは自動化ツールのみ。
   const [hp, setHp] = useState("");
@@ -47,11 +60,17 @@ export default function ContactForm() {
 
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
+  const contactTypeRef = useRef<HTMLSelectElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const formErrorRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLParagraphElement>(null);
   // 同期ロック（React state に依存しない多重送信防止）
   const submitGuard = useRef(createSubmitGuard()).current;
+
+  // 流入（UTM/fbclid）の first-touch を保存。/contact へ直接着地した場合もここで取得できる。
+  useEffect(() => {
+    captureAttribution();
+  }, []);
 
   useEffect(() => {
     if (status === "error") formErrorRef.current?.focus();
@@ -61,6 +80,7 @@ export default function ContactForm() {
   const focusFirstInvalid = (errors: FieldErrors) => {
     if (errors.name) nameRef.current?.focus();
     else if (errors.email) emailRef.current?.focus();
+    else if (errors.contactType) contactTypeRef.current?.focus();
     else if (errors.message) messageRef.current?.focus();
   };
 
@@ -72,6 +92,8 @@ export default function ContactForm() {
     setReference("");
     setName("");
     setEmail("");
+    setContactType("");
+    setCompany("");
     setMessage("");
     setHp("");
     setFieldErrors({});
@@ -86,7 +108,7 @@ export default function ContactForm() {
     // 同期ロック: 同一tickの多重送信を即時遮断（state 更新の遅延に依存しない）
     if (submitGuard.isLocked()) return;
 
-    const errors = validateFields({ name, email, message });
+    const errors = validateFields({ name, email, contactType, company, message });
     if (Object.values(errors).some(Boolean)) {
       setFieldErrors(errors);
       focusFirstInvalid(errors);
@@ -108,7 +130,17 @@ export default function ContactForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, submissionId: next.id, [HONEYPOT_FIELD]: hp }),
+        // source はクライアントから送らない（API 側で固定）。attribution は許可キーのみ保存。
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          contact_type: contactType,
+          company,
+          submissionId: next.id,
+          attribution: getAttribution(),
+          [HONEYPOT_FIELD]: hp,
+        }),
       });
       const data = (await res.json()) as {
         success?: boolean;
@@ -233,6 +265,70 @@ export default function ContactForm() {
         {fieldErrors.email && (
           <p id="email-error" className="mt-2 text-sm text-red-600">
             {fieldErrors.email}
+          </p>
+        )}
+      </div>
+
+      {/* お問い合わせ種別（必須） */}
+      <div>
+        <label htmlFor="contact_type" className="block text-sm font-medium text-gray-700 mb-2">
+          お問い合わせ種別 <span className="text-red-500" aria-hidden="true">*</span>
+        </label>
+        <select
+          id="contact_type"
+          ref={contactTypeRef}
+          required
+          aria-required="true"
+          value={contactType}
+          onChange={(e) => {
+            setContactType(e.target.value);
+            clearFieldError("contactType");
+          }}
+          disabled={sending}
+          aria-invalid={fieldErrors.contactType ? true : undefined}
+          aria-describedby={fieldErrors.contactType ? "contact_type-error" : undefined}
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition disabled:opacity-50"
+        >
+          <option value="" disabled>
+            選択してください
+          </option>
+          {CONTACT_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+        {fieldErrors.contactType && (
+          <p id="contact_type-error" className="mt-2 text-sm text-red-600">
+            {fieldErrors.contactType}
+          </p>
+        )}
+      </div>
+
+      {/* 会社名（任意） */}
+      <div>
+        <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+          会社名 <span className="text-gray-400 text-xs font-normal">（任意）</span>
+        </label>
+        <input
+          id="company"
+          type="text"
+          autoComplete="organization"
+          maxLength={COMPANY_MAX}
+          value={company}
+          onChange={(e) => {
+            setCompany(e.target.value);
+            clearFieldError("company");
+          }}
+          disabled={sending}
+          aria-invalid={fieldErrors.company ? true : undefined}
+          aria-describedby={fieldErrors.company ? "company-error" : undefined}
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d2545] focus:border-transparent transition disabled:opacity-50"
+          placeholder="株式会社〇〇"
+        />
+        {fieldErrors.company && (
+          <p id="company-error" className="mt-2 text-sm text-red-600">
+            {fieldErrors.company}
           </p>
         )}
       </div>

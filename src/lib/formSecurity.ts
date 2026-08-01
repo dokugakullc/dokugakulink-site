@@ -11,7 +11,29 @@ export const CONTACT_LIMITS = {
   NAME_MAX: 100,
   EMAIL_MAX: 254,
   MESSAGE_MAX: 5000,
+  COMPANY_MAX: 120,
 } as const;
+
+// ── お問い合わせ種別（必須の選択式）。value=保存/集計キー, label=表示/メール件名 ──
+// 値は自由入力させず、この許可リストのみ受理する（クライアント改ざん対策）。
+export const CONTACT_TYPES = [
+  { value: "service", label: "サービスについて" },
+  { value: "partnership", label: "業務提携について" },
+  { value: "media", label: "取材・メディアについて" },
+  { value: "support", label: "不具合・サポート" },
+  { value: "other", label: "その他" },
+] as const;
+
+export const CONTACT_TYPE_VALUES: readonly string[] = CONTACT_TYPES.map((t) => t.value);
+
+/** 種別値 → 表示ラベル（メール件名生成に使用）。未知値は「その他」。 */
+export function contactTypeLabel(value: string): string {
+  return CONTACT_TYPES.find((t) => t.value === value)?.label ?? "その他";
+}
+
+// お問い合わせの source は API 側で固定する（クライアントから受理しない）。
+// 事前登録の ALLOWED_SOURCES とは意図的に分離（登録APIで contact を受理させない）。
+export const CONTACT_SOURCE = "web_contact";
 
 export const REGISTER_LIMITS = {
   EMAIL_MAX: 254,
@@ -200,13 +222,19 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, label?: string):
 }
 
 // ── お問い合わせ入力の検証（DL-006）──
-export type ContactInput = { name: string; email: string; message: string };
+export type ContactInput = {
+  name: string;
+  email: string;
+  message: string;
+  contactType: string;
+  company: string;
+};
 
 export function validateContactInput(raw: unknown): Result<ContactInput> {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
     return err("invalid_body", "リクエストが不正です");
   }
-  const { name, email, message } = raw as Record<string, unknown>;
+  const { name, email, message, contact_type, company } = raw as Record<string, unknown>;
 
   // 型不正（配列・数値・オブジェクト・null 等）は空欄チェックの前に string 型で弾く
   if (typeof name !== "string" || !name.trim()) {
@@ -236,7 +264,21 @@ export function validateContactInput(raw: unknown): Result<ContactInput> {
     return err("message_too_long", `お問い合わせ内容が長すぎます（${CONTACT_LIMITS.MESSAGE_MAX}文字以内）`);
   }
 
-  return { ok: true, value: { name: name_, email: email_, message: message_ } };
+  // お問い合わせ種別（必須・許可リスト照合）。自由入力は受理しない。
+  if (typeof contact_type !== "string" || !CONTACT_TYPE_VALUES.includes(contact_type)) {
+    return err("contact_type_invalid", "お問い合わせ種別を選択してください");
+  }
+
+  // 会社名（任意）。文字列以外は空扱い。長さ上限のみ検証。
+  const company_ = typeof company === "string" ? company.trim() : "";
+  if (company_.length > CONTACT_LIMITS.COMPANY_MAX) {
+    return err("company_too_long", "会社名が長すぎます");
+  }
+
+  return {
+    ok: true,
+    value: { name: name_, email: email_, message: message_, contactType: contact_type, company: company_ },
+  };
 }
 
 // ── 事前登録入力の検証（DL-006）──

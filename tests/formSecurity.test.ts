@@ -15,17 +15,47 @@ import {
   withTimeout,
 } from "../src/lib/formSecurity";
 
-const validContact = { name: "山田 太郎", email: "taro@example.com", message: "問い合わせ本文です。" };
+const validContact = {
+  name: "山田 太郎",
+  email: "taro@example.com",
+  message: "問い合わせ本文です。",
+  contact_type: "service",
+};
 
 // ── validateContactInput ─────────────────────────────────────────────
 test("contact: 正常入力は ok=true・trim される", () => {
-  const r = validateContactInput({ name: "  太郎 ", email: " taro@example.com ", message: " 本文 " });
+  const r = validateContactInput({
+    name: "  太郎 ",
+    email: " taro@example.com ",
+    message: " 本文 ",
+    contact_type: "service",
+    company: "  テスト社  ",
+  });
   assert.equal(r.ok, true);
   if (r.ok) {
     assert.equal(r.value.name, "太郎");
     assert.equal(r.value.email, "taro@example.com");
     assert.equal(r.value.message, "本文");
+    assert.equal(r.value.contactType, "service");
+    assert.equal(r.value.company, "テスト社");
   }
+});
+
+test("contact: contact_type は必須・許可リスト外/欠落は拒否、company は任意で上限のみ検証", () => {
+  // 欠落 → 拒否
+  assert.equal(validateContactInput({ name: "a", email: "a@b.co", message: "x" }).ok, false);
+  // 許可リスト外 → 拒否
+  assert.equal(validateContactInput({ ...validContact, contact_type: "hacker" }).ok, false);
+  // 全許可値 → ok
+  for (const t of ["service", "partnership", "media", "support", "other"]) {
+    assert.equal(validateContactInput({ ...validContact, contact_type: t }).ok, true, t);
+  }
+  // company 未指定 → ok（空文字）
+  const r = validateContactInput({ ...validContact, company: undefined });
+  assert.equal(r.ok, true);
+  if (r.ok) assert.equal(r.value.company, "");
+  // company 上限超過 → 拒否
+  assert.equal(validateContactInput({ ...validContact, company: "あ".repeat(121) }).ok, false);
 });
 
 test("contact: 空/空白のみ/改行のみを拒否", () => {
