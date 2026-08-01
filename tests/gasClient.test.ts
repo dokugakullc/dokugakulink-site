@@ -36,11 +36,28 @@ test("非2xx は throw（URL/Secret を含めない・ステータスのみ）",
   );
 });
 
-test("success:false は throw（GAS 汎用コードのみ・PII/Secret 非含有）", async () => {
+test("success:false は固定メッセージで throw（GAS 応答内容を一切含めない）", async () => {
   const fetchImpl = (async () => new Response(JSON.stringify({ success: false, error: "unauthorized" }), { status: 200 })) as unknown as typeof fetch;
   await assert.rejects(
-    () => postToGas(URL_DUMMY, { token: "S_SECRET", email: "leak@example.com" }, { timeoutMs: 1000, fetchImpl }),
-    (e: unknown) => e instanceof Error && /unauthorized/.test(e.message) && !e.message.includes("leak@example.com") && !e.message.includes("S_SECRET"),
+    () => postToGas(URL_DUMMY, {}, { timeoutMs: 1000, fetchImpl }),
+    (e: unknown) => e instanceof Error && e.message === "GAS request failed" && !e.message.includes("unauthorized"),
+  );
+});
+
+test("悪意ある GAS 応答（Secret/メール/URL/内部文字列）でも throw 文へ一切出ない", async () => {
+  // 実値は使わずダミー。将来 GAS 応答へ機微情報が混入した想定。
+  const maliciousError = "SECRET_DUMMY_LEAK / leak@example.com / https://script.google.test/exec-LEAK / STACKTRACE_INTERNAL";
+  const fetchImpl = (async () =>
+    new Response(JSON.stringify({ success: false, error: maliciousError }), { status: 200 })) as unknown as typeof fetch;
+  await assert.rejects(
+    () => postToGas(URL_DUMMY, { token: "SECRET_DUMMY_LEAK" }, { timeoutMs: 1000, fetchImpl }),
+    (e: unknown) =>
+      e instanceof Error &&
+      e.message === "GAS request failed" &&
+      !e.message.includes("SECRET_DUMMY_LEAK") &&
+      !e.message.includes("leak@example.com") &&
+      !e.message.includes("script.google.test") &&
+      !e.message.includes("STACKTRACE_INTERNAL"),
   );
 });
 

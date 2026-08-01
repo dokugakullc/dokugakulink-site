@@ -23,12 +23,13 @@ export async function postToGas(
       signal: controller.signal,
       body: JSON.stringify(body),
     });
-    // ステータスのみ（URL / Secret / 本文を含めない）
+    // ステータス番号のみ（URL / Secret / 本文を含めない）
     if (!res.ok) throw new Error(`GAS returned ${res.status}`);
     const data = (await res.json()) as { success?: boolean; duplicated?: boolean; error?: string };
     if (!data.success) {
-      // GAS は unauthorized / invalid_email 等の汎用コードのみ返す（PII/Secret を含めない設計）
-      throw new Error(`GAS error: ${data.error ?? "unknown"}`);
+      // GAS 応答（data.error 等）は一切含めない固定メッセージ。将来 GAS 応答へ PII / Secret /
+      // URL / 内部情報が混入しても、throw されるエラー文へは漏れない。
+      throw new Error("GAS request failed");
     }
     return { duplicated: data.duplicated ?? false };
   } finally {

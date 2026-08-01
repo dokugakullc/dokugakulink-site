@@ -12,7 +12,7 @@ import {
 import { useVariant, resolveVariant, isAbSource } from "@/lib/ab";
 import { HONEYPOT_FIELD } from "@/lib/formSecurity";
 import { createSubmitGuard } from "@/lib/submitGuard";
-import { resolveRegistrationOutcome } from "@/lib/registrationOutcome";
+import { resolveRegistrationOutcome, outcomeFiresMetaLead } from "@/lib/registrationOutcome";
 
 // Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
@@ -153,13 +153,14 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
         setStatus("error");
         return;
       }
-      // 新規登録のみ Meta Lead を発火。重複は専用イベントのみ（Lead 二重計上を防ぐ）。
-      if (outcome === "duplicated") {
-        trackDuplicate(withVariant({ source }));
-        setStatus("duplicated");
-      } else {
-        trackSubmitted(withVariant({ source }));
+      // Meta Lead を発火してよいのは新規登録のみ。判定は outcomeFiresMetaLead に一元化
+      // （テスト済みの判定関数を本番分岐に結合。重複は Lead を発火しない）。
+      if (outcomeFiresMetaLead(outcome)) {
+        trackSubmitted(withVariant({ source })); // 新規: GA4 + Meta Lead + PostHog
         setStatus("success");
+      } else {
+        trackDuplicate(withVariant({ source })); // 重複: Lead を発火しない
+        setStatus("duplicated");
       }
     } catch {
       trackSubmissionFailed(withVariant({ source }));
