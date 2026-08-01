@@ -13,19 +13,35 @@ const payload: ResendPayload = {
   text: "本文",
 };
 
-test("成功: 2xx なら解決し、認証・冪等キー・エンドポイントが正しい", async () => {
+test("成功: 2xx で解決し、UA・認証・Content-Type・冪等キー・signal・エンドポイントが正しい", async () => {
   let seenUrl = "";
   let seenHeaders: Record<string, string> = {};
+  let seenSignal: AbortSignal | null | undefined;
   const fetchImpl = (async (url: string | URL | Request, init?: RequestInit) => {
     seenUrl = String(url);
-    seenHeaders = init?.headers as Record<string, string>;
+    seenHeaders = (init?.headers ?? {}) as Record<string, string>;
+    seenSignal = init?.signal;
     return new Response(JSON.stringify({ id: "email_1" }), { status: 200 });
   }) as unknown as typeof fetch;
 
   await sendResendEmail(payload, { apiKey: "re_key", idempotencyKey: "contact:sid:admin", timeoutMs: 1000, fetchImpl });
   assert.equal(seenUrl, "https://api.resend.com/emails");
+  // User-Agent（固定・非機密）
+  assert.equal(seenHeaders["User-Agent"], "dokugakulink-site/0.1.0");
+  // 既存ヘッダーの維持
   assert.equal(seenHeaders["Authorization"], "Bearer re_key");
+  assert.equal(seenHeaders["Content-Type"], "application/json");
   assert.equal(seenHeaders["Idempotency-Key"], "contact:sid:admin");
+  // AbortSignal が fetch に渡っている
+  assert.ok(seenSignal instanceof AbortSignal, "signal は AbortSignal であるべき");
+});
+
+test("Secret（APIキー）はエラーメッセージへ出さない", async () => {
+  const fetchImpl = (async () => new Response("body", { status: 500 })) as unknown as typeof fetch;
+  await assert.rejects(
+    () => sendResendEmail(payload, { apiKey: "re_supersecret_value", idempotencyKey: "k", timeoutMs: 1000, fetchImpl }),
+    (e: unknown) => e instanceof Error && !/re_supersecret_value/.test(e.message),
+  );
 });
 
 test("失敗: 非2xx は throw（本文＝PII を読まない・ステータスのみ）", async () => {

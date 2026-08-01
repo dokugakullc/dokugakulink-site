@@ -9,6 +9,9 @@
 // このモジュールは外部通信を行うが、テストでは fetchImpl を注入して接続を差し替える。
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
 
+// 固定・非機密の識別子（env / Secret から生成しない）。Resend REST 呼び出しの User-Agent。
+const USER_AGENT = "dokugakulink-site/0.1.0";
+
 export type ResendPayload = {
   from: string;
   to: string[];
@@ -42,6 +45,7 @@ export async function sendResendEmail(payload: ResendPayload, opts: SendResendOp
         Authorization: `Bearer ${opts.apiKey}`,
         "Content-Type": "application/json",
         "Idempotency-Key": opts.idempotencyKey,
+        "User-Agent": USER_AGENT,
       },
       body: JSON.stringify(payload),
       signal: controller.signal,
