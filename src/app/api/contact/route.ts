@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import { handleContact } from "@/lib/contactHandler";
+import { sendResendEmail, type ResendPayload } from "@/lib/resendClient";
+import type { EmailKind, Inquiry, SendEmail } from "@/lib/contactDelivery";
 
 const SUPPORT_FROM = "ウカレル サポート <support@dokugakulink.com>";
 const SUPPORT_TO = "support@dokugakulink.com";
 const SITE_URL = "https://www.dokugakulink.com";
 const CONTACT_URL = `${SITE_URL}/contact`;
-
-// セキュリティ: 入力長の上限
-const NAME_MAX = 100;
-const EMAIL_MAX = 254;
-const MESSAGE_MAX = 5000;
 
 function escapeHtml(value: string): string {
   return value
@@ -18,41 +15,6 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
-
-function formatJst(date: Date): string {
-  return date.toLocaleString("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-// 受付番号: UKR-YYYYMMDD-HHmmss（JST）
-function generateReference(date: Date): string {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(date);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  return `UKR-${get("year")}${get("month")}${get("day")}-${get("hour")}${get("minute")}${get("second")}`;
-}
-
-type Inquiry = {
-  name: string;
-  email: string;
-  message: string;
-  receivedAt: string;
-  reference: string;
-};
 
 // 共通のカード行
 function row(label: string, value: string): string {
@@ -171,146 +133,46 @@ function buildUserText(i: Inquiry): string {
   ].join("\n");
 }
 
+// kind ごとに Resend REST ペイロードを組み立てる
+function buildPayload(kind: EmailKind, i: Inquiry): ResendPayload {
+  if (kind === "admin") {
+    return {
+      from: SUPPORT_FROM,
+      to: [SUPPORT_TO],
+      reply_to: i.email,
+      subject: `【ウカレル】新しいお問い合わせ（${i.name}）`,
+      html: buildAdminHtml(i),
+      text: buildAdminText(i),
+    };
+  }
+  return {
+    from: SUPPORT_FROM,
+    to: [i.email],
+    reply_to: SUPPORT_TO,
+    subject: "【ウカレル】お問い合わせを受け付けました",
+    html: buildUserHtml(i),
+    text: buildUserText(i),
+  };
+}
+
 export async function POST(req: NextRequest) {
-  let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "リクエストが不正です" }, { status: 400 });
-  }
+  const apiKey = process.env.RESEND_API_KEY;
 
-  if (typeof body !== "object" || body === null) {
-    return NextResponse.json({ error: "リクエストが不正です" }, { status: 400 });
-  }
-
-  const { name, email, message } = body as Record<string, unknown>;
-
-  // 空欄チェック・形式・長さ制限
-  if (typeof name !== "string" || !name.trim()) {
-    return NextResponse.json({ error: "お名前を入力してください" }, { status: 400 });
-  }
-  if (typeof email !== "string" || !email.trim()) {
-    return NextResponse.json({ error: "メールアドレスを入力してください" }, { status: 400 });
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    return NextResponse.json({ error: "正しいメールアドレスを入力してください" }, { status: 400 });
-  }
-  if (typeof message !== "string" || !message.trim()) {
-    return NextResponse.json({ error: "お問い合わせ内容を入力してください" }, { status: 400 });
-  }
-  if (name.trim().length > NAME_MAX) {
-    return NextResponse.json({ error: "お名前が長すぎます" }, { status: 400 });
-  }
-  if (email.trim().length > EMAIL_MAX) {
-    return NextResponse.json({ error: "メールアドレスが長すぎます" }, { status: 400 });
-  }
-  if (message.trim().length > MESSAGE_MAX) {
-    return NextResponse.json(
-      { error: `お問い合わせ内容が長すぎます（${MESSAGE_MAX}文字以内）` },
-      { status: 400 },
-    );
-  }
-
-  const now = new Date();
-  const inquiry: Inquiry = {
-    name: name.trim(),
-    email: email.trim(),
-    message: message.trim(),
-    receivedAt: formatJst(now),
-    reference: generateReference(now),
+  // 実際の送信: Resend REST を AbortController で実中断＋Idempotency-Key。
+  const sendEmail: SendEmail = async (kind, inquiry, ctx) => {
+    await sendResendEmail(buildPayload(kind, inquiry), {
+      apiKey: apiKey ?? "",
+      idempotencyKey: ctx.idempotencyKey,
+      timeoutMs: ctx.timeoutMs,
+    });
   };
 
-  // ── 1) Resend（優先の送信基盤）: 運営宛＋ユーザー宛の2通 ──────
-  const resendApiKey = process.env.RESEND_API_KEY;
-  if (resendApiKey) {
-    try {
-      const resend = new Resend(resendApiKey);
-      const [adminRes, userRes] = await Promise.all([
-        resend.emails.send({
-          from: SUPPORT_FROM,
-          to: [SUPPORT_TO],
-          replyTo: inquiry.email,
-          subject: `【ウカレル】新しいお問い合わせ（${inquiry.name}）`,
-          html: buildAdminHtml(inquiry),
-          text: buildAdminText(inquiry),
-        }),
-        resend.emails.send({
-          from: SUPPORT_FROM,
-          to: [inquiry.email],
-          replyTo: SUPPORT_TO,
-          subject: "【ウカレル】お問い合わせを受け付けました",
-          html: buildUserHtml(inquiry),
-          text: buildUserText(inquiry),
-        }),
-      ]);
+  const result = await handleContact(req, {
+    resendConfigured: Boolean(apiKey),
+    sendEmail,
+    logError: (message, meta) => console.error(message, meta),
+    logWarn: (message, meta) => console.warn(message, meta),
+  });
 
-      // 両方成功した場合のみ成功。PIIはログに出さず、受付番号のみ残す。
-      if (adminRes.error || userRes.error) {
-        console.error("Resend send failed", {
-          reference: inquiry.reference,
-          admin: adminRes.error ?? null,
-          user: userRes.error ?? null,
-        });
-        return NextResponse.json(
-          { error: "送信に失敗しました。時間をおいて再度お試しください。" },
-          { status: 500 },
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        reference: inquiry.reference,
-        adminId: adminRes.data?.id,
-        userId: userRes.data?.id,
-      });
-    } catch (err) {
-      console.error("Resend threw an exception", { reference: inquiry.reference, err });
-      return NextResponse.json(
-        { error: "送信に失敗しました。時間をおいて再度お試しください。" },
-        { status: 500 },
-      );
-    }
-  }
-
-  // ── 2) フォールバック（Resend未設定時のみ）: 既存Webhook（運営宛のみ）─
-  // RESEND_API_KEY 設定後はこの分岐には入らない。移行期の保険。
-  const webhookUrl = process.env.CONTACT_WEBHOOK_URL || process.env.GAS_WEBHOOK_URL;
-  if (!webhookUrl) {
-    console.error("RESEND_API_KEY も CONTACT_WEBHOOK_URL/GAS_WEBHOOK_URL も未設定です");
-    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
-  }
-
-  try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      redirect: "follow",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: inquiry.name,
-        email: inquiry.email.toLowerCase(),
-        message: inquiry.message,
-        reference: inquiry.reference,
-        timestamp: now.toISOString(),
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Webhook returned ${res.status}`);
-    }
-
-    let data: { success?: boolean; error?: string } | null = null;
-    try {
-      data = (await res.json()) as { success?: boolean; error?: string };
-    } catch {
-      data = null;
-    }
-    if (data && data.success === false) {
-      throw new Error(data.error ?? "Webhook reported failure");
-    }
-
-    return NextResponse.json({ success: true, reference: inquiry.reference });
-  } catch (err) {
-    console.error("Contact webhook failed:", err);
-    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
-  }
+  return NextResponse.json(result.body, { status: result.status });
 }
