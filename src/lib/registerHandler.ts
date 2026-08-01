@@ -10,6 +10,8 @@ import {
   validateRegisterInput,
 } from "./formSecurity";
 import type { HttpRequestLike, HandlerResult } from "./contactHandler";
+import { TURNSTILE_FIELD } from "./turnstileClient";
+import { TURNSTILE_FAIL_MESSAGE, type TurnstileGuard } from "./turnstile";
 
 export type RegisterPayload = {
   email: string;
@@ -31,6 +33,8 @@ export type RegisterHandlerDeps = {
   postRegister: PostRegister;
   // Preview 環境フラグ（route が VERCEL_ENV から注入）。true の間は外部保存を一切行わない。
   isPreview?: boolean;
+  // Turnstile（bot 対策）。未注入または state="disabled" なら従来挙動を完全維持。
+  turnstile?: TurnstileGuard;
   timeoutMs?: number;
   logError?: (message: string, meta: Record<string, unknown>) => void;
   logWarn?: (message: string, meta: Record<string, unknown>) => void;
@@ -86,6 +90,30 @@ export async function handleRegister(req: HttpRequestLike, deps: RegisterHandler
   // 追加されても保存されないよう恒久的に禁止）。gasConfigured / postRegister より前に返す。
   if (deps.isPreview) {
     return { status: 503, body: { error: "この環境では送信できません。" } };
+  }
+
+  // Turnstile（設定整合 → 検証）。honeypot / 入力不正 / Preview では到達しない＝Siteverify を呼ばない。
+  // 未設定(disabled)は従来挙動。片側設定(misconfigured)は外部処理せず 500。token は GAS・ログへ出さない。
+  const turnstile = deps.turnstile;
+  if (turnstile && turnstile.state !== "disabled") {
+    if (turnstile.state === "misconfigured") {
+      logError("register: turnstile misconfigured", {});
+      return { status: 500, body: { error: "サーバーエラーが発生しました" } };
+    }
+    const token = typeof record[TURNSTILE_FIELD] === "string" ? (record[TURNSTILE_FIELD] as string) : "";
+    if (!token) {
+      return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
+    }
+    let verified = false;
+    try {
+      verified = (await turnstile.verify(token, { action: "register", timeoutMs })).success;
+    } catch {
+      verified = false; // Cloudflare 障害・timeout でも成功を返さない（fail-closed）。
+      logWarn("register: turnstile verify error", {});
+    }
+    if (!verified) {
+      return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
+    }
   }
 
   if (!deps.gasConfigured) {

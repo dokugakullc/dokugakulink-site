@@ -13,6 +13,11 @@ import { useVariant, resolveVariant, isAbSource } from "@/lib/ab";
 import { HONEYPOT_FIELD } from "@/lib/formSecurity";
 import { createSubmitGuard } from "@/lib/submitGuard";
 import { resolveRegistrationOutcome, outcomeFiresMetaLead } from "@/lib/registrationOutcome";
+import { isTurnstileSiteConfigured, canSubmitTurnstile, turnstilePayloadField } from "@/lib/turnstileClient";
+import TurnstileWidget, { type TurnstileWidgetHandle } from "@/components/TurnstileWidget";
+
+// SiteKey 未設定なら widget を描画せず送信可能（従来挙動）。設定時のみ Cloudflare script を読み込む。
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 // Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
@@ -25,7 +30,7 @@ const PROBLEMS = [
 
 type ProblemValue = typeof PROBLEMS[number]["value"];
 type Status = "idle" | "loading" | "success" | "duplicated" | "error";
-type FieldError = "" | "email_empty" | "email_invalid" | "consent";
+type FieldError = "" | "email_empty" | "email_invalid" | "consent" | "turnstile";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,6 +38,7 @@ const ERROR_TEXT: Record<Exclude<FieldError, "">, string> = {
   email_empty: "メールアドレスを入力してください。",
   email_invalid: "メールアドレスの形式をご確認ください。",
   consent: "プライバシーポリシーへの同意が必要です。",
+  turnstile: "認証の確認が完了していません。少し待つか、チェックをやり直してください。",
 };
 
 interface EmailFormProps {
@@ -92,6 +98,10 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
   const startedRef = useRef(false);
   // 同期ロック（React state に依存しない多重送信防止）
   const submitGuard = useRef(createSubmitGuard()).current;
+  // Turnstile: SiteKey 設定時のみ widget を描画し token を保持（localStorage 等には保存しない）。
+  const siteConfigured = isTurnstileSiteConfigured(TURNSTILE_SITE_KEY);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
 
   // A/B は広告LP(source=landing_takken)のみ有効。他ルート(services_takken)は常にA・非バケット。
   const abOn = isAbSource(source);
@@ -120,6 +130,8 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
     if (!trimmed) return setFieldError("email_empty");
     if (!EMAIL_RE.test(trimmed)) return setFieldError("email_invalid");
     if (!consent) return setFieldError("consent");
+    // Turnstile: SiteKey 設定時は token 取得まで送信不可（未取得・期限切れ・エラーで null）。
+    if (!canSubmitTurnstile({ siteConfigured, token: turnstileToken })) return setFieldError("turnstile");
     setFieldError("");
 
     // B版はアンケートを送信ペイロードに含めない（登録API・保存先は不変・回答は完了後に分析イベントのみ）
@@ -137,6 +149,8 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
           problem: submitProblem,
           source,
           attribution: getAttribution(),
+          // Turnstile token は固定フィールドで送る（サーバーで検証・GAS/Analytics には出さない）。
+          ...turnstilePayloadField(turnstileToken),
           [HONEYPOT_FIELD]: hp, // honeypot（通常は空）
         }),
       });
@@ -150,6 +164,8 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
       if (outcome === "failed") {
         trackSubmissionFailed(withVariant({ source }));
         setHp(""); // honeypot 誤検知等で失敗しても再操作できるようリセット
+        setTurnstileToken(null); // token は単回利用。失敗時は破棄して widget を再取得
+        turnstileRef.current?.reset();
         setStatus("error");
         return;
       }
@@ -165,6 +181,8 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
     } catch {
       trackSubmissionFailed(withVariant({ source }));
       setHp("");
+      setTurnstileToken(null); // token は単回利用。失敗時は破棄して widget を再取得
+      turnstileRef.current?.reset();
       setStatus("error");
     } finally {
       // 失敗・例外・成功いずれでも解放（エラー後の再試行を妨げない）
@@ -333,6 +351,24 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
           onChange={(e) => setHp(e.target.value)}
         />
       </div>
+
+      {/* Turnstile（SiteKey 設定時のみ描画。未設定なら widget なしで従来どおり送信可能）。 */}
+      {siteConfigured && TURNSTILE_SITE_KEY && (
+        <div>
+          <TurnstileWidget
+            ref={turnstileRef}
+            siteKey={TURNSTILE_SITE_KEY}
+            action="register"
+            theme="dark"
+            onVerify={(token) => {
+              setTurnstileToken(token);
+              if (fieldError === "turnstile") setFieldError("");
+            }}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+          />
+        </div>
+      )}
 
       {/* ④ 送信ボタン */}
       <button

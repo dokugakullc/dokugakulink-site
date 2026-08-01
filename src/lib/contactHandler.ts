@@ -15,6 +15,8 @@ import {
 import { deliverContact, type Inquiry, type SendEmail } from "./contactDelivery";
 import { formatJst, generateReference, generateSubmissionId } from "./contactFormat";
 import type { ContactStoreRecord } from "./contactStorePayload";
+import { TURNSTILE_FIELD } from "./turnstileClient";
+import { TURNSTILE_FAIL_MESSAGE, type TurnstileGuard } from "./turnstile";
 
 // 型は contactStorePayload に集約し、ここから再輸出（既存 import 互換）。
 export type { ContactStoreRecord };
@@ -39,6 +41,8 @@ export type ContactHandlerDeps = {
   storeContact?: StoreContact;
   // Preview 環境フラグ（route が VERCEL_ENV から注入）。true の間は保存も送信も一切行わない。
   isPreview?: boolean;
+  // Turnstile（bot 対策）。未注入または state="disabled" なら従来挙動を完全維持。
+  turnstile?: TurnstileGuard;
   timeoutMs?: number;
   now?: () => Date;
   logError?: (message: string, meta: Record<string, unknown>) => void;
@@ -104,6 +108,32 @@ export async function handleContact(req: HttpRequestLike, deps: ContactHandlerDe
   //     honeypot 等の判定順序が Production と変わらず情報漏えいにならないようにする。
   if (deps.isPreview) {
     return { status: 503, body: { error: "この環境ではお問い合わせを送信できません。" } };
+  }
+
+  // 3'') Turnstile（設定整合 → 検証）。honeypot / 入力不正 / Preview では到達しない＝Siteverify を呼ばない。
+  //      未設定(disabled)は従来挙動。片側設定(misconfigured)は外部処理せず 500。token は保存・メール・ログへ出さない。
+  const turnstile = deps.turnstile;
+  if (turnstile && turnstile.state !== "disabled") {
+    if (turnstile.state === "misconfigured") {
+      logError("contact: turnstile misconfigured", {});
+      return { status: 500, body: { error: "サーバーエラーが発生しました" } };
+    }
+    // enabled: token 必須 → Siteverify で検証。
+    const token = typeof record[TURNSTILE_FIELD] === "string" ? (record[TURNSTILE_FIELD] as string) : "";
+    if (!token) {
+      return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
+    }
+    let verified = false;
+    try {
+      verified = (await turnstile.verify(token, { action: "contact", timeoutMs })).success;
+    } catch {
+      // Cloudflare 障害・timeout でも成功を返さない（fail-closed）。詳細はログへ出さない。
+      verified = false;
+      logWarn("contact: turnstile verify error", {});
+    }
+    if (!verified) {
+      return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
+    }
   }
 
   // submissionId: クライアント提供の冪等キー種。無効ならサーバーで生成（単一リクエスト内で安定）。

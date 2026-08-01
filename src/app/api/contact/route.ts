@@ -6,6 +6,7 @@ import { isPreviewDeployment } from "@/lib/deployEnv";
 import { contactTypeLabel } from "@/lib/formSecurity";
 import { postContactStore, isContactStoreConfigured } from "@/lib/contactStoreClient";
 import { buildContactStoreBody } from "@/lib/contactStorePayload";
+import { resolveTurnstileConfig, verifyTurnstile } from "@/lib/turnstile";
 
 const SUPPORT_FROM = "ウカレル サポート <support@dokugakulink.com>";
 const SUPPORT_TO = "support@dokugakulink.com";
@@ -169,6 +170,9 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   const storeUrl = process.env.CONTACT_STORE_URL;
   const storeSecret = process.env.CONTACT_STORE_SHARED_SECRET;
+  // Turnstile: SiteKey/Secret 両方揃えば必須・両方未設定なら無効・片方だけなら misconfigured。
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
 
   // 実際の送信: Resend REST を AbortController で実中断＋Idempotency-Key。
   const sendEmail: SendEmail = async (kind, inquiry, ctx) => {
@@ -192,6 +196,12 @@ export async function POST(req: NextRequest) {
     // URL・Secret の両方が揃ったときだけ保存を有効化（片方でも欠ければ外部 POST しない）。
     storeConfigured: isContactStoreConfigured(storeUrl, storeSecret),
     storeContact,
+    // Turnstile（未設定なら state=disabled で従来挙動）。verify は secret を束ねて注入（handler は secret を知らない）。
+    turnstile: {
+      state: resolveTurnstileConfig(turnstileSiteKey, turnstileSecret),
+      verify: (token, ctx) =>
+        verifyTurnstile(turnstileSecret ?? "", token, { action: ctx.action, timeoutMs: ctx.timeoutMs }),
+    },
     isPreview: isPreviewDeployment(process.env.VERCEL_ENV),
     sendEmail,
     logError: (message, meta) => console.error(message, meta),

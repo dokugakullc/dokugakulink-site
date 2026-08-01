@@ -4,9 +4,14 @@ import { CONTACT_LIMITS, CONTACT_TYPES, CONTACT_TYPE_VALUES, EMAIL_RE, HONEYPOT_
 import { resolveSubmissionId, type SubmissionState } from "@/lib/submission";
 import { createSubmitGuard } from "@/lib/submitGuard";
 import { captureAttribution, getAttribution } from "@/lib/utm";
+import { isTurnstileSiteConfigured, canSubmitTurnstile, turnstilePayloadField } from "@/lib/turnstileClient";
+import TurnstileWidget, { type TurnstileWidgetHandle } from "@/components/TurnstileWidget";
+
+// SiteKey 未設定なら widget を描画せず送信可能（従来挙動）。設定時のみ Cloudflare script を読み込む。
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 type Status = "idle" | "sending" | "success" | "error";
-type FieldKey = "name" | "email" | "contactType" | "company" | "message";
+type FieldKey = "name" | "email" | "contactType" | "company" | "message" | "turnstile";
 type FieldErrors = Partial<Record<FieldKey, string>>;
 
 const { NAME_MAX, EMAIL_MAX, MESSAGE_MAX, COMPANY_MAX } = CONTACT_LIMITS;
@@ -57,6 +62,10 @@ export default function ContactForm() {
   // 冪等キー種と、それに対応する「送信内容スナップショット」。
   // 内容が変わらない再試行では id を保持し、内容が変わったら作り直す（resolveSubmissionId）。
   const [submission, setSubmission] = useState<SubmissionState | null>(null);
+  // Turnstile: SiteKey 設定時のみ widget を描画し token を保持（localStorage 等には保存しない）。
+  const siteConfigured = isTurnstileSiteConfigured(TURNSTILE_SITE_KEY);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -99,6 +108,9 @@ export default function ContactForm() {
     setFieldErrors({});
     setErrorMessage("");
     setSubmission(null); // 新しい問い合わせ＝次回送信時に新しい冪等キーを生成
+    // Turnstile: token を破棄し widget を再取得（成功後の使い回しを防ぐ）。
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
     // 自然なフォーカス復帰: 最初の入力へ
     requestAnimationFrame(() => nameRef.current?.focus());
   };
@@ -109,6 +121,10 @@ export default function ContactForm() {
     if (submitGuard.isLocked()) return;
 
     const errors = validateFields({ name, email, contactType, company, message });
+    // Turnstile: SiteKey 設定時は token 取得まで送信不可（未取得・期限切れ・エラーで null）。
+    if (!canSubmitTurnstile({ siteConfigured, token: turnstileToken })) {
+      errors.turnstile = "認証の確認が完了していません。少し待つか、チェックをやり直してください。";
+    }
     if (Object.values(errors).some(Boolean)) {
       setFieldErrors(errors);
       focusFirstInvalid(errors);
@@ -139,6 +155,8 @@ export default function ContactForm() {
           company,
           submissionId: next.id,
           attribution: getAttribution(),
+          // Turnstile token は固定フィールドで送る（サーバーで検証・保存/メール/Analytics には出さない）。
+          ...turnstilePayloadField(turnstileToken),
           [HONEYPOT_FIELD]: hp,
         }),
       });
@@ -160,6 +178,9 @@ export default function ContactForm() {
       setErrorMessage(err instanceof Error ? err.message : "送信に失敗しました");
       // honeypot 誤検知等で失敗した場合でも利用者が再操作できるよう honeypot をリセット。
       setHp("");
+      // Turnstile token は単回利用。失敗時は破棄して widget を再取得（次の送信で新しい token を使う）。
+      setTurnstileToken(null);
+      turnstileRef.current?.reset();
     } finally {
       // 失敗・例外・成功いずれでも解放（エラー後の再試行を妨げない）
       submitGuard.unlock();
@@ -392,6 +413,28 @@ export default function ContactForm() {
       >
         {errorMessage}
       </p>
+
+      {/* Turnstile（SiteKey 設定時のみ描画。未設定なら widget なしで従来どおり送信可能）。 */}
+      {siteConfigured && TURNSTILE_SITE_KEY && (
+        <div>
+          <TurnstileWidget
+            ref={turnstileRef}
+            siteKey={TURNSTILE_SITE_KEY}
+            action="contact"
+            onVerify={(token) => {
+              setTurnstileToken(token);
+              clearFieldError("turnstile");
+            }}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+          />
+          {fieldErrors.turnstile && (
+            <p id="turnstile-error" role="alert" className="mt-2 text-sm text-red-600">
+              {fieldErrors.turnstile}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* 送信中の状態を支援技術へ通知 */}
       <p className="sr-only" role="status" aria-live="polite">
