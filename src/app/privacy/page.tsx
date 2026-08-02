@@ -100,6 +100,22 @@ const sections = [
             </a>
           </li>
         </ul>
+        <p className="mt-6">
+          また弊社は、お問い合わせフォームおよび事前登録フォームの不正利用や自動送信を防止する目的で、Cloudflare, Inc. が提供する Cloudflare Turnstile を利用する場合があります（上記の分析・広告効果測定とは目的が異なり、bot 対策として利用します）。Turnstile の動作に伴い、端末、ブラウザ、ネットワークその他の技術情報が Cloudflare により処理される場合があります。これらの情報は、Cloudflare のプライバシーポリシーおよび Turnstile に関するポリシーに基づいて取り扱われます。Cookie 等の利用を含む具体的な取扱いは、当社の設定および Cloudflare の仕様によります。
+        </p>
+        <ul className="mt-4 list-disc space-y-4 pl-6">
+          <li>
+            Cloudflare Turnstile（提供者：Cloudflare, Inc.）<br />
+            利用目的：お問い合わせ・事前登録フォームの不正利用および自動送信（bot）の防止<br />
+            <a href="https://www.cloudflare.com/turnstile-privacy-policy/" className="text-blue-700 hover:underline">
+              Cloudflare Turnstile プライバシーポリシー
+            </a>
+            <br />
+            <a href="https://www.cloudflare.com/privacypolicy/" className="text-blue-700 hover:underline">
+              Cloudflare プライバシーポリシー
+            </a>
+          </li>
+        </ul>
         <p className="mt-4">
           利用者はブラウザの設定によりCookieを無効化できます。ただし、その場合はウェブサイトの一部機能が正常に動作しないことがあります。
         </p>
