@@ -376,6 +376,12 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600 leading-loose mt-3 mb-8">
             下記フォームに必要事項をご入力ください。内容を確認後、通常2営業日以内に返信いたします。
+            <br />
+            ご入力いただいた内容の取扱い・保存期間については、
+            <Link href="/privacy" className="text-blue-700 underline underline-offset-2 hover:text-blue-800">
+              プライバシーポリシー
+            </Link>
+            をご確認ください。
           </p>
           <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
             <ContactForm />
