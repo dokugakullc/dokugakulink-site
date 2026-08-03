@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     postRegister,
     // Turnstile（未設定なら state=disabled で従来挙動）。verify は secret を束ねて注入。
     turnstile: {
-      state: resolveTurnstileConfig(turnstileSiteKey, turnstileSecret),
+      state: resolveTurnstileConfig(process.env.NEXT_PUBLIC_TURNSTILE_ENABLED, turnstileSiteKey, turnstileSecret),
       verify: (token, ctx) =>
         verifyTurnstile(turnstileSecret ?? "", token, { action: ctx.action, timeoutMs: ctx.timeoutMs }),
     },

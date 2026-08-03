@@ -107,3 +107,63 @@
 - Pre-clearance（既定は cf_clearance 不使用）: https://developers.cloudflare.com/turnstile/get-started/pre-clearance/
 - Cloudflare Turnstile Privacy Policy: https://www.cloudflare.com/turnstile-privacy-policy/
 - Cloudflare Privacy Policy（一般）: https://www.cloudflare.com/privacypolicy/
+
+## 16. 2026-08-03 初回 Production 有効化インシデントと診断改善
+
+- **事象**：2026-08-03 に Production で Turnstile を初回有効化したところ、**client widget の token 発行は成功**したが、**サーバー側 Siteverify 呼び出しが catch 経路**に入り、問い合わせフォームが 400（固定汎用メッセージ）を返した。Cloudflare 側には「siteverify が呼び出されていない」警告。
+- **分類**：カテゴリ B（Siteverify 通信例外・timeout・非2xx・invalid_response のいずれか）。当時のログは固定文（`turnstile verify error`）のみで、B 内の厳密な原因を区別できなかった。
+- **対応**：直前の正常 Deployment（Turnstile 環境変数設定前ビルド・`dpl_DX3R6Z9skuEWrAD4DJ2uqSZz63jh`）へ Vercel 公式ロールバック。**現在 Production は Turnstile 無効**（widget 非描画・従来の honeypot/Origin 等は有効）。環境変数・Cloudflare widget は残置。
+
+### 診断改善（本 PR）
+`verifyTurnstile` は失敗を throw せず、**固定カテゴリ**へ分類して返す。handler は**カテゴリのみ**をログへ出す（`contact/register: turnstile verification failed { reason, httpStatus? }`）。ユーザー応答は従来の固定文で不変。
+
+- カテゴリ：`missing_token` / `siteverify_timeout` / `siteverify_network_error` / `siteverify_http_error`（+ 安全な HTTP ステータス 100-599 のみ） / `siteverify_invalid_response` / `siteverify_rejected` / `action_mismatch` / `hostname_mismatch`。
+- リクエスト形式を Cloudflare 公式例へ整合：`URLSearchParams` を body へ直接渡す・固定 User-Agent `dokugakulink-site/0.1.0` 付与・timeout 10 秒（既定）。User-Agent は公式の必須要件ではないが、固定・非機密の識別子として付与（Resend REST と同方針）。
+- **ログへ出さない**：Secret / token / token 長 / email / 氏名 / 会社名 / 本文 / IP / hostname 実値 / action 実値 / Cloudflare 応答本文 / error-codes 実値 / Error.message / cause / stack / Siteverify URL クエリ / request body。
+
+### 次回再有効化前の確認事項
+- **同じキーの再入力だけで再挑戦しない**。まず本診断改善を Production へ反映し、失敗時のカテゴリを可視化する。
+- 再有効化は**別承認**。有効化前にプライバシーポリシー（反映済み）と本書を確認。
+- 想定原因の切り分け：`siteverify_http_error` が出れば Cloudflare へのリクエストが非2xx（例：User-Agent 等の要因）、`siteverify_network_error`/`siteverify_timeout` なら egress/到達性、`siteverify_rejected` ならキー/検証内容、`action_mismatch`/`hostname_mismatch` なら widget と本番ドメイン/action の不整合。
+- ロールバック先：`dpl_DX3R6Z9skuEWrAD4DJ2uqSZz63jh`（commit `d476e27`・Turnstile 無効ビルド）。
+
+### 参照（確認日 2026-08-03）
+- Server-side validation: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
+
+## 17. 明示的な有効化フラグ（3変数構成・kill switch）
+
+初回有効化のロールバック後、**Site Key / Secret が保存済みでも、マージや再デプロイだけで意図せず再有効化されない**よう、明示的な有効化フラグを追加した（Phase 2D.5）。
+
+### 有効化に必要な 3 変数（Production 限定）
+```text
+NEXT_PUBLIC_TURNSTILE_ENABLED=true
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=<Production Site Key>
+TURNSTILE_SECRET_KEY=<Production Secret>
+```
+- `NEXT_PUBLIC_TURNSTILE_ENABLED` は**文字列が完全に `"true"` のときだけ有効**。未設定 / `""` / `"false"` / `"TRUE"` / `"1"` / その他は無効（曖昧 truthy 判定はしない）。
+- 判定契約は `resolveTurnstileConfig(enabledValue, siteKey, secret)` に一元化：フラグが `"true"` でなければ**鍵があっても `disabled`**／フラグ `"true"`＋両鍵あり＝`enabled`／フラグ `"true"` だが鍵が欠ける＝`misconfigured`（fail-closed で 500）。
+- クライアント（`ContactForm`/`EmailForm`）の widget 描画も **フラグ `"true"`＋SiteKey** のときだけ（共通純粋関数 `isTurnstileWidgetActive`）。Secret はクライアントへ取り込まない。有効化判定はリクエスト値から変更できない。
+
+### 通常状態
+- Site Key / Secret が保存されていても、**フラグ未設定/`false` なら Turnstile は無効**（widget 非描画・従来のフォーム経路）。
+- **PR をマージするだけでは Turnstile は有効にならない**（フラグが未設定のため）。
+
+### 有効化手順（Owner の別承認）
+1. `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` が Production 限定で存在することを確認。
+2. Owner の別承認を得る。
+3. `NEXT_PUBLIC_TURNSTILE_ENABLED=true` を **Production 限定**で設定。
+4. Production を再デプロイ（`NEXT_PUBLIC_*` はビルド時反映＝ビルドキャッシュを使わない）。
+5. widget 表示・Siteverify・action・hostname・token/reset・**診断ログの reason** を確認。
+6. contact / register を各 1 件だけ管理された方法で確認（Owner 手動）。
+7. エラー監視（5xx・`turnstile verification failed` の reason 分布）。
+
+### 無効化手順（kill switch）
+1. `NEXT_PUBLIC_TURNSTILE_ENABLED` を**削除、または `false` へ変更**。
+2. Production を再デプロイ。
+3. widget / script が非描画になったことを確認。
+4. 従来のフォーム経路が復旧したことを確認。
+- **Site Key / Secret は緊急無効化時に残したままでよい**（有効化フラグが kill switch）。
+
+### ロールバック
+- 必要なら直前正常デプロイへロールバック。現在の安全なロールバック先＝`dpl_DX3R6Z9skuEWrAD4DJ2uqSZz63jh`（Turnstile 無効ビルド）。
+- **Preview / Development には 3 変数とも設定しない**。

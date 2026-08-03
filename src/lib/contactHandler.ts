@@ -16,7 +16,12 @@ import { deliverContact, type Inquiry, type SendEmail } from "./contactDelivery"
 import { formatJst, generateReference, generateSubmissionId } from "./contactFormat";
 import type { ContactStoreRecord } from "./contactStorePayload";
 import { TURNSTILE_FIELD } from "./turnstileClient";
-import { TURNSTILE_FAIL_MESSAGE, type TurnstileGuard } from "./turnstile";
+import {
+  TURNSTILE_FAIL_MESSAGE,
+  type TurnstileGuard,
+  type TurnstileVerifyResult,
+  type TurnstileLogMeta,
+} from "./turnstile";
 
 // 型は contactStorePayload に集約し、ここから再輸出（既存 import 互換）。
 export type { ContactStoreRecord };
@@ -118,20 +123,25 @@ export async function handleContact(req: HttpRequestLike, deps: ContactHandlerDe
       logError("contact: turnstile misconfigured", {});
       return { status: 500, body: { error: "サーバーエラーが発生しました" } };
     }
-    // enabled: token 必須 → Siteverify で検証。
+    // enabled: token 必須 → Siteverify で検証。失敗理由は固定カテゴリのみログへ出す
+    // （Secret / token / email / 本文 / hostname 実値 / action 実値 / 応答本文は出さない）。
     const token = typeof record[TURNSTILE_FIELD] === "string" ? (record[TURNSTILE_FIELD] as string) : "";
     if (!token) {
+      // token 欠落は外部を呼ばず missing_token として記録（token 値・長さは出さない）。
+      logWarn("contact: turnstile verification failed", { reason: "missing_token" } satisfies TurnstileLogMeta);
       return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
     }
-    let verified = false;
+    let result: TurnstileVerifyResult;
     try {
-      verified = (await turnstile.verify(token, { action: "contact", timeoutMs })).success;
+      result = await turnstile.verify(token, { action: "contact", timeoutMs });
     } catch {
-      // Cloudflare 障害・timeout でも成功を返さない（fail-closed）。詳細はログへ出さない。
-      verified = false;
-      logWarn("contact: turnstile verify error", {});
+      // verify は原則 throw しないが、想定外の throw も fail-closed で固定カテゴリへ変換。
+      result = { success: false, reason: "siteverify_network_error" };
     }
-    if (!verified) {
+    if (!result.success) {
+      const meta: TurnstileLogMeta = { reason: result.reason };
+      if (typeof result.httpStatus === "number") meta.httpStatus = result.httpStatus;
+      logWarn("contact: turnstile verification failed", meta);
       return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
     }
   }

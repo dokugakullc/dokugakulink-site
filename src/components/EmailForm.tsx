@@ -13,11 +13,12 @@ import { useVariant, resolveVariant, isAbSource } from "@/lib/ab";
 import { HONEYPOT_FIELD } from "@/lib/formSecurity";
 import { createSubmitGuard } from "@/lib/submitGuard";
 import { resolveRegistrationOutcome, outcomeFiresMetaLead } from "@/lib/registrationOutcome";
-import { isTurnstileSiteConfigured, canSubmitTurnstile, turnstilePayloadField } from "@/lib/turnstileClient";
+import { isTurnstileWidgetActive, canSubmitTurnstile, turnstilePayloadField } from "@/lib/turnstileClient";
 import TurnstileWidget, { type TurnstileWidgetHandle } from "@/components/TurnstileWidget";
 
 // SiteKey 未設定なら widget を描画せず送信可能（従来挙動）。設定時のみ Cloudflare script を読み込む。
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const TURNSTILE_ENABLED = process.env.NEXT_PUBLIC_TURNSTILE_ENABLED;
 
 // Google Sheetsで集計しやすい英語スラッグ
 const PROBLEMS = [
@@ -98,8 +99,8 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
   const startedRef = useRef(false);
   // 同期ロック（React state に依存しない多重送信防止）
   const submitGuard = useRef(createSubmitGuard()).current;
-  // Turnstile: SiteKey 設定時のみ widget を描画し token を保持（localStorage 等には保存しない）。
-  const siteConfigured = isTurnstileSiteConfigured(TURNSTILE_SITE_KEY);
+  // Turnstile: 有効化フラグ("true")＋SiteKey 設定時のみ widget を描画し token を保持（localStorage 等には保存しない）。
+  const turnstileActive = isTurnstileWidgetActive(TURNSTILE_ENABLED, TURNSTILE_SITE_KEY);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
 
@@ -131,7 +132,7 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
     if (!EMAIL_RE.test(trimmed)) return setFieldError("email_invalid");
     if (!consent) return setFieldError("consent");
     // Turnstile: SiteKey 設定時は token 取得まで送信不可（未取得・期限切れ・エラーで null）。
-    if (!canSubmitTurnstile({ siteConfigured, token: turnstileToken })) return setFieldError("turnstile");
+    if (!canSubmitTurnstile({ siteConfigured: turnstileActive, token: turnstileToken })) return setFieldError("turnstile");
     setFieldError("");
 
     // B版はアンケートを送信ペイロードに含めない（登録API・保存先は不変・回答は完了後に分析イベントのみ）
@@ -353,7 +354,7 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
       </div>
 
       {/* Turnstile（SiteKey 設定時のみ描画。未設定なら widget なしで従来どおり送信可能）。 */}
-      {siteConfigured && TURNSTILE_SITE_KEY && (
+      {turnstileActive && TURNSTILE_SITE_KEY && (
         <div>
           <TurnstileWidget
             ref={turnstileRef}

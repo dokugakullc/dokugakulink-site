@@ -9,6 +9,27 @@ export function isTurnstileSiteConfigured(siteKey: string | null | undefined): b
 }
 
 /**
+ * 明示的な有効化フラグ（NEXT_PUBLIC_TURNSTILE_ENABLED）の判定。
+ * 曖昧な truthy 判定はせず、文字列が完全に "true" のときだけ有効。
+ * （未設定 / "" / "false" / "TRUE" / "1" / その他 は無効。）
+ */
+export function isTurnstileFlagEnabled(flag: string | null | undefined): boolean {
+  return flag === "true";
+}
+
+/**
+ * widget を描画・利用する条件（client / server で共通の有効化契約）。
+ *  - 有効化フラグが "true"、かつ SiteKey が設定済みのときだけ true。
+ *  - フラグが無効なら SiteKey があっても false（kill switch）。Secret はクライアントへ取り込まない。
+ */
+export function isTurnstileWidgetActive(
+  flag: string | null | undefined,
+  siteKey: string | null | undefined,
+): boolean {
+  return isTurnstileFlagEnabled(flag) && isTurnstileSiteConfigured(siteKey);
+}
+
+/**
  * 送信可否判定。
  *  - SiteKey 未設定（widget 不要）→ 常に送信可（従来挙動）。
  *  - SiteKey 設定時 → token 取得済みのときだけ送信可（未取得・期限切れ・エラーで token=null なら不可）。
