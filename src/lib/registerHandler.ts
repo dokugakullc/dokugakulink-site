@@ -11,7 +11,12 @@ import {
 } from "./formSecurity";
 import type { HttpRequestLike, HandlerResult } from "./contactHandler";
 import { TURNSTILE_FIELD } from "./turnstileClient";
-import { TURNSTILE_FAIL_MESSAGE, type TurnstileGuard } from "./turnstile";
+import {
+  TURNSTILE_FAIL_MESSAGE,
+  type TurnstileGuard,
+  type TurnstileVerifyResult,
+  type TurnstileLogMeta,
+} from "./turnstile";
 
 export type RegisterPayload = {
   email: string;
@@ -100,18 +105,23 @@ export async function handleRegister(req: HttpRequestLike, deps: RegisterHandler
       logError("register: turnstile misconfigured", {});
       return { status: 500, body: { error: "サーバーエラーが発生しました" } };
     }
+    // token 必須 → Siteverify で検証。失敗理由は固定カテゴリのみログへ出す
+    // （Secret / token / email / hostname 実値 / action 実値 / 応答本文は出さない）。
     const token = typeof record[TURNSTILE_FIELD] === "string" ? (record[TURNSTILE_FIELD] as string) : "";
     if (!token) {
+      logWarn("register: turnstile verification failed", { reason: "missing_token" } satisfies TurnstileLogMeta);
       return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
     }
-    let verified = false;
+    let result: TurnstileVerifyResult;
     try {
-      verified = (await turnstile.verify(token, { action: "register", timeoutMs })).success;
+      result = await turnstile.verify(token, { action: "register", timeoutMs });
     } catch {
-      verified = false; // Cloudflare 障害・timeout でも成功を返さない（fail-closed）。
-      logWarn("register: turnstile verify error", {});
+      result = { success: false, reason: "siteverify_network_error" }; // 想定外 throw も fail-closed。
     }
-    if (!verified) {
+    if (!result.success) {
+      const meta: TurnstileLogMeta = { reason: result.reason };
+      if (typeof result.httpStatus === "number") meta.httpStatus = result.httpStatus;
+      logWarn("register: turnstile verification failed", meta);
       return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
     }
   }

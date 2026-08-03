@@ -107,3 +107,25 @@
 - Pre-clearance（既定は cf_clearance 不使用）: https://developers.cloudflare.com/turnstile/get-started/pre-clearance/
 - Cloudflare Turnstile Privacy Policy: https://www.cloudflare.com/turnstile-privacy-policy/
 - Cloudflare Privacy Policy（一般）: https://www.cloudflare.com/privacypolicy/
+
+## 16. 2026-08-03 初回 Production 有効化インシデントと診断改善
+
+- **事象**：2026-08-03 に Production で Turnstile を初回有効化したところ、**client widget の token 発行は成功**したが、**サーバー側 Siteverify 呼び出しが catch 経路**に入り、問い合わせフォームが 400（固定汎用メッセージ）を返した。Cloudflare 側には「siteverify が呼び出されていない」警告。
+- **分類**：カテゴリ B（Siteverify 通信例外・timeout・非2xx・invalid_response のいずれか）。当時のログは固定文（`turnstile verify error`）のみで、B 内の厳密な原因を区別できなかった。
+- **対応**：直前の正常 Deployment（Turnstile 環境変数設定前ビルド・`dpl_DX3R6Z9skuEWrAD4DJ2uqSZz63jh`）へ Vercel 公式ロールバック。**現在 Production は Turnstile 無効**（widget 非描画・従来の honeypot/Origin 等は有効）。環境変数・Cloudflare widget は残置。
+
+### 診断改善（本 PR）
+`verifyTurnstile` は失敗を throw せず、**固定カテゴリ**へ分類して返す。handler は**カテゴリのみ**をログへ出す（`contact/register: turnstile verification failed { reason, httpStatus? }`）。ユーザー応答は従来の固定文で不変。
+
+- カテゴリ：`missing_token` / `siteverify_timeout` / `siteverify_network_error` / `siteverify_http_error`（+ 安全な HTTP ステータス 100-599 のみ） / `siteverify_invalid_response` / `siteverify_rejected` / `action_mismatch` / `hostname_mismatch`。
+- リクエスト形式を Cloudflare 公式例へ整合：`URLSearchParams` を body へ直接渡す・固定 User-Agent `dokugakulink-site/0.1.0` 付与・timeout 10 秒（既定）。User-Agent は公式の必須要件ではないが、固定・非機密の識別子として付与（Resend REST と同方針）。
+- **ログへ出さない**：Secret / token / token 長 / email / 氏名 / 会社名 / 本文 / IP / hostname 実値 / action 実値 / Cloudflare 応答本文 / error-codes 実値 / Error.message / cause / stack / Siteverify URL クエリ / request body。
+
+### 次回再有効化前の確認事項
+- **同じキーの再入力だけで再挑戦しない**。まず本診断改善を Production へ反映し、失敗時のカテゴリを可視化する。
+- 再有効化は**別承認**。有効化前にプライバシーポリシー（反映済み）と本書を確認。
+- 想定原因の切り分け：`siteverify_http_error` が出れば Cloudflare へのリクエストが非2xx（例：User-Agent 等の要因）、`siteverify_network_error`/`siteverify_timeout` なら egress/到達性、`siteverify_rejected` ならキー/検証内容、`action_mismatch`/`hostname_mismatch` なら widget と本番ドメイン/action の不整合。
+- ロールバック先：`dpl_DX3R6Z9skuEWrAD4DJ2uqSZz63jh`（commit `d476e27`・Turnstile 無効ビルド）。
+
+### 参照（確認日 2026-08-03）
+- Server-side validation: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
