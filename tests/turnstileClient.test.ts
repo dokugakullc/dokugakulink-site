@@ -3,10 +3,38 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   isTurnstileSiteConfigured,
+  isTurnstileFlagEnabled,
+  isTurnstileWidgetActive,
   canSubmitTurnstile,
   turnstilePayloadField,
   TURNSTILE_FIELD,
 } from "../src/lib/turnstileClient";
+
+// ── 明示的な有効化フラグ ──────────────────────────────────────────
+test('有効化フラグ: 完全一致の "true" だけ true', () => {
+  assert.equal(isTurnstileFlagEnabled("true"), true);
+});
+test("有効化フラグ: 未設定/空/false/曖昧値は false（曖昧 truthy 判定をしない）", () => {
+  for (const v of [undefined, null, "", "false", "FALSE", "TRUE", "True", "1", "0", "yes", "on", " true", "true "]) {
+    assert.equal(isTurnstileFlagEnabled(v), false, `flag=${JSON.stringify(v)}`);
+  }
+});
+
+// ── widget 有効判定（フラグ + SiteKey の両方） ────────────────────
+test("widget 有効: フラグ true ＋ SiteKey あり → true", () => {
+  assert.equal(isTurnstileWidgetActive("true", "0xSITEKEY"), true);
+});
+test("widget 有効: フラグ未設定/false は SiteKey があっても false（kill switch）", () => {
+  assert.equal(isTurnstileWidgetActive(undefined, "0xSITEKEY"), false);
+  assert.equal(isTurnstileWidgetActive("", "0xSITEKEY"), false);
+  assert.equal(isTurnstileWidgetActive("false", "0xSITEKEY"), false);
+  assert.equal(isTurnstileWidgetActive("1", "0xSITEKEY"), false);
+});
+test("widget 有効: フラグ true でも SiteKey 未設定なら false", () => {
+  assert.equal(isTurnstileWidgetActive("true", undefined), false);
+  assert.equal(isTurnstileWidgetActive("true", ""), false);
+  assert.equal(isTurnstileWidgetActive("true", "   "), false);
+});
 
 test("SiteKey 判定: 未設定/空/空白 → false、値あり → true", () => {
   assert.equal(isTurnstileSiteConfigured(undefined), false);

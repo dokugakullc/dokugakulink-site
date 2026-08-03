@@ -33,6 +33,8 @@ export const ALLOWED_TURNSTILE_HOSTNAMES: readonly string[] = ["dokugakulink.com
 export const TURNSTILE_FAIL_MESSAGE =
   "認証を確認できませんでした。ページを再読み込みして、もう一度お試しください。";
 
+import { isTurnstileFlagEnabled } from "./turnstileClient";
+
 export type TurnstileConfigState = "disabled" | "enabled" | "misconfigured";
 
 // Siteverify 失敗の固定カテゴリ（Secret / token / PII / 応答本文を含まない・外部公開可）。
@@ -50,18 +52,21 @@ export type TurnstileFailureReason =
 export type TurnstileLogMeta = { reason: TurnstileFailureReason; httpStatus?: number };
 
 /**
- * SiteKey / Secret の設定状態。
- *  - 両方未設定 → disabled（Turnstile 機能を完全に無効・従来挙動を維持）
- *  - 両方設定   → enabled（Turnstile 必須）
- *  - 片方のみ   → misconfigured（設定不整合・fail-closed。外部処理せず 500）
+ * Turnstile の有効化契約（明示フラグ + Site Key + Secret）。判定を一元化する。
+ *  - 有効化フラグ（enabledValue）が "true" でない → **disabled**（Site Key / Secret が保存済みでも完全に無効）。
+ *  - フラグ "true" ＋ SiteKey・Secret 両方あり → enabled。
+ *  - フラグ "true" だが SiteKey か Secret が欠ける → misconfigured（設定不備・fail-closed で 500）。
+ * enabledValue はサーバー側 env（NEXT_PUBLIC_TURNSTILE_ENABLED）からのみ渡す。リクエスト値からは決めない。
+ * env 値はログへ出さない。
  */
 export function resolveTurnstileConfig(
+  enabledValue: string | null | undefined,
   siteKey: string | null | undefined,
   secret: string | null | undefined,
 ): TurnstileConfigState {
+  if (!isTurnstileFlagEnabled(enabledValue)) return "disabled";
   const hasSite = Boolean(siteKey && siteKey.trim());
   const hasSecret = Boolean(secret && secret.trim());
-  if (!hasSite && !hasSecret) return "disabled";
   if (hasSite && hasSecret) return "enabled";
   return "misconfigured";
 }

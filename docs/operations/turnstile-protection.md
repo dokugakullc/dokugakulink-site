@@ -129,3 +129,41 @@
 
 ### 参照（確認日 2026-08-03）
 - Server-side validation: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
+
+## 17. 明示的な有効化フラグ（3変数構成・kill switch）
+
+初回有効化のロールバック後、**Site Key / Secret が保存済みでも、マージや再デプロイだけで意図せず再有効化されない**よう、明示的な有効化フラグを追加した（Phase 2D.5）。
+
+### 有効化に必要な 3 変数（Production 限定）
+```text
+NEXT_PUBLIC_TURNSTILE_ENABLED=true
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=<Production Site Key>
+TURNSTILE_SECRET_KEY=<Production Secret>
+```
+- `NEXT_PUBLIC_TURNSTILE_ENABLED` は**文字列が完全に `"true"` のときだけ有効**。未設定 / `""` / `"false"` / `"TRUE"` / `"1"` / その他は無効（曖昧 truthy 判定はしない）。
+- 判定契約は `resolveTurnstileConfig(enabledValue, siteKey, secret)` に一元化：フラグが `"true"` でなければ**鍵があっても `disabled`**／フラグ `"true"`＋両鍵あり＝`enabled`／フラグ `"true"` だが鍵が欠ける＝`misconfigured`（fail-closed で 500）。
+- クライアント（`ContactForm`/`EmailForm`）の widget 描画も **フラグ `"true"`＋SiteKey** のときだけ（共通純粋関数 `isTurnstileWidgetActive`）。Secret はクライアントへ取り込まない。有効化判定はリクエスト値から変更できない。
+
+### 通常状態
+- Site Key / Secret が保存されていても、**フラグ未設定/`false` なら Turnstile は無効**（widget 非描画・従来のフォーム経路）。
+- **PR をマージするだけでは Turnstile は有効にならない**（フラグが未設定のため）。
+
+### 有効化手順（Owner の別承認）
+1. `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` が Production 限定で存在することを確認。
+2. Owner の別承認を得る。
+3. `NEXT_PUBLIC_TURNSTILE_ENABLED=true` を **Production 限定**で設定。
+4. Production を再デプロイ（`NEXT_PUBLIC_*` はビルド時反映＝ビルドキャッシュを使わない）。
+5. widget 表示・Siteverify・action・hostname・token/reset・**診断ログの reason** を確認。
+6. contact / register を各 1 件だけ管理された方法で確認（Owner 手動）。
+7. エラー監視（5xx・`turnstile verification failed` の reason 分布）。
+
+### 無効化手順（kill switch）
+1. `NEXT_PUBLIC_TURNSTILE_ENABLED` を**削除、または `false` へ変更**。
+2. Production を再デプロイ。
+3. widget / script が非描画になったことを確認。
+4. 従来のフォーム経路が復旧したことを確認。
+- **Site Key / Secret は緊急無効化時に残したままでよい**（有効化フラグが kill switch）。
+
+### ロールバック
+- 必要なら直前正常デプロイへロールバック。現在の安全なロールバック先＝`dpl_DX3R6Z9skuEWrAD4DJ2uqSZz63jh`（Turnstile 無効ビルド）。
+- **Preview / Development には 3 変数とも設定しない**。

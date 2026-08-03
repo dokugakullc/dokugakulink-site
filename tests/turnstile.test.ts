@@ -24,21 +24,26 @@ function bodyParams(init?: RequestInit): URLSearchParams {
   return new URLSearchParams(String(init?.body ?? ""));
 }
 
-// ── 設定状態 ─────────────────────────────────────────────────────
-test("両方未設定 → disabled", () => {
-  assert.equal(resolveTurnstileConfig(undefined, undefined), "disabled");
-  assert.equal(resolveTurnstileConfig("", ""), "disabled");
+// ── 設定状態（明示フラグ + SiteKey + Secret の 3 引数契約） ────────
+test("フラグ未設定/空/false/曖昧値 → disabled（鍵が両方あっても無効）", () => {
+  for (const flag of [undefined, null, "", "false", "FALSE", "TRUE", "True", "1", "yes", "on", " true"]) {
+    assert.equal(resolveTurnstileConfig(flag, "site", "secret"), "disabled", `flag=${JSON.stringify(flag)}`);
+  }
 });
-test("両方設定 → enabled", () => {
-  assert.equal(resolveTurnstileConfig("site", "secret"), "enabled");
+test('フラグ"true" + SiteKey・Secret 両方あり → enabled', () => {
+  assert.equal(resolveTurnstileConfig("true", "site", "secret"), "enabled");
 });
-test("SiteKey のみ → misconfigured", () => {
-  assert.equal(resolveTurnstileConfig("site", undefined), "misconfigured");
-  assert.equal(resolveTurnstileConfig("site", ""), "misconfigured");
+test('フラグ"true" + SiteKey 欠け → misconfigured', () => {
+  assert.equal(resolveTurnstileConfig("true", undefined, "secret"), "misconfigured");
+  assert.equal(resolveTurnstileConfig("true", "", "secret"), "misconfigured");
 });
-test("Secret のみ → misconfigured", () => {
-  assert.equal(resolveTurnstileConfig(undefined, "secret"), "misconfigured");
-  assert.equal(resolveTurnstileConfig("", "secret"), "misconfigured");
+test('フラグ"true" + Secret 欠け → misconfigured', () => {
+  assert.equal(resolveTurnstileConfig("true", "site", undefined), "misconfigured");
+  assert.equal(resolveTurnstileConfig("true", "site", ""), "misconfigured");
+});
+test('フラグ"true" + 両方欠け → misconfigured', () => {
+  assert.equal(resolveTurnstileConfig("true", undefined, undefined), "misconfigured");
+  assert.equal(resolveTurnstileConfig("true", "", ""), "misconfigured");
 });
 
 // ── リクエスト形式 ───────────────────────────────────────────────

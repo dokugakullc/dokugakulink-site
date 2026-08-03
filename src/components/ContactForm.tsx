@@ -4,11 +4,12 @@ import { CONTACT_LIMITS, CONTACT_TYPES, CONTACT_TYPE_VALUES, EMAIL_RE, HONEYPOT_
 import { resolveSubmissionId, type SubmissionState } from "@/lib/submission";
 import { createSubmitGuard } from "@/lib/submitGuard";
 import { captureAttribution, getAttribution } from "@/lib/utm";
-import { isTurnstileSiteConfigured, canSubmitTurnstile, turnstilePayloadField } from "@/lib/turnstileClient";
+import { isTurnstileWidgetActive, canSubmitTurnstile, turnstilePayloadField } from "@/lib/turnstileClient";
 import TurnstileWidget, { type TurnstileWidgetHandle } from "@/components/TurnstileWidget";
 
 // SiteKey 未設定なら widget を描画せず送信可能（従来挙動）。設定時のみ Cloudflare script を読み込む。
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const TURNSTILE_ENABLED = process.env.NEXT_PUBLIC_TURNSTILE_ENABLED;
 
 type Status = "idle" | "sending" | "success" | "error";
 type FieldKey = "name" | "email" | "contactType" | "company" | "message" | "turnstile";
@@ -62,8 +63,8 @@ export default function ContactForm() {
   // 冪等キー種と、それに対応する「送信内容スナップショット」。
   // 内容が変わらない再試行では id を保持し、内容が変わったら作り直す（resolveSubmissionId）。
   const [submission, setSubmission] = useState<SubmissionState | null>(null);
-  // Turnstile: SiteKey 設定時のみ widget を描画し token を保持（localStorage 等には保存しない）。
-  const siteConfigured = isTurnstileSiteConfigured(TURNSTILE_SITE_KEY);
+  // Turnstile: 有効化フラグ("true")＋SiteKey 設定時のみ widget を描画し token を保持（localStorage 等には保存しない）。
+  const turnstileActive = isTurnstileWidgetActive(TURNSTILE_ENABLED, TURNSTILE_SITE_KEY);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
 
@@ -122,7 +123,7 @@ export default function ContactForm() {
 
     const errors = validateFields({ name, email, contactType, company, message });
     // Turnstile: SiteKey 設定時は token 取得まで送信不可（未取得・期限切れ・エラーで null）。
-    if (!canSubmitTurnstile({ siteConfigured, token: turnstileToken })) {
+    if (!canSubmitTurnstile({ siteConfigured: turnstileActive, token: turnstileToken })) {
       errors.turnstile = "認証の確認が完了していません。少し待つか、チェックをやり直してください。";
     }
     if (Object.values(errors).some(Boolean)) {
@@ -415,7 +416,7 @@ export default function ContactForm() {
       </p>
 
       {/* Turnstile（SiteKey 設定時のみ描画。未設定なら widget なしで従来どおり送信可能）。 */}
-      {siteConfigured && TURNSTILE_SITE_KEY && (
+      {turnstileActive && TURNSTILE_SITE_KEY && (
         <div>
           <TurnstileWidget
             ref={turnstileRef}
