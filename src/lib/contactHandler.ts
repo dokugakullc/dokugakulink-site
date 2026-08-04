@@ -141,6 +141,8 @@ export async function handleContact(req: HttpRequestLike, deps: ContactHandlerDe
     if (!result.success) {
       const meta: TurnstileLogMeta = { reason: result.reason };
       if (typeof result.httpStatus === "number") meta.httpStatus = result.httpStatus;
+      // 非2xx 時に抽出された既知 error-code（許可リスト一致・件数上限内）だけを記録する。
+      if (Array.isArray(result.errorCodes) && result.errorCodes.length > 0) meta.errorCodes = result.errorCodes;
       logWarn("contact: turnstile verification failed", meta);
       return { status: 400, body: { error: TURNSTILE_FAIL_MESSAGE } };
     }
