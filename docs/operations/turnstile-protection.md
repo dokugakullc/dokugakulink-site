@@ -167,3 +167,40 @@ TURNSTILE_SECRET_KEY=<Production Secret>
 ### ロールバック
 - 必要なら直前正常デプロイへロールバック。現在の安全なロールバック先＝`dpl_DX3R6Z9skuEWrAD4DJ2uqSZz63jh`（Turnstile 無効ビルド）。
 - **Preview / Development には 3 変数とも設定しない**。
+
+## 18. 2026-08-04 管理下再有効化と Siteverify HTTP 400 診断（Phase 2D.6）
+
+### インシデント要約
+- 管理下で Production の Turnstile を一時有効化（フラグ入りビルドを promote）→ Owner が **問い合わせフォームを 1 回だけ**手動送信。
+- 結果：widget は成功表示だが送信は失敗（ユーザー向け文言「認証を確認できませんでした。…」）。
+- ランタイムログ（失敗デプロイ限定・当該 1 件のみ）：`contact: turnstile verification failed { reason: 'siteverify_http_error', httpStatus: 400 }`。
+- 二重 POST なし・`/api/register` POST なし・5xx / 例外なし・Resend / Contact Store 未到達・Secret / token / PII 非露出。
+- **即時ロールバック**：安全デプロイ `dpl_FpMQT6HbujUGh8MAFoYzvyfbJYp2`（commit `1edfc60`／フラグ未設定ビルド＝Turnstile 無効）を Production へ promote し復旧。
+- 前回（2026-08-03）の「Category B（例外 throw）」から前進し、失敗が「**Siteverify が明確に HTTP 400 を返す（リクエストが不正扱い）**」ことまで確定。具体サブ原因は当時の許可情報だけでは一意化不可（応答本文は規則により未取得）。
+
+### 現在の安全デプロイ（ロールバック先）
+- **`dpl_FpMQT6HbujUGh8MAFoYzvyfbJYp2`**（§17 の旧記載 `dpl_DX3R6Z9sk…` を上書きせず、こちらが最新の安全デプロイ）。
+- `vercel promote dpl_FpMQT6HbujUGh8MAFoYzvyfbJYp2` で即復帰できる。
+
+### Siteverify 診断のログ方針（Phase 2D.6 改善）
+- **HTTP 400（非2xx）時は、許可リストに一致した既知 error-code だけを記録**する（`missing-input-secret` / `invalid-input-secret` / `missing-input-response` / `invalid-input-response` / `bad-request` / `timeout-or-duplicate` / `internal-error`）。
+- **生の Cloudflare レスポンス本文・JSON 全体・headers・request body は記録しない**。未知コード・非文字列・過長値は捨てる。件数は上限（許可リスト長）まで。
+- ログ meta は `{ reason, httpStatus?, errorCodes? }` の固定型のみ。Secret / token / hostname 実値 / action 実値 / PII は出さない。
+- 例：`{ reason: "siteverify_http_error", httpStatus: 400, errorCodes: ["invalid-input-secret"] }`。
+
+### error-code 別の次アクション（Owner 判断）
+- **`invalid-input-secret`**：Site Key と Secret の**ペア整合**を Owner が再確認（テストキーと本番キーの取り違え、別ウィジェットの Secret 混在など）。値は表示しない。
+- **`bad-request`**：**送信形式・必須フィールド**を公式仕様と再照合（本 PR で JSON `{ secret, response }` へ統一済み）。
+- **`invalid-input-response`**：**token の生成・有効期限（300秒）・単回利用**を確認（widget callback → POST body の受け渡し、使い回し/失効）。
+- **`timeout-or-duplicate`**：token の再利用・失効。widget の reset と再取得フローを確認。
+- **`missing-input-secret` / `missing-input-response`**：env（Secret）または token の受け渡し欠落を確認。
+- **Secret の再生成は Owner の別承認**が必要（本作業では行わない）。
+
+### 送信形式の堅牢化（Phase 2D.6）
+- Siteverify 送信を **JSON（`Content-Type: application/json`, body=`{ secret, response }`）** に統一（公式が明示対応する形式・シリアライズが明示的）。エンドポイント・10秒 timeout・User-Agent は不変。`remoteip` / `idempotency_key` は送らない。
+- **入力正規化**：token は文字列・非空・最大 2048 文字（超過は Cloudflare を呼ばず安全拒否・token は加工しない）。Secret は前後の改行/空白を除いて送る（env コピー時の混入を吸収・trim 後空は `resolveTurnstileConfig` が `misconfigured`）。
+- 「現行 form-urlencoded が誤りだった」という断定ではなく、**公式対応形式のうちシリアライズが明示的な JSON へ統一する堅牢化**。
+
+### 再有効化の条件
+- 本 PR は **Draft のまま**。再有効化は本修正 PR のマージ後に、**管理された短時間テスト**で行う（widget 表示 → Owner 手動 1 件 → 診断 reason 確認 → 問題時は上記安全デプロイへ即ロールバック）。
+- 原因特定前に Turnstile を再有効化しない。

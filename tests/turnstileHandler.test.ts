@@ -16,7 +16,13 @@ type VerifyCall = { token: string; action: TurnstileAction };
 // state と結果（success / 失敗 reason / throw）を制御し、呼び出しを記録する Turnstile ガード。
 function fakeTurnstile(
   state: TurnstileConfigState,
-  opts: { success?: boolean; reason?: TurnstileFailureReason; httpStatus?: number; throws?: boolean } = {},
+  opts: {
+    success?: boolean;
+    reason?: TurnstileFailureReason;
+    httpStatus?: number;
+    errorCodes?: string[];
+    throws?: boolean;
+  } = {},
 ) {
   const calls: VerifyCall[] = [];
   return {
@@ -27,9 +33,13 @@ function fakeTurnstile(
         calls.push({ token, action: ctx.action });
         if (opts.throws) throw new Error("cloudflare down");
         if (opts.success === false) {
-          return opts.httpStatus !== undefined
-            ? { success: false as const, reason: opts.reason ?? "siteverify_rejected", httpStatus: opts.httpStatus }
-            : { success: false as const, reason: opts.reason ?? "siteverify_rejected" };
+          const res: { success: false; reason: TurnstileFailureReason; httpStatus?: number; errorCodes?: string[] } = {
+            success: false,
+            reason: opts.reason ?? "siteverify_rejected",
+          };
+          if (opts.httpStatus !== undefined) res.httpStatus = opts.httpStatus;
+          if (opts.errorCodes) res.errorCodes = opts.errorCodes;
+          return res;
         }
         return { success: true as const };
       },
@@ -219,6 +229,25 @@ test("contact: 失敗ログの meta は reason(+httpStatus) のみ（余計な�
   await handleContact(makeReq({ body: contactBody() }), deps);
   const failLog = logs.find((l) => l.m === "contact: turnstile verification failed");
   assert.deepEqual(Object.keys(failLog?.meta ?? {}).sort(), ["httpStatus", "reason"]);
+});
+
+test("contact: 非2xx で抽出済み errorCodes は meta へ伝播（reason/httpStatus/errorCodes のみ）", async () => {
+  const t = fakeTurnstile("enabled", {
+    success: false,
+    reason: "siteverify_http_error",
+    httpStatus: 400,
+    errorCodes: ["invalid-input-secret"],
+  });
+  const { deps, logs } = contactDeps(t.guard);
+  await handleContact(makeReq({ body: contactBody() }), deps);
+  const failLog = logs.find((l) => l.m === "contact: turnstile verification failed");
+  assert.deepEqual(Object.keys(failLog?.meta ?? {}).sort(), ["errorCodes", "httpStatus", "reason"]);
+  assert.deepEqual(failLog?.meta.errorCodes, ["invalid-input-secret"]);
+  assert.equal(failLog?.meta.httpStatus, 400);
+  // token / PII はログへ出さない。
+  const flat = JSON.stringify(logs);
+  assert.equal(flat.includes(TOKEN), false);
+  assert.equal(flat.includes("taro@example.com"), false);
 });
 
 // ── register ─────────────────────────────────────────────────────
