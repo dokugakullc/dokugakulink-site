@@ -24,15 +24,14 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DEPLOY_WEBHOOK_URL }}
           SHA: ${{ github.event.deployment.sha }}
-          DESC: ${{ github.event.deployment_status.description }}
           URL: ${{ github.event.deployment_status.target_url }}
-          ACTOR: ${{ github.event.deployment_status.creator.login }}
         run: |
           set -euo pipefail
           short_sha="${SHA:0:7}"
           ts="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')"
-          text=$(printf '[DEPLOY] Web Production\n環境: production\n対象: web\n状態: SUCCESS\nCommit: %s\n概要: %s\nURL: %s\n実行者: %s\n時刻: %s' \
-            "$short_sha" "$DESC" "$URL" "$ACTOR" "$ts")
+          # 概要・実行者は固定（外部 description を使わない。creator は if: で vercel[bot] に確定）。
+          text=$(printf '[DEPLOY] Web Production\n環境: production\n対象: web\n状態: SUCCESS\nCommit: %s\n概要: Vercel Production デプロイが完了\nURL: %s\n実行者: vercel[bot]\n時刻: %s' \
+            "$short_sha" "$URL" "$ts")
           payload=$(jq -n --arg t "$text" '{text:$t}')
           curl --fail --silent --show-error --retry 2 --max-time 15 \
             -X POST -H 'Content-type: application/json' \
@@ -52,14 +51,14 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK_URL }}
           SHA: ${{ github.event.deployment.sha }}
           STATE: ${{ github.event.deployment_status.state }}
-          DESC: ${{ github.event.deployment_status.description }}
           URL: ${{ github.event.deployment_status.target_url }}
         run: |
           set -euo pipefail
           short_sha="${SHA:0:7}"
           ts="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')"
-          text=$(printf '[P1] Vercel Production deployment failed\n環境: production\n対象: web\n状態: ACTION REQUIRED\nCommit: %s\n概要: %s (%s)\n次の対応: Owner が Vercel デプロイログを確認\nリンク: %s\n時刻: %s' \
-            "$short_sha" "$DESC" "$STATE" "$URL" "$ts")
+          # 概要は固定文言。state は if: で failure/error のみに制限済み（外部 description は使わない）。
+          text=$(printf '[P1] Vercel Production deployment failed\n環境: production\n対象: web\n状態: ACTION REQUIRED\nCommit: %s\n概要: Vercel Production デプロイが失敗（state: %s）\n次の対応: Owner が Vercel デプロイログを確認\nリンク: %s\n時刻: %s' \
+            "$short_sha" "$STATE" "$URL" "$ts")
           payload=$(jq -n --arg t "$text" '{text:$t}')
           curl --fail --silent --show-error --retry 2 --max-time 15 \
             -X POST -H 'Content-type: application/json' \
