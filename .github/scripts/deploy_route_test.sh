@@ -42,6 +42,8 @@ check "Production+vercel[bot]+error"         alerts Production "vercel[bot]" err
 check "Preview+vercel[bot]+success(除外)"    skip   Preview    "vercel[bot]" success
 check "Production+別creator(除外)"           skip   Production "other-bot"   success
 check "Production+vercel[bot]+pending(除外)" skip   Production "vercel[bot]" pending
+check "Production+vercel[bot]+in_progress(除外)" skip Production "vercel[bot]" in_progress
+check "Production+vercel[bot]+queued(除外)"  skip   Production "vercel[bot]" queued
 check "Production+vercel[bot]+inactive(除外)" skip  Production "vercel[bot]" inactive
 
 if [ "$fail" -eq 0 ]; then echo "ALL FIXTURE CASES PASSED"; else echo "FIXTURE FAILURES PRESENT"; fi
