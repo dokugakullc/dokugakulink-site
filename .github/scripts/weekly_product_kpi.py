@@ -1,0 +1,275 @@
+#!/usr/bin/env python3
+"""Weekly PostHog product KPI summary -> Slack (#ukarelu-product).
+
+Data safety boundary (do not weaken):
+- Queries ONLY aggregate counts / unique-person counts for a FIXED event
+  allowlist over one JST week window. It never fetches persons, person
+  properties, emails, uids, distinct_ids, session replay, raw events, or
+  arbitrary event properties.
+- The Slack message is built ONLY from validated non-negative integers plus
+  fixed Japanese labels. `assert_message_safe` is a defense-in-depth re-check.
+- On any PostHog API failure, empty/short response, wrong shape, wrong column
+  names, or non-integer value, the run ABORTS with a non-zero exit and sends
+  nothing to Slack (never posts partial or malformed numbers).
+
+The workflow embeds this file verbatim (no external actions / no checkout).
+`weekly_product_kpi_test.py` tests the pure functions with fixtures (no
+network, no secrets) and guards against workflow/module drift.
+"""
+import json
+import os
+import sys
+import urllib.request
+from datetime import datetime, timedelta, timezone
+
+try:
+    from zoneinfo import ZoneInfo
+    JST = ZoneInfo("Asia/Tokyo")
+except Exception:  # pragma: no cover - fallback if tzdata is unavailable
+    JST = timezone(timedelta(hours=9))
+
+# Non-secret, fixed configuration (safe to hardcode per approved conditions).
+PROJECT_ID = "447967"
+POSTHOG_HOST = "https://us.posthog.com"
+DASHBOARD_URL = "https://us.posthog.com/project/447967/dashboard/1650311"
+PRELAUNCH_LABEL = "プリローンチ・参考値（QA/テスト混在）"
+
+# Fixed event allowlist. Only these events are queried, and only via count /
+# unique-person aggregates. No other event or property is ever requested.
+ALLOWLIST_EVENTS = [
+    "app_opened",
+    "quiz_started",
+    "question_answered",
+    "today_questions_loaded",
+    "quiz_completed",
+    "category_selected",
+    "paywall_viewed",
+    "purchase_started",
+    "purchase_completed",
+    "onboarding_completed",
+    "onboarding_started",
+]
+
+# Expected result schema: exactly these columns, in this order, all
+# non-negative integers, exactly one row.
+EXPECTED_COLUMNS = [
+    "wau",
+    "q_answered",
+    "q_answered_users",
+    "quiz_completed_cnt",
+    "quiz_completed_users",
+    "onboarding_completed_cnt",
+    "paywall_viewed_cnt",
+    "purchase_started_cnt",
+    "purchase_completed_cnt",
+]
+
+HTTP_TIMEOUT = 20
+HTTP_RETRIES = 2
+
+
+def jst_week_window(now_utc):
+    """Return (start_utc, end_utc, period_start_date, period_end_date) for the
+    just-completed JST week: previous Monday 00:00 JST .. this Monday 00:00 JST.
+
+    `now_utc` must be a timezone-aware UTC datetime. The window boundaries are
+    computed in Asia/Tokyo and converted to UTC absolute times so the query is
+    correct regardless of the PostHog project timezone (which is UTC).
+    """
+    now_jst = now_utc.astimezone(JST)
+    this_monday = (now_jst - timedelta(days=now_jst.weekday())).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    end_jst = this_monday
+    start_jst = end_jst - timedelta(days=7)
+    start_utc = start_jst.astimezone(timezone.utc)
+    end_utc = end_jst.astimezone(timezone.utc)
+    period_start = start_jst.date()
+    period_end = (end_jst - timedelta(days=1)).date()  # inclusive Sunday
+    return start_utc, end_utc, period_start, period_end
+
+
+def build_hogql(start_utc, end_utc):
+    """Build the aggregate HogQL for [start_utc, end_utc).
+
+    Bounds are formatted as UTC wall-clock strings; the project timezone is UTC
+    so toDateTime parses them as UTC. The event allowlist bounds the scan in the
+    WHERE clause; every metric is a countIf/uniqIf aggregate. No PII, no person
+    properties, no raw rows.
+    """
+    s = start_utc.strftime("%Y-%m-%d %H:%M:%S")
+    e = end_utc.strftime("%Y-%m-%d %H:%M:%S")
+    events_sql = ", ".join("'%s'" % ev for ev in ALLOWLIST_EVENTS)
+    return (
+        "SELECT "
+        "uniqIf(person_id, event IN (%(ev)s)) AS wau, "
+        "countIf(event='question_answered') AS q_answered, "
+        "uniqIf(person_id, event='question_answered') AS q_answered_users, "
+        "countIf(event='quiz_completed') AS quiz_completed_cnt, "
+        "uniqIf(person_id, event='quiz_completed') AS quiz_completed_users, "
+        "countIf(event='onboarding_completed') AS onboarding_completed_cnt, "
+        "countIf(event='paywall_viewed') AS paywall_viewed_cnt, "
+        "countIf(event='purchase_started') AS purchase_started_cnt, "
+        "countIf(event='purchase_completed') AS purchase_completed_cnt "
+        "FROM events "
+        "WHERE timestamp >= toDateTime('%(s)s') AND timestamp < toDateTime('%(e)s') "
+        "AND event IN (%(ev)s)"
+    ) % {"ev": events_sql, "s": s, "e": e}
+
+
+def validate_results(payload):
+    """Validate the /query/ response is exactly one row of nine non-negative
+    integers with the expected column names, and return {column: int}.
+
+    Raises ValueError on any mismatch. Callers MUST abort (send nothing) on
+    ValueError. This is the output-schema allowlist check.
+    """
+    if not isinstance(payload, dict):
+        raise ValueError("response is not an object")
+    results = payload.get("results")
+    if not isinstance(results, list) or len(results) != 1:
+        raise ValueError("expected exactly one result row")
+    row = results[0]
+    if not isinstance(row, list) or len(row) != len(EXPECTED_COLUMNS):
+        raise ValueError("unexpected column count")
+    columns = payload.get("columns")
+    if isinstance(columns, list) and columns != EXPECTED_COLUMNS:
+        raise ValueError("unexpected column names")
+    out = {}
+    for name, value in zip(EXPECTED_COLUMNS, row):
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValueError("non-integer or negative value")
+        out[name] = value
+    return out
+
+
+def _pct(cur, prev):
+    """Week-over-week percent. Denominator 0 renders as an em dash."""
+    if prev == 0:
+        return "—"
+    return "%+.1f%%" % ((cur - prev) / prev * 100.0)
+
+
+def format_message(cur, prev, period_start, period_end):
+    """Build the Slack message text from validated integer dicts only.
+
+    Missing-instrumentation KPIs are fixed to "未計装" (never guessed).
+    Revenue amount is never derived; only purchase-completed count is shown.
+    """
+    lines = [
+        "[WEEKLY] ウカレル Product KPI（%s）" % PRELAUNCH_LABEL,
+        "期間: %s〜%s JST" % (period_start.isoformat(), period_end.isoformat()),
+        "週間アクティブ利用者: %d人" % cur["wau"],
+        "問題回答数: %d件（回答者 %d人）"
+        % (cur["q_answered"], cur["q_answered_users"]),
+        "クイズ完了数: %d件（完了者 %d人）"
+        % (cur["quiz_completed_cnt"], cur["quiz_completed_users"]),
+        "オンボーディング完了数: %d件" % cur["onboarding_completed_cnt"],
+        "Paywall表示数: %d件" % cur["paywall_viewed_cnt"],
+        "購入開始数: %d件" % cur["purchase_started_cnt"],
+        "購入完了数: %d件" % cur["purchase_completed_cnt"],
+        "新規登録: 未計装",
+        "メール認証完了率: 未計装",
+        "模試開始: 未計装",
+        "模試完了: 未計装",
+        "模試合格率: 未計装",
+        "前週比(アクティブ): 先週%d人→今週%d人（%s / 分母0は—）"
+        % (prev["wau"], cur["wau"], _pct(cur["wau"], prev["wau"])),
+        "前週比(問題回答数): 先週%d件→今週%d件（%s）"
+        % (prev["q_answered"], cur["q_answered"], _pct(cur["q_answered"], prev["q_answered"])),
+        "注目点: 週間アクティブ%d人・購入完了%d件（プリローンチ水準）"
+        % (cur["wau"], cur["purchase_completed_cnt"]),
+        "次の判断: 実ユーザー流入前のため計装欠落(新規登録/メール認証/模試)の解消を優先",
+        "リンク: %s" % DASHBOARD_URL,
+    ]
+    return "\n".join(lines)
+
+
+# Defense-in-depth: the message is built from ints + fixed labels, but re-check
+# it carries no PII / secret / link markers other than the allowed dashboard URL.
+FORBIDDEN_SUBSTRINGS = ["@", "distinct_id", "person", "replay", "phc_", "bearer", "http"]
+
+
+def assert_message_safe(text):
+    """Raise ValueError if the message contains a forbidden token. The single
+    allowed URL (the dashboard link) is removed before scanning."""
+    probe = text.replace(DASHBOARD_URL, "").lower()
+    for bad in FORBIDDEN_SUBSTRINGS:
+        if bad in probe:
+            raise ValueError("forbidden token in message: %s" % bad)
+    return True
+
+
+def _http_post_json(url, payload_obj, headers):
+    """POST JSON with timeout and limited retries. Returns response bytes.
+    On failure raises RuntimeError WITHOUT including the response body."""
+    data = json.dumps(payload_obj).encode("utf-8")
+    last_kind = "unknown"
+    for _ in range(HTTP_RETRIES + 1):
+        try:
+            req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
+                return resp.read()
+        except Exception as ex:  # noqa: BLE001 - never surface response bodies
+            last_kind = type(ex).__name__
+    raise RuntimeError("HTTP POST failed after retries: %s" % last_kind)
+
+
+def query_window(api_key, start_utc, end_utc):
+    """Run the aggregate query for one window and return validated {col: int}."""
+    url = "%s/api/projects/%s/query/" % (POSTHOG_HOST, PROJECT_ID)
+    body = {"query": {"kind": "HogQLQuery", "query": build_hogql(start_utc, end_utc)}}
+    headers = {"Authorization": "Bearer %s" % api_key, "Content-Type": "application/json"}
+    raw = _http_post_json(url, body, headers)
+    payload = json.loads(raw)
+    return validate_results(payload)
+
+
+def post_slack(webhook_url, text):
+    _http_post_json(webhook_url, {"text": text}, {"Content-Type": "application/json"})
+
+
+def main():
+    mode = os.environ.get("MODE", "dry-run")
+    api_key = os.environ.get("POSTHOG_PERSONAL_API_KEY", "")
+    if not api_key:
+        print("POSTHOG_PERSONAL_API_KEY missing", file=sys.stderr)
+        return 1
+
+    now_utc = datetime.now(timezone.utc)
+    start, end, period_start, period_end = jst_week_window(now_utc)
+    prev_start, prev_end = start - timedelta(days=7), start
+
+    try:
+        cur = query_window(api_key, start, end)
+        prev = query_window(api_key, prev_start, prev_end)
+    except Exception as ex:  # noqa: BLE001
+        print("query failed (%s); sending nothing" % type(ex).__name__, file=sys.stderr)
+        return 1
+
+    try:
+        message = format_message(cur, prev, period_start, period_end)
+        assert_message_safe(message)
+    except Exception as ex:  # noqa: BLE001
+        print("format/safety check failed (%s); sending nothing" % ex, file=sys.stderr)
+        return 1
+
+    if mode == "send":
+        webhook = os.environ.get("SLACK_PRODUCT_WEBHOOK_URL", "")
+        if not webhook:
+            print("SLACK_PRODUCT_WEBHOOK_URL missing", file=sys.stderr)
+            return 1
+        try:
+            post_slack(webhook, message)
+        except Exception:  # noqa: BLE001
+            print("slack post failed; not retrying beyond limit", file=sys.stderr)
+            return 1
+        print("sent weekly KPI summary (%s..%s JST)" % (period_start, period_end))
+    else:
+        print("[DRY-RUN] would send to #ukarelu-product (no Slack call):")
+        print(message)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
