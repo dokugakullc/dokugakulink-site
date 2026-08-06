@@ -40,7 +40,20 @@ jobs:
           text=$(printf '[P1] GitHub Actions failed\n環境: production\n対象: web\n状態: FAILED (%s)\nRepository: %s\nBranch: %s\nWorkflow: %s\nCommit: %s\n概要: main の CI が失敗\n次の対応: Owner が Actions ログを確認\nリンク: %s\n時刻: %s' \
             "$WR_CONCL" "$REPO" "$WR_BRANCH" "$WR_NAME" "$short_sha" "$WR_URL" "$ts")
           payload=$(jq -n --arg t "$text" '{text:$t}')
-          curl -sS -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK_URL" >/dev/null
+          # --fail: Slack の 4xx/5xx を通知workflowの失敗として検知
+          # --retry 2: 一時的な通信失敗を最大2回再試行 / --max-time 15: 15秒でタイムアウト
+          # --silent --show-error: 進捗は出さずエラーのみ（URL・レスポンス本文はログに出さない）
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 2 \
+            --max-time 15 \
+            -X POST \
+            -H 'Content-type: application/json' \
+            --data "$payload" \
+            "$SLACK_WEBHOOK_URL" \
+            >/dev/null
 
   # 接続テスト: 手動(workflow_dispatch)のみ・固定[TEST]メッセージ・入力なし
   test-alert:
@@ -57,4 +70,17 @@ jobs:
           text=$(printf '[TEST][P1] GitHub Actions alert\n環境: test\n対象: web\n状態: TEST\nRepository: %s\nBranch: test\nWorkflow: Slack alert connectivity test\n概要: Incoming Webhook の接続確認。実障害ではありません。\n次の対応: 通知内容と配信先を確認\n時刻: %s' \
             "$REPO" "$ts")
           payload=$(jq -n --arg t "$text" '{text:$t}')
-          curl -sS -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK_URL" >/dev/null
+          # --fail: Slack の 4xx/5xx を通知workflowの失敗として検知
+          # --retry 2: 一時的な通信失敗を最大2回再試行 / --max-time 15: 15秒でタイムアウト
+          # --silent --show-error: 進捗は出さずエラーのみ（URL・レスポンス本文はログに出さない）
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 2 \
+            --max-time 15 \
+            -X POST \
+            -H 'Content-type: application/json' \
+            --data "$payload" \
+            "$SLACK_WEBHOOK_URL" \
+            >/dev/null
