@@ -1,0 +1,66 @@
+name: Notify Vercel Production deploy (Slack)
+
+# Vercel の Production デプロイ結果を Slack へ通知:
+#   success       -> #ukarelu-deploy  (SLACK_DEPLOY_WEBHOOK_URL)
+#   failure/error -> #ukarelu-alerts  (SLACK_ALERTS_WEBHOOK_URL)
+# GitHub の deployment_status イベントを使用（Vercel 設定変更・Vercel Token 不要）。
+# 注: deployment.ref は commit SHA のため使わない。environment/creator/state で判定する。
+# 判定条件は .github/scripts/deploy_route_test.sh の route() と一致させること（乖離防止）。
+on:
+  deployment_status
+
+permissions: {}
+
+jobs:
+  # 成功のみ: Production かつ vercel[bot] かつ state==success
+  notify-success:
+    if: >
+      github.event.deployment.environment == 'Production' &&
+      github.event.deployment_status.creator.login == 'vercel[bot]' &&
+      github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post SUCCESS to #ukarelu-deploy
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DEPLOY_WEBHOOK_URL }}
+          SHA: ${{ github.event.deployment.sha }}
+          DESC: ${{ github.event.deployment_status.description }}
+          URL: ${{ github.event.deployment_status.target_url }}
+          ACTOR: ${{ github.event.deployment_status.creator.login }}
+        run: |
+          set -euo pipefail
+          short_sha="${SHA:0:7}"
+          ts="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')"
+          text=$(printf '[DEPLOY] Web Production\n環境: production\n対象: web\n状態: SUCCESS\nCommit: %s\n概要: %s\nURL: %s\n実行者: %s\n時刻: %s' \
+            "$short_sha" "$DESC" "$URL" "$ACTOR" "$ts")
+          payload=$(jq -n --arg t "$text" '{text:$t}')
+          curl --fail --silent --show-error --retry 2 --max-time 15 \
+            -X POST -H 'Content-type: application/json' \
+            --data "$payload" "$SLACK_WEBHOOK_URL" >/dev/null
+
+  # 失敗のみ: Production かつ vercel[bot] かつ state∈{failure,error}
+  notify-failure:
+    if: >
+      github.event.deployment.environment == 'Production' &&
+      github.event.deployment_status.creator.login == 'vercel[bot]' &&
+      (github.event.deployment_status.state == 'failure' ||
+       github.event.deployment_status.state == 'error')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post FAILURE to #ukarelu-alerts
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK_URL }}
+          SHA: ${{ github.event.deployment.sha }}
+          STATE: ${{ github.event.deployment_status.state }}
+          DESC: ${{ github.event.deployment_status.description }}
+          URL: ${{ github.event.deployment_status.target_url }}
+        run: |
+          set -euo pipefail
+          short_sha="${SHA:0:7}"
+          ts="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')"
+          text=$(printf '[P1] Vercel Production deployment failed\n環境: production\n対象: web\n状態: ACTION REQUIRED\nCommit: %s\n概要: %s (%s)\n次の対応: Owner が Vercel デプロイログを確認\nリンク: %s\n時刻: %s' \
+            "$short_sha" "$DESC" "$STATE" "$URL" "$ts")
+          payload=$(jq -n --arg t "$text" '{text:$t}')
+          curl --fail --silent --show-error --retry 2 --max-time 15 \
+            -X POST -H 'Content-type: application/json' \
+            --data "$payload" "$SLACK_WEBHOOK_URL" >/dev/null
