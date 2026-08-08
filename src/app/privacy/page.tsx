@@ -209,7 +209,7 @@ export default function PrivacyPage() {
 
         <p className="text-xs text-gray-400 mt-12 pt-8 border-t border-gray-100">
           制定日：2025年10月27日<br />
-          最終改訂日：2026年8月2日<br />
+          最終改訂日：2026年8月8日<br />
           dokugaku link合同会社
         </p>
       </div>
