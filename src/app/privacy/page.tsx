@@ -99,7 +99,20 @@ const sections = [
               Microsoft プライバシーステートメント
             </a>
           </li>
+          <li>
+            PostHog（提供者：PostHog, Inc.）<br />
+            利用目的：アプリ（ウカレル）のサービス利用状況の把握、機能改善および品質向上<br />
+            <a href="https://posthog.com/privacy" className="text-blue-700 hover:underline">
+              PostHog プライバシーポリシー
+            </a>
+          </li>
         </ul>
+        <p className="mt-4">
+          アプリ（ウカレル）では、上記 PostHog を利用して、アプリ内での操作・利用に関するイベント、端末・アプリに関する技術情報、およびアカウントに紐づく擬似識別子を取得します。お名前・メールアドレスは、分析基盤（PostHog）へ新規に送信していません。利用者の識別には、アカウントに紐づく擬似識別子を用います。
+        </p>
+        <p className="mt-4">
+          なお、アカウントを削除された場合でも、分析基盤（PostHog）へ既に送信された利用データが直ちに、または完全に削除されるものではありません。分析基盤上のデータの取扱いに関するご請求は、下記「お問い合わせ窓口」までご連絡ください。
+        </p>
         <p className="mt-6">
           また弊社は、お問い合わせフォームおよび事前登録フォームの不正利用や自動送信を防止する目的で、Cloudflare, Inc. が提供する Cloudflare Turnstile を利用する場合があります（上記の分析・広告効果測定とは目的が異なり、bot 対策として利用します）。Turnstile の動作に伴い、端末、ブラウザ、ネットワークその他の技術情報が Cloudflare により処理される場合があります。これらの情報は、Cloudflare のプライバシーポリシーおよび Turnstile に関するポリシーに基づいて取り扱われます。Cookie 等の利用を含む具体的な取扱いは、当社の設定および Cloudflare の仕様によります。
         </p>
@@ -196,7 +209,7 @@ export default function PrivacyPage() {
 
         <p className="text-xs text-gray-400 mt-12 pt-8 border-t border-gray-100">
           制定日：2025年10月27日<br />
-          最終改訂日：2026年8月2日<br />
+          最終改訂日：2026年8月8日<br />
           dokugaku link合同会社
         </p>
       </div>
