@@ -8,7 +8,10 @@ embedded in the workflow (which cannot use actions/checkout).
 Run: python3 .github/scripts/weekly_product_kpi_test.py
 """
 import os
+import socket
+import ssl
 import sys
+import urllib.error
 from datetime import datetime, timezone, date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -122,6 +125,77 @@ expect_raises("email marker blocked", lambda: m.assert_message_safe(msg + "\nx a
 expect_raises("distinct_id blocked", lambda: m.assert_message_safe(msg + "\ndistinct_id=1"))
 expect_raises("replay link blocked", lambda: m.assert_message_safe(msg + "\nreplay/123"))
 expect_raises("stray http blocked", lambda: m.assert_message_safe(msg + "\nhttp://evil"))
+
+# 7b. classify_transport_error: map transport exceptions to SAFE tokens only.
+def _httperr(code):
+    return urllib.error.HTTPError(url="https://secret.example/query", code=code,
+                                  msg="secret-reason", hdrs=None, fp=None)
+
+
+check("classify 400", m.classify_transport_error(_httperr(400)) == "HTTP_400")
+check("classify 401", m.classify_transport_error(_httperr(401)) == "HTTP_401")
+check("classify 403", m.classify_transport_error(_httperr(403)) == "HTTP_403")
+check("classify 404", m.classify_transport_error(_httperr(404)) == "HTTP_404")
+check("classify 409", m.classify_transport_error(_httperr(409)) == "HTTP_409")
+check("classify 422", m.classify_transport_error(_httperr(422)) == "HTTP_422")
+check("classify 429", m.classify_transport_error(_httperr(429)) == "HTTP_429")
+check("classify 500 -> HTTP_5XX", m.classify_transport_error(_httperr(500)) == "HTTP_5XX")
+check("classify 503 -> HTTP_5XX", m.classify_transport_error(_httperr(503)) == "HTTP_5XX")
+check("classify unexpected 418 -> HTTP_OTHER", m.classify_transport_error(_httperr(418)) == "HTTP_OTHER")
+check("classify socket.timeout -> TIMEOUT", m.classify_transport_error(socket.timeout()) == "TIMEOUT")
+check("classify TimeoutError -> TIMEOUT", m.classify_transport_error(TimeoutError()) == "TIMEOUT")
+check("classify SSLError -> TLS_ERROR", m.classify_transport_error(ssl.SSLError("boom")) == "TLS_ERROR")
+check("classify URLError -> URL_ERROR",
+      m.classify_transport_error(urllib.error.URLError("https://secret/x")) == "URL_ERROR")
+check("classify URLError(timeout reason) -> TIMEOUT",
+      m.classify_transport_error(urllib.error.URLError(socket.timeout())) == "TIMEOUT")
+check("classify URLError(ssl reason) -> TLS_ERROR",
+      m.classify_transport_error(urllib.error.URLError(ssl.SSLError("boom"))) == "TLS_ERROR")
+check("classify ValueError -> INVALID_HEADER", m.classify_transport_error(ValueError("Bearer abc")) == "INVALID_HEADER")
+check("classify unknown OSError -> UNKNOWN_TRANSPORT_ERROR",
+      m.classify_transport_error(OSError("boom")) == "UNKNOWN_TRANSPORT_ERROR")
+
+# Classification returns ONLY allowlisted tokens, never body/url/reason/key text.
+_ALLOWED_TOKENS = {
+    "HTTP_400", "HTTP_401", "HTTP_403", "HTTP_404", "HTTP_409", "HTTP_422",
+    "HTTP_429", "HTTP_5XX", "HTTP_OTHER", "TIMEOUT", "URL_ERROR", "TLS_ERROR",
+    "INVALID_HEADER", "UNKNOWN_TRANSPORT_ERROR",
+}
+_samples = [m.classify_transport_error(_httperr(c)) for c in (400, 401, 403, 404, 409, 422, 429, 500, 418)]
+_samples += [
+    m.classify_transport_error(socket.timeout()),
+    m.classify_transport_error(ssl.SSLError("secret-reason")),
+    m.classify_transport_error(urllib.error.URLError("https://secret/path?key=phc_abc")),
+    m.classify_transport_error(ValueError("Bearer phc_secret")),
+    m.classify_transport_error(OSError("secret")),
+]
+check("classification only returns allowlisted tokens", all(s in _ALLOWED_TOKENS for s in _samples))
+check("classification leaks no url/body/reason/key text",
+      all(("secret" not in s and "http" not in s and "phc_" not in s and "Bearer" not in s) for s in _samples))
+
+# retry count unchanged, and _http_post_json raises a SAFE TransportError code
+# without ever posting to Slack (offline monkeypatch of urlopen).
+check("retry count unchanged (HTTP_RETRIES==2)", m.HTTP_RETRIES == 2)
+_calls = {"n": 0}
+
+
+def _boom(*_a, **_k):
+    _calls["n"] += 1
+    raise _httperr(403)
+
+
+_orig_urlopen = m.urllib.request.urlopen
+m.urllib.request.urlopen = _boom
+_raised_code = None
+try:
+    try:
+        m._http_post_json("https://x/query", {"a": 1}, {"Content-Type": "application/json"})
+    except m.TransportError as te:
+        _raised_code = te.code
+finally:
+    m.urllib.request.urlopen = _orig_urlopen
+check("http_post_json attempts == HTTP_RETRIES+1", _calls["n"] == m.HTTP_RETRIES + 1)
+check("http_post_json raises safe TransportError code", _raised_code == "HTTP_403")
 
 # 8. Drift guard: the workflow embeds this module verbatim.
 WF = os.path.abspath(os.path.join(HERE, "..", "workflows", "weekly-product-kpi.yml"))
