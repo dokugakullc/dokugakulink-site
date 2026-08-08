@@ -1,0 +1,86 @@
+name: Notify CI Failure (Slack alerts)
+
+# 目的: Web CI("CI") の main への push が failure/timed_out のとき #ukarelu-alerts へ通知。
+# CI 本体(ci.yml)は変更しない。workflow_run は base(デフォルトブランチ)コンテキストで動き、
+# Fork 由来 PR の実行には Secret を渡さない（pull_request_target は使わない）。
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  # 手動テスト経路: write 権限者のみ実行可・入力なし・固定[TEST]メッセージ（任意入力/URL入力不可）
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  # 実障害通知: push かつ main かつ failure/timed_out のみ
+  notify-failure:
+    if: >
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      (github.event.workflow_run.conclusion == 'failure' ||
+       github.event.workflow_run.conclusion == 'timed_out')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post failure to Slack alerts
+        env:
+          # 値は env 経由のみ（run へ ${{ }} 直書きしない=インジェクション防止）。ログ非出力。
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK_URL }}
+          WR_NAME: ${{ github.event.workflow_run.name }}
+          WR_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          WR_SHA: ${{ github.event.workflow_run.head_sha }}
+          WR_URL: ${{ github.event.workflow_run.html_url }}
+          WR_CONCL: ${{ github.event.workflow_run.conclusion }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          short_sha="${WR_SHA:0:7}"
+          ts="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')"
+          text=$(printf '[P1] GitHub Actions failed\n環境: production\n対象: web\n状態: FAILED (%s)\nRepository: %s\nBranch: %s\nWorkflow: %s\nCommit: %s\n概要: main の CI が失敗\n次の対応: Owner が Actions ログを確認\nリンク: %s\n時刻: %s' \
+            "$WR_CONCL" "$REPO" "$WR_BRANCH" "$WR_NAME" "$short_sha" "$WR_URL" "$ts")
+          payload=$(jq -n --arg t "$text" '{text:$t}')
+          # --fail: Slack の 4xx/5xx を通知workflowの失敗として検知
+          # --retry 2: 一時的な通信失敗を最大2回再試行 / --max-time 15: 15秒でタイムアウト
+          # --silent --show-error: 進捗は出さずエラーのみ（URL・レスポンス本文はログに出さない）
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 2 \
+            --max-time 15 \
+            -X POST \
+            -H 'Content-type: application/json' \
+            --data "$payload" \
+            "$SLACK_WEBHOOK_URL" \
+            >/dev/null
+
+  # 接続テスト: 手動(workflow_dispatch)のみ・固定[TEST]メッセージ・入力なし
+  test-alert:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send fixed [TEST] message
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK_URL }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          ts="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')"
+          text=$(printf '[TEST][P1] GitHub Actions alert\n環境: test\n対象: web\n状態: TEST\nRepository: %s\nBranch: test\nWorkflow: Slack alert connectivity test\n概要: Incoming Webhook の接続確認。実障害ではありません。\n次の対応: 通知内容と配信先を確認\n時刻: %s' \
+            "$REPO" "$ts")
+          payload=$(jq -n --arg t "$text" '{text:$t}')
+          # --fail: Slack の 4xx/5xx を通知workflowの失敗として検知
+          # --retry 2: 一時的な通信失敗を最大2回再試行 / --max-time 15: 15秒でタイムアウト
+          # --silent --show-error: 進捗は出さずエラーのみ（URL・レスポンス本文はログに出さない）
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 2 \
+            --max-time 15 \
+            -X POST \
+            -H 'Content-type: application/json' \
+            --data "$payload" \
+            "$SLACK_WEBHOOK_URL" \
+            >/dev/null
