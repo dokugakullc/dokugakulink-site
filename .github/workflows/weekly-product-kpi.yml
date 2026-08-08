@@ -52,7 +52,10 @@ jobs:
           """
           import json
           import os
+          import socket
+          import ssl
           import sys
+          import urllib.error
           import urllib.request
           from datetime import datetime, timedelta, timezone
 
@@ -234,19 +237,77 @@ jobs:
               return True
 
 
+          # Allowlisted, non-sensitive transport error classifications. Only the exception
+          # TYPE and (for HTTPError) the integer status code are inspected — never the
+          # response body, reason string, URL, headers, Authorization, API key, query, or
+          # any exception text / traceback. Unmapped HTTP statuses round to HTTP_OTHER.
+          _HTTP_STATUS_CODES = {
+              400: "HTTP_400",
+              401: "HTTP_401",
+              403: "HTTP_403",
+              404: "HTTP_404",
+              409: "HTTP_409",
+              422: "HTTP_422",
+              429: "HTTP_429",
+          }
+
+
+          class TransportError(RuntimeError):
+              """Raised after retries. `code` is a SAFE allowlisted classification token
+              (e.g. HTTP_403 / TIMEOUT); it carries no body, URL, reason, header, or key."""
+
+              def __init__(self, code):
+                  super().__init__(code)
+                  self.code = code
+
+
+          def classify_transport_error(ex):
+              """Map a transport exception to a SAFE classification token.
+
+              Inspects ONLY the exception type and, for HTTPError, the integer status
+              code. Never reads or returns messages, reasons, bodies, URLs, headers, or
+              keys. Unmapped HTTP status codes round to HTTP_OTHER.
+              """
+              if isinstance(ex, urllib.error.HTTPError):
+                  try:
+                      code = int(ex.code)
+                  except Exception:  # noqa: BLE001 - status code missing / non-int
+                      return "HTTP_OTHER"
+                  if code in _HTTP_STATUS_CODES:
+                      return _HTTP_STATUS_CODES[code]
+                  if 500 <= code <= 599:
+                      return "HTTP_5XX"
+                  return "HTTP_OTHER"
+              if isinstance(ex, (socket.timeout, TimeoutError)):
+                  return "TIMEOUT"
+              if isinstance(ex, ssl.SSLError):
+                  return "TLS_ERROR"
+              if isinstance(ex, urllib.error.URLError):
+                  reason = getattr(ex, "reason", None)
+                  if isinstance(reason, (socket.timeout, TimeoutError)):
+                      return "TIMEOUT"
+                  if isinstance(reason, ssl.SSLError):
+                      return "TLS_ERROR"
+                  return "URL_ERROR"
+              if isinstance(ex, (ValueError, TypeError)):
+                  return "INVALID_HEADER"
+              return "UNKNOWN_TRANSPORT_ERROR"
+
+
           def _http_post_json(url, payload_obj, headers):
               """POST JSON with timeout and limited retries. Returns response bytes.
-              On failure raises RuntimeError WITHOUT including the response body."""
+              On failure raises TransportError whose `code` is a SAFE classification
+              token (no response body, reason, URL, header, or key)."""
               data = json.dumps(payload_obj).encode("utf-8")
-              last_kind = "unknown"
+              last_code = "UNKNOWN_TRANSPORT_ERROR"
               for _ in range(HTTP_RETRIES + 1):
                   try:
                       req = urllib.request.Request(url, data=data, headers=headers, method="POST")
                       with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
                           return resp.read()
-                  except Exception as ex:  # noqa: BLE001 - never surface response bodies
-                      last_kind = type(ex).__name__
-              raise RuntimeError("HTTP POST failed after retries: %s" % last_kind)
+                  except Exception as ex:  # noqa: BLE001 - classify to a safe token only
+                      last_code = classify_transport_error(ex)
+              raise TransportError(last_code)
 
 
           def query_window(api_key, start_utc, end_utc):
@@ -265,7 +326,7 @@ jobs:
 
           def main():
               mode = os.environ.get("MODE", "dry-run")
-              api_key = os.environ.get("POSTHOG_PERSONAL_API_KEY", "")
+              api_key = os.environ.get("POSTHOG_PERSONAL_API_KEY", "").strip()
               if not api_key:
                   print("POSTHOG_PERSONAL_API_KEY missing", file=sys.stderr)
                   return 1
@@ -277,19 +338,22 @@ jobs:
               try:
                   cur = query_window(api_key, start, end)
                   prev = query_window(api_key, prev_start, prev_end)
-              except Exception as ex:  # noqa: BLE001
+              except TransportError as ex:  # safe HTTP/transport classification only
+                  print("query failed (%s); sending nothing" % ex.code, file=sys.stderr)
+                  return 1
+              except Exception as ex:  # noqa: BLE001 - schema/parse error (type name only)
                   print("query failed (%s); sending nothing" % type(ex).__name__, file=sys.stderr)
                   return 1
 
               try:
                   message = format_message(cur, prev, period_start, period_end)
                   assert_message_safe(message)
-              except Exception as ex:  # noqa: BLE001
-                  print("format/safety check failed (%s); sending nothing" % ex, file=sys.stderr)
+              except Exception as ex:  # noqa: BLE001 - type name only (no message / body)
+                  print("format/safety check failed (%s); sending nothing" % type(ex).__name__, file=sys.stderr)
                   return 1
 
               if mode == "send":
-                  webhook = os.environ.get("SLACK_PRODUCT_WEBHOOK_URL", "")
+                  webhook = os.environ.get("SLACK_PRODUCT_WEBHOOK_URL", "").strip()
                   if not webhook:
                       print("SLACK_PRODUCT_WEBHOOK_URL missing", file=sys.stderr)
                       return 1
