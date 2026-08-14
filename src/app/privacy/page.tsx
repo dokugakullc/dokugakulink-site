@@ -99,6 +99,20 @@ const sections = [
               Microsoft プライバシーステートメント
             </a>
           </li>
+          <li>
+            Meta ピクセル（提供者：Meta Platforms, Inc.）<br />
+            利用目的：Meta（Facebook・Instagram等）で配信する広告の効果測定および最適化<br />
+            取得情報：閲覧ページ、事前登録フォームの操作等のイベント情報、端末・ブラウザ情報、IPアドレス、Cookie等の識別子（氏名・メールアドレス等の個人情報は送信しません）<br />
+            <a href="https://www.facebook.com/privacy/policy/" className="text-blue-700 hover:underline">
+              Meta プライバシーポリシー
+            </a>
+            <br />
+            オプトアウト：
+            <a href="https://www.facebook.com/adpreferences/ad_settings" className="text-blue-700 hover:underline">
+              Meta 広告設定
+            </a>
+            、または下記のブラウザ設定によるCookie無効化で広告効果測定を停止できます。
+          </li>
         </ul>
         <p className="mt-6">
           また弊社は、お問い合わせフォームおよび事前登録フォームの不正利用や自動送信を防止する目的で、Cloudflare, Inc. が提供する Cloudflare Turnstile を利用する場合があります（上記の分析・広告効果測定とは目的が異なり、bot 対策として利用します）。Turnstile の動作に伴い、端末、ブラウザ、ネットワークその他の技術情報が Cloudflare により処理される場合があります。これらの情報は、Cloudflare のプライバシーポリシーおよび Turnstile に関するポリシーに基づいて取り扱われます。Cookie 等の利用を含む具体的な取扱いは、当社の設定および Cloudflare の仕様によります。

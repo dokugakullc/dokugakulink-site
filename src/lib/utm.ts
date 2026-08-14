@@ -308,3 +308,23 @@ export function getAttribution(): Attribution {
     return {};
   }
 }
+
+/**
+ * 分析イベント（GA4 / PostHog）へ付与してよい帰属プロパティだけを取り出す純粋関数。
+ *
+ * 返すのは utm_source / utm_medium / utm_campaign / utm_content / utm_term のみ。
+ * 意図的に **除外** するもの：
+ *   - fbclid … 広告クリック識別子。プロダクト分析には不要で、識別子性が高いため
+ *     ブラウザ計測（GA4/PostHog）へは送らない。サーバー側 attribution
+ *     （registerPayload → GAS）にのみ保持する。
+ *   - landing_url / referrer … 分析イベントには不要（URL 縮約済みだが載せない）。
+ * 値が空のキーは含めない。GAS/Sheets 破損回避のためのサニタイズは utm.ts 側で実施済み。
+ */
+export function attributionEventProps(attr: Attribution): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const key of UTM_KEYS) {
+    const v = attr[key];
+    if (typeof v === "string" && v) out[key] = v;
+  }
+  return out;
+}
