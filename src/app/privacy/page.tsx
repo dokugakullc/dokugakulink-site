@@ -106,6 +106,20 @@ const sections = [
               PostHog プライバシーポリシー
             </a>
           </li>
+          <li>
+            Meta ピクセル（提供者：Meta Platforms, Inc.）<br />
+            利用目的：Meta（Facebook・Instagram等）で配信する広告の効果測定および最適化<br />
+            取得情報：閲覧ページ、事前登録フォームの操作等のイベント情報、端末・ブラウザ情報、IPアドレス、Cookie等の識別子（氏名・メールアドレス等の個人情報は送信しません）<br />
+            <a href="https://www.facebook.com/privacy/policy/" className="text-blue-700 hover:underline">
+              Meta プライバシーポリシー
+            </a>
+            <br />
+            オプトアウト：
+            <a href="https://www.facebook.com/adpreferences/ad_settings" className="text-blue-700 hover:underline">
+              Meta 広告設定
+            </a>
+            、または下記のブラウザ設定によるCookie無効化で広告効果測定を停止できます。
+          </li>
         </ul>
         <p className="mt-4">
           アプリ（ウカレル）では、上記 PostHog を利用して、アプリ内での操作・利用に関するイベント、端末・アプリに関する技術情報、およびアカウントに紐づく識別情報を取得する場合があります。当社は、分析目的で送信する情報を必要な範囲に限定し、識別情報を含む送信項目の最小化を継続的に行います。
