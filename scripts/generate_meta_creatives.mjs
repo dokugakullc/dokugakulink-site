@@ -19,10 +19,11 @@ function escapeXml(value) {
 
 function textSvg(spec) {
   const titleLines = spec.title.map((line, i) =>
-    `<text x="74" y="${268 + i * 84}" font-size="70" font-weight="700" fill="${i === spec.accentLine ? blue : navy}">${escapeXml(line)}</text>`,
+    `<text x="74" y="${268 + i * 78}" font-size="66" font-weight="700" fill="${spec.accentLines.includes(i) ? blue : navy}">${escapeXml(line)}</text>`,
   ).join("");
+  const supportTop = 468 + Math.max(0, spec.title.length - 2) * 76;
   const supportLines = spec.support.map((line, i) =>
-    `<text x="76" y="${468 + i * 43}" font-size="30" font-weight="500" fill="#425B78">${escapeXml(line)}</text>`,
+    `<text x="76" y="${supportTop + i * 43}" font-size="30" font-weight="500" fill="#425B78">${escapeXml(line)}</text>`,
   ).join("");
   return Buffer.from(`
     <svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
@@ -55,22 +56,22 @@ function textSvg(spec) {
 const creatives = [
   {
     id: "h1_current_position_a",
-    title: ["独学でも、", "合格までの現在地が分かる。"],
-    accentLine: 1,
+    title: ["独学でも、", "合格までの", "「現在地」が", "分かる。"],
+    accentLines: [1, 2, 3],
     support: ["今日やるべき学習と、", "合格までの現在地をひと目で。"],
     screenshot: "public/screenshots/ukareru/02_probability.webp",
   },
   {
     id: "h2_15_questions_a",
     title: ["今日は、", "15問だけ。"],
-    accentLine: 1,
+    accentLines: [1],
     support: ["今日の15問から。", "すきま時間でも積み重ねられる。"],
     screenshot: "public/screenshots/ukareru/01_home.webp",
   },
   {
     id: "h3_recall_timing_a",
     title: ["忘れた頃に、", "もう一度。"],
-    accentLine: 1,
+    accentLines: [1],
     support: ["解いた問題を、後日もう一度。", "復習のタイミングに迷わない。"],
     screenshot: "public/screenshots/ukareru/06_result.webp",
   },
