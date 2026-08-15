@@ -8,96 +8,89 @@ await fs.mkdir(outDir, { recursive: true });
 
 const W = 1080;
 const H = 1350;
-const blue = "#1478F2";
-const navy = "#102A4C";
 
-function escapeXml(value) {
+function esc(value) {
   return value.replace(/[&<>"']/g, (ch) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;",
   })[ch]);
 }
 
-function textSvg(spec) {
-  const titleLines = spec.title.map((line, i) =>
-    `<text x="74" y="${268 + i * 78}" font-size="66" font-weight="700" fill="${spec.accentLines.includes(i) ? blue : navy}">${escapeXml(line)}</text>`,
-  ).join("");
-  const supportTop = 468 + Math.max(0, spec.title.length - 2) * 76;
-  const supportLines = spec.support.map((line, i) =>
-    `<text x="76" y="${supportTop + i * 43}" font-size="30" font-weight="500" fill="#425B78">${escapeXml(line)}</text>`,
+function layoutSvg(spec) {
+  const lines = spec.title.map((line, i) =>
+    `<text x="72" y="${300 + i * 92}" font-size="78" font-weight="800" fill="${spec.accentLines.includes(i) ? "#55A7FF" : "#FFFFFF"}">${esc(line)}</text>`,
   ).join("");
   return Buffer.from(`
-    <svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="1080" height="1350" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#F8FBFF"/><stop offset="1" stop-color="#EAF3FF"/>
+          <stop offset="0" stop-color="#07182D"/><stop offset="1" stop-color="#0D2B50"/>
         </linearGradient>
-        <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#16385F" flood-opacity="0.18"/>
-        </filter>
+        <filter id="glow"><feGaussianBlur stdDeviation="55"/></filter>
+        <clipPath id="screen"><rect x="572" y="445" width="500" height="780" rx="34"/></clipPath>
       </defs>
       <rect width="1080" height="1350" fill="url(#bg)"/>
-      <circle cx="990" cy="100" r="210" fill="#DCEBFF" opacity="0.72"/>
-      <circle cx="110" cy="1250" r="260" fill="#DCEBFF" opacity="0.65"/>
-      <rect x="64" y="62" width="175" height="60" rx="30" fill="#E4F0FF"/>
-      <text x="151" y="102" text-anchor="middle" font-size="31" font-weight="700" fill="${navy}">ウカレル</text>
-      <text x="74" y="196" font-size="28" font-weight="600" fill="#54708F">宅建を独学で学ぶ社会人へ</text>
-      ${titleLines}
-      ${supportLines}
-      <g filter="url(#shadow)">
-        <rect x="74" y="1138" width="420" height="92" rx="46" fill="${blue}"/>
-      </g>
-      <text x="284" y="1197" text-anchor="middle" font-size="34" font-weight="700" fill="white">無料で事前登録</text>
-      <text x="76" y="1278" font-size="24" font-weight="500" fill="#607994">App Store公開時にお知らせ</text>
-      <text x="1004" y="1292" text-anchor="end" font-size="22" font-weight="600" fill="#7890AA">dokugakulink.com</text>
+      <circle cx="1040" cy="100" r="230" fill="#1478F2" opacity="0.18" filter="url(#glow)"/>
+      <circle cx="70" cy="1300" r="230" fill="#1478F2" opacity="0.14" filter="url(#glow)"/>
+      <text x="72" y="90" font-family="Hiragino Kaku Gothic ProN, sans-serif" font-size="34" font-weight="700" fill="#FFFFFF">ウカレル</text>
+      <text x="1008" y="88" text-anchor="end" font-family="Hiragino Kaku Gothic ProN, sans-serif" font-size="23" font-weight="600" letter-spacing="2" fill="#8FB9E8">宅建 × 独学</text>
+      <rect x="72" y="142" width="94" height="7" rx="4" fill="#268BFF"/>
+      <g font-family="Hiragino Kaku Gothic ProN, sans-serif">${lines}</g>
+      <text x="75" y="${spec.supportY}" font-family="Hiragino Kaku Gothic ProN, sans-serif" font-size="31" font-weight="500" fill="#C8D9ED">${esc(spec.support[0])}</text>
+      <text x="75" y="${spec.supportY + 48}" font-family="Hiragino Kaku Gothic ProN, sans-serif" font-size="31" font-weight="500" fill="#C8D9ED">${esc(spec.support[1])}</text>
+      <rect x="72" y="1162" width="390" height="82" rx="41" fill="#1478F2"/>
+      <text x="267" y="1216" text-anchor="middle" font-family="Hiragino Kaku Gothic ProN, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">無料で事前登録</text>
+      <text x="72" y="1292" font-family="Hiragino Kaku Gothic ProN, sans-serif" font-size="22" font-weight="500" fill="#7FA6CF">App Store 公開時にお知らせ</text>
+      <path d="M486 1202h38m-11-11 11 11-11 11" fill="none" stroke="#55A7FF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   `);
 }
 
-const creatives = [
+const specs = [
   {
     id: "h1_current_position_a",
-    title: ["独学でも、", "合格までの", "「現在地」が", "分かる。"],
-    accentLines: [1, 2, 3],
-    support: ["今日やるべき学習と、", "合格までの現在地をひと目で。"],
+    title: ["独学、", "今どこ？"],
+    accentLines: [1],
+    supportY: 540,
+    support: ["今日やることと、", "合格までの現在地が分かる。"],
     screenshot: "public/screenshots/ukareru/02_probability.webp",
   },
   {
     id: "h2_15_questions_a",
     title: ["今日は、", "15問だけ。"],
     accentLines: [1],
-    support: ["今日の15問から。", "すきま時間でも積み重ねられる。"],
+    supportY: 540,
+    support: ["すきま時間から、", "宅建学習を積み重ねる。"],
     screenshot: "public/screenshots/ukareru/01_home.webp",
   },
   {
     id: "h3_recall_timing_a",
-    title: ["忘れた頃に、", "もう一度。"],
-    accentLines: [1],
+    title: ["覚えても、", "忘れる。", "だから、", "もう一度。"],
+    accentLines: [2, 3],
+    supportY: 710,
     support: ["解いた問題を、後日もう一度。", "復習のタイミングに迷わない。"],
     screenshot: "public/screenshots/ukareru/06_result.webp",
   },
 ];
 
-for (const spec of creatives) {
+for (const spec of specs) {
   const screenshot = await sharp(path.join(root, spec.screenshot))
-    .resize({ width: 510 })
+    .resize({ width: 500 })
     .png()
     .toBuffer();
-  const phoneHeight = (await sharp(screenshot).metadata()).height ?? 1100;
-  const top = Math.max(150, H - phoneHeight + 85);
   const portraitPath = path.join(outDir, `${spec.id}-4x5.png`);
-  await sharp({ create: { width: W, height: H, channels: 4, background: "#F8FBFF" } })
+  await sharp({ create: { width: W, height: H, channels: 4, background: "#07182D" } })
     .composite([
-      { input: textSvg(spec), left: 0, top: 0 },
-      { input: screenshot, left: 550, top },
+      { input: layoutSvg(spec), left: 0, top: 0 },
+      { input: screenshot, left: 572, top: 445 },
     ])
     .png({ compressionLevel: 9 })
     .toFile(portraitPath);
 
   const squareInner = await sharp(portraitPath).resize({ height: 1080 }).png().toBuffer();
-  await sharp({ create: { width: 1080, height: 1080, channels: 4, background: "#F3F8FF" } })
+  await sharp({ create: { width: 1080, height: 1080, channels: 4, background: "#07182D" } })
     .composite([{ input: squareInner, left: 108, top: 0 }])
     .png({ compressionLevel: 9 })
     .toFile(path.join(outDir, `${spec.id}-1x1.png`));
 }
 
-console.log(`Generated ${creatives.length} creatives in ${outDir}`);
+console.log(`Generated ${specs.length} creatives in ${outDir}`);
