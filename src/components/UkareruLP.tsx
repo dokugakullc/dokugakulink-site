@@ -156,6 +156,28 @@ export default function UkareruLP({ source }: { source: string }) {
         </div>
       </section>
 
+      {/* S3.5: 復習設計。広告 H3「忘れた頃に、もう一度。」の約束を LP 側で回収する。 */}
+      <section id="review">
+        <div className="wrap">
+          <p className="eyebrow" style={{ textAlign: "center" }}>復習の設計</p>
+          <h2 style={{ textAlign: "center" }}>忘れた頃に、<br />もう一度。</h2>
+          <p className="uk-review-lead">
+            覚えたはずの問題が、しばらくすると解けなくなる。独学でいちばん起きやすいことです。
+            ウカレルは、一度間違えた問題を<strong>忘れやすいタイミングであらためて出題</strong>し、
+            もう一度出会わせます。
+          </p>
+          <ul className="uk-review-list">
+            <li>間違えた問題を、あとでもう一度出題する</li>
+            <li>復習が必要な問題を、こちらで管理する</li>
+            <li>解説で「なぜそうなるか」まで確認できる</li>
+          </ul>
+          <p className="uk-review-note">
+            この復習の考え方は、事前登録でお渡しする{WAITLIST_GUIDE_TITLE}にも、
+            アプリなしで今日から始められる形でまとめています。
+          </p>
+        </div>
+      </section>
+
       {/* S4: アプリ体験 — 実スクリーンショット */}
       <section id="experience" className="alt">
         <div className="wrap-wide">
