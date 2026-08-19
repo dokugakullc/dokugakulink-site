@@ -527,3 +527,61 @@
   /* keep final CTA clear of the sticky bar */
   .lp-root .uk-final { padding-bottom: 120px; }
 }
+
+/* ファーストビュー内の事前登録フォーム。
+   ヒーローは明るい背景・フォームは白文字前提のため、暗いカードで包んでコントラストを確保する。 */
+.uk-hero-form {
+  background: #0d2545;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 10px 30px rgba(13, 37, 69, 0.18);
+}
+.uk-hero-form-alt {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #5b6b7f;
+}
+.uk-hero-form-alt-link {
+  color: #007aff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+@media (max-width: 720px) {
+  .uk-hero-form { padding: 16px; border-radius: 16px; }
+}
+
+/* ヒーロー内の即時特典の説明 */
+.uk-hero-offer {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  background: #eef5ff;
+  border: 1px solid #d3e5fb;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #1c3557;
+}
+
+/* S1.5 開発状況 */
+.uk-status { background: #f7f9fc; border-top: 1px solid #e6edf6; border-bottom: 1px solid #e6edf6; }
+.uk-status-h { font-size: 22px; line-height: 1.45; margin: 0 0 14px; }
+.uk-status-body { margin: 0 0 10px; line-height: 1.9; color: #33465e; }
+.uk-status-note { margin: 12px 0 0; font-size: 13px; color: #6b7b8f; }
+
+/* S3.5 復習設計 */
+.uk-review-lead { margin: 14px auto 16px; max-width: 620px; line-height: 1.95; color: #33465e; }
+.uk-review-list { list-style: none; padding: 0; margin: 0 auto 14px; max-width: 620px; }
+.uk-review-list li { position: relative; padding-left: 26px; margin-bottom: 10px; line-height: 1.7; }
+.uk-review-list li::before {
+  content: "✓"; position: absolute; left: 0; top: 0;
+  color: #007aff; font-weight: 700;
+}
+.uk-review-note { max-width: 620px; margin: 0 auto; font-size: 13px; color: #6b7b8f; line-height: 1.8; }
+
+.uk-register-trust-link { color: #93c5fd; text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 720px) {
+  .uk-status-h { font-size: 19px; }
+  .uk-hero-offer { font-size: 13.5px; padding: 11px 12px; }
+}

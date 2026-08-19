@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import Link from "next/link";
 import { getAttribution } from "@/lib/utm";
 import {
@@ -14,6 +14,7 @@ import { HONEYPOT_FIELD } from "@/lib/formSecurity";
 import { createSubmitGuard } from "@/lib/submitGuard";
 import { resolveRegistrationOutcome, outcomeFiresMetaLead } from "@/lib/registrationOutcome";
 import { isTurnstileWidgetActive, canSubmitTurnstile, turnstilePayloadField } from "@/lib/turnstileClient";
+import { WAITLIST_GUIDE_PATH, WAITLIST_GUIDE_TITLE, WAITLIST_GUIDE_FILENAME } from "@/lib/waitlistGuide";
 import TurnstileWidget, { type TurnstileWidgetHandle } from "@/components/TurnstileWidget";
 
 // SiteKey 未設定なら widget を描画せず送信可能（従来挙動）。設定時のみ Cloudflare script を読み込む。
@@ -44,6 +45,14 @@ const ERROR_TEXT: Record<Exclude<FieldError, "">, string> = {
 
 interface EmailFormProps {
   source?: string;
+  /**
+   * "full"   : 従来の登録セクション用（任意アンケートを含む）
+   * "compact": ファーストビュー用。任意アンケートを出さず、メール＋同意＋送信だけに絞る。
+   *            登録API・保存先・計測イベント名は full と同一（payload は変えない）。
+   */
+  layout?: "full" | "compact";
+  /** 計測でフォーム設置箇所を区別するための値（GA4 / PostHog / Meta カスタムイベントの params）。 */
+  formLocation?: string;
 }
 
 // 悩みカードUI（A: フォーム内 / B: 登録完了後 で共用）
@@ -87,7 +96,19 @@ function ProblemCards({
   );
 }
 
-export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
+export default function EmailForm({
+  source = "takken_lp",
+  layout = "full",
+  formLocation,
+}: EmailFormProps) {
+  // 同一ページに複数のフォームを置けるよう、DOM id をインスタンスごとに一意にする。
+  // name 属性（email / honeypot）は不変＝サーバー・GAS の受け口は変えない。
+  const uid = useId();
+  const emailId = `${uid}-waitlist-email`;
+  const errorId = `${uid}-waitlist-error`;
+  const hpId = `${uid}-${HONEYPOT_FIELD}`;
+  const isCompact = layout === "compact";
+  const location = formLocation ?? (isCompact ? "hero" : "register");
   const [email, setEmail] = useState("");
   const [problem, setProblem] = useState<ProblemValue | "">("");
   const [consent, setConsent] = useState(false);
@@ -108,11 +129,13 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
   const abOn = isAbSource(source);
   // null(未確定)/A はフォーム内アンケートを表示（＝SSR既定=A）。B は非表示にし完了後へ移設。
   const variant = useVariant();
-  const isB = abOn && variant === "B";
+  // compact では任意アンケートを出さない（B版の完了後アンケートも出さない）。
+  const isB = abOn && variant === "B" && !isCompact;
 
   // 計測 params（A/B有効時のみ variant を付与）
   function withVariant(base: Record<string, string>): Record<string, string> {
-    return abOn ? { ...base, variant: resolveVariant() } : base;
+    const withLocation = { ...base, form_location: location };
+    return abOn ? { ...withLocation, variant: resolveVariant() } : withLocation;
   }
 
   // フォーム入力開始を一度だけ計測
@@ -240,10 +263,34 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
           </div>
         </div>
 
+        {/* 即時特典: 登録直後にこの画面から受け取れるようにする（メール到達に依存させない）。
+            PDF は個人情報を扱わない静的ファイルのため、アクセス制御は設けていない。 */}
+        <div className="rounded-xl bg-white/10 border border-white/20 p-4 text-center">
+          <p className="text-white text-sm font-bold mb-1">{WAITLIST_GUIDE_TITLE}</p>
+          <p className="text-blue-200 text-xs mb-3">
+            今日から使えるチェックリストです（PDF・2ページ）。
+          </p>
+          <a
+            href={WAITLIST_GUIDE_PATH}
+            download={WAITLIST_GUIDE_FILENAME}
+            target="_blank"
+            rel="noopener"
+            className="inline-flex items-center justify-center gap-2 w-full py-[14px] bg-white text-[#0d2545] text-sm font-bold rounded-xl hover:bg-blue-50 transition-colors"
+          >
+            ガイドを受け取る（PDF）
+          </a>
+          <p className="text-white/40 text-xs mt-2">
+            開かない場合は、このページを閉じずにもう一度お試しください。
+          </p>
+        </div>
+
         <div className="text-center">
           <p className="text-blue-200 text-sm leading-loose">
-            ウカレルの App Store 公開時に、<br />
+            このあとは、App Store 審査への提出状況と公開開始を、<br />
             ご登録いただいたメールアドレスへお知らせします。
+          </p>
+          <p className="text-white/40 text-xs mt-2">
+            公開時期は Apple の審査状況により前後する場合があります。
           </p>
         </div>
 
@@ -275,11 +322,11 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       {/* ① メールアドレス */}
       <div>
-        <label htmlFor="waitlist-email" className="block text-white/80 text-sm font-medium mb-2">
+        <label htmlFor={emailId} className="block text-white/80 text-sm font-medium mb-2">
           メールアドレス
         </label>
         <input
-          id="waitlist-email"
+          id={emailId}
           name="email"
           type="email"
           inputMode="email"
@@ -295,13 +342,13 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
           required
           disabled={status === "loading"}
           aria-invalid={fieldError === "email_empty" || fieldError === "email_invalid"}
-          aria-describedby={fieldError ? "waitlist-error" : undefined}
+          aria-describedby={fieldError ? errorId : undefined}
           className="w-full px-4 py-[18px] rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 text-base focus:outline-none focus:border-white/60 transition-colors disabled:opacity-50"
         />
       </div>
 
       {/* ② 悩みカード選択（任意）— A版のみフォーム内に表示。B版は登録完了後に移設。 */}
-      {!isB && (
+      {!isB && !isCompact && (
         <div>
           <p className="text-white/40 text-xs mb-2.5">今一番困っていること（任意）</p>
           <ProblemCards
@@ -326,7 +373,7 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
             if (fieldError === "consent" && e.target.checked) setFieldError("");
           }}
           aria-invalid={fieldError === "consent"}
-          aria-describedby={fieldError === "consent" ? "waitlist-error" : undefined}
+          aria-describedby={fieldError === "consent" ? errorId : undefined}
           className="mt-1 w-5 h-5 shrink-0 accent-[#007AFF]"
         />
         <span className="text-white/70 text-sm leading-relaxed">
@@ -339,9 +386,9 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
 
       {/* honeypot: 視覚・支援技術の双方から隠す（aria-hidden + tabIndex -1 + autoComplete off） */}
       <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
-        <label htmlFor={HONEYPOT_FIELD}>この欄は入力しないでください</label>
+        <label htmlFor={hpId}>この欄は入力しないでください</label>
         <input
-          id={HONEYPOT_FIELD}
+          id={hpId}
           type="text"
           name={HONEYPOT_FIELD}
           tabIndex={-1}
@@ -377,21 +424,26 @@ export default function EmailForm({ source = "takken_lp" }: EmailFormProps) {
         disabled={status === "loading"}
         className="w-full py-[18px] bg-white text-[#0d2545] text-base font-bold rounded-xl hover:bg-blue-50 transition-colors disabled:opacity-60"
       >
-        {status === "loading" ? "送信中…" : "リリース通知を受け取る →"}
+        {status === "loading"
+          ? "送信中…"
+          : isCompact
+            ? "無料で事前登録する"
+            : "学習ガイドと公開のお知らせを受け取る"}
       </button>
 
       {fieldError && (
-        <p id="waitlist-error" role="alert" className="text-amber-300 text-sm text-center">
+        <p id={errorId} role="alert" className="text-amber-300 text-sm text-center">
           {ERROR_TEXT[fieldError]}
         </p>
       )}
       {status === "error" && (
-        <p id="waitlist-error" role="alert" className="text-red-300 text-sm text-center">
+        <p id={errorId} role="alert" className="text-red-300 text-sm text-center">
           送信できませんでした。通信環境をご確認のうえ、もう一度お試しください。
         </p>
       )}
       <p className="text-white/30 text-xs text-center">
-        メールアドレスだけで登録できます。登録は無料です。
+        メールアドレスだけで登録できます。登録は無料です。<br />
+        登録後すぐに{WAITLIST_GUIDE_TITLE}をお渡しします。
       </p>
     </form>
   );

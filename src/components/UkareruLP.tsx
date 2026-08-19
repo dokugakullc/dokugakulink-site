@@ -3,6 +3,7 @@ import EmailForm from "@/components/EmailForm";
 import CtaLink from "@/components/CtaLink";
 import LPInit from "@/components/LPInit";
 import LpShotsCarousel from "@/components/LpShotsCarousel";
+import { WAITLIST_GUIDE_TITLE } from "@/lib/waitlistGuide";
 
 const FAQ = [
   {
@@ -11,11 +12,15 @@ const FAQ = [
   },
   {
     q: "いつリリースされますか？",
-    a: "現在、正式リリースに向けて準備を進めています。公開時期が決まり次第、事前登録いただいたメールアドレスへお知らせします。",
+    a: "現在、App Store への提出を予定している公開候補版を開発中です。完成後に実機で動作を確認し、問題がなければ Apple の審査へ提出します。公開時期は Apple の審査状況により前後する場合があるため、確定した日付はお伝えできません。審査への提出状況と公開開始は、事前登録いただいたメールアドレスへお知らせします。",
   },
   {
     q: "利用料金はいくらですか？",
     a: "プレミアムプランは月額580円（税込）です。登録から30日間は、すべての機能を無料で利用できます。30日を過ぎても、今日の15問と学習履歴の閲覧は無料でそのまま続けられ、無料期間の終了を理由に自動で課金されることはありません。プレミアム機能をご利用になる場合のみ、Apple App内課金で任意にご加入いただけます。加入後は解約されるまで自動更新され、いつでも解約できます。",
+  },
+  {
+    q: "開発はどこまで進んでいますか？",
+    a: "社内では「Build 15」と呼んでいる公開候補版を開発中です。完成後に実機で動作を確認し、問題がなければ App Store の審査へ提出する予定です。審査の期間と結果は Apple の判断によるため、公開日を確約することはできません。",
   },
   {
     q: "どの資格に対応していますか？",
@@ -23,11 +28,11 @@ const FAQ = [
   },
   {
     q: "事前登録すると何が届きますか？",
-    a: "ウカレルの App Store 公開時に、案内メールが届きます。継続的な宣伝メールを大量に送ることはありません。",
+    a: "登録が完了した画面で、すぐに「宅建独学・15問活用ガイド」（PDF・2ページ）をお受け取りいただけます。そのあとは、App Store 審査への提出状況と、公開開始のお知らせをメールでお送りします。継続的な宣伝メールを大量に送ることはありません。",
   },
   {
     q: "登録後に解除できますか？",
-    a: "いつでも解除できます。お手数ですが、お問い合わせページよりご連絡ください。",
+    a: "いつでも解除できます。お問い合わせページから「事前登録の解除希望」とご登録のメールアドレスを添えてご連絡いただければ、こちらで削除します。理由をお伺いすることはありません。",
   },
 ] as const;
 
@@ -47,14 +52,27 @@ export default function UkareruLP({ source }: { source: string }) {
               今日やるべき学習と、合格までの現在地が分かる。<br />
               働きながら独学で宅建合格を目指す人のための学習アプリです。
             </p>
+            {/* ファーストビューで登録を完了できるようにする（従来はページ下部の #register まで
+                約9画面スクロールが必要だった）。送信ロジック・API・保存先は #register と同一。 */}
+            <p className="uk-hero-offer">
+              登録するとすぐに<strong>{WAITLIST_GUIDE_TITLE}</strong>（PDF）をお渡しします。
+              そのあと、審査への提出状況と公開開始をメールでお知らせします。
+            </p>
             <div className="uk-hero-cta">
-              <CtaLink source={source} location="hero" className="btn btn-lg">
-                無料で事前登録する
-              </CtaLink>
+              <div className="uk-hero-form">
+                <EmailForm source={source} layout="compact" formLocation="hero" />
+              </div>
               <div className="cta-badges">
                 <div className="badge"><span className="badge-dot" />メールアドレスだけ・30秒</div>
+                <div className="badge"><span className="badge-dot" />登録後すぐガイドを受け取れます</div>
                 <div className="badge"><span className="badge-dot" />しつこい宣伝メールなし</div>
               </div>
+              <p className="uk-hero-form-alt">
+                あとで読みたい方は{" "}
+                <CtaLink source={source} location="hero" className="uk-hero-form-alt-link">
+                  ウカレルの詳細を見る
+                </CtaLink>
+              </p>
             </div>
             <ul className="uk-hero-proof">
               <li><span className="uk-proof-n">913</span>問を収録</li>
@@ -75,6 +93,25 @@ export default function UkareruLP({ source }: { source: string }) {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* S1.5: 開発状況。公開日を確約せず、いまの事実だけを書く。
+          Apple の審査期間・結果・公開日は当社が確約できないため断定しない。 */}
+      <section id="status" className="uk-status">
+        <div className="wrap">
+          <h2 className="uk-status-h">ウカレルは、公開に向けた最終確認を進めています</h2>
+          <p className="uk-status-body">
+            現在、App Store への提出を予定している<strong>公開候補版</strong>を開発中です。
+            完成後に実機で動作を確認し、問題がなければ Apple の審査へ提出します。
+          </p>
+          <p className="uk-status-body">
+            事前登録いただいた方には、<strong>{WAITLIST_GUIDE_TITLE}</strong>をお届けし、
+            審査への提出状況と公開開始をメールでお知らせします。
+          </p>
+          <p className="uk-status-note">
+            ※公開時期は Apple の審査状況により前後する場合があります。
+          </p>
         </div>
       </section>
 
@@ -128,9 +165,9 @@ export default function UkareruLP({ source }: { source: string }) {
           <div className="uk-midcta">
             <p className="uk-midcta-lead">この画面を、いちばんに使ってみませんか？</p>
             <CtaLink source={source} location="mid" className="btn">
-              無料で事前登録する
+              学習ガイドと公開のお知らせを受け取る
             </CtaLink>
-            <p className="uk-midcta-note">メールアドレスだけ・30秒で完了</p>
+            <p className="uk-midcta-note">メールアドレスだけ・30秒／登録後すぐガイドをお渡しします</p>
           </div>
         </div>
       </section>
@@ -186,18 +223,23 @@ export default function UkareruLP({ source }: { source: string }) {
         <div className="wrap">
           <p className="eyebrow" style={{ color: "rgba(147,197,253,0.9)" }}>事前登録</p>
           <h2 style={{ color: "#fff", marginBottom: "12px" }}>
-            リリースしたら、<br />いちばんに。
+            ガイドを受け取って、<br />今日から始める。
           </h2>
           <p className="uk-register-lead">
-            ウカレルは現在、正式リリースに向けて準備中です。<br />
-            事前登録いただいた方へ、App Store 公開時にメールでお知らせします。
+            登録するとすぐに<strong>{WAITLIST_GUIDE_TITLE}</strong>（PDF・2ページ）をお渡しします。<br />
+            そのあと、App Store 審査への提出状況と公開開始をメールでお知らせします。
           </p>
           <div className="uk-form-card">
-            <EmailForm source={source} />
+            <EmailForm source={source} formLocation="register" />
           </div>
           <ul className="uk-register-trust">
-            <li>登録は無料。App Store 公開のお知らせだけをお送りします。</li>
-            <li>ご登録はいつでも解除できます。</li>
+            <li>登録は無料。ガイドのお渡しと、提出状況・公開開始のお知らせだけをお送りします。</li>
+            <li>
+              解除はいつでもできます。
+              <a href="/contact" className="uk-register-trust-link">お問い合わせ</a>
+              から「事前登録の解除希望」とご連絡いただければ、こちらで削除します。
+            </li>
+            <li>公開時期は Apple の審査状況により前後する場合があります。</li>
             <li>運営：dokugaku link合同会社（大阪）</li>
           </ul>
         </div>
@@ -223,9 +265,11 @@ export default function UkareruLP({ source }: { source: string }) {
       <section id="final-cta" className="uk-final">
         <div className="wrap">
           <h2>独学は、<br />もっと迷わなくていい。</h2>
-          <p className="uk-final-sub">いま事前登録して、リリースをいちばんに受け取りましょう。</p>
+          <p className="uk-final-sub">
+            いま登録すれば、{WAITLIST_GUIDE_TITLE}を今日から使えます。
+          </p>
           <CtaLink source={source} location="final" className="btn btn-lg">
-            無料で事前登録する
+            学習ガイドと公開のお知らせを受け取る
           </CtaLink>
           <p className="uk-final-note">メールアドレスだけ・30秒で完了</p>
         </div>
