@@ -12,12 +12,22 @@ const SHOTS = [
   { file: "06_result", alt: "演習結果を振り返る画面。", cap: "解いた学習を振り返り、積み重ねが見える。" },
 ] as const;
 
+const RELEASED_SHOTS = [
+  { file: "01_home", alt: "ウカレルのホーム画面。今日の15問が表示されている。", cap: "今日やることは、15問。迷わず学習を始められます。" },
+  { file: "02_question", alt: "ウカレルの一問一答画面。", cap: "一問ずつ答えて、理解度も記録できます。" },
+  { file: "03_explanation", alt: "ウカレルの解説画面。", cap: "回答後すぐに、理由まで解説で確認できます。" },
+  { file: "04_review", alt: "復習待ちの問題を表示する画面。", cap: "正誤と理解度をもとに、復習する問題を確認できます。" },
+  { file: "05_weakness", alt: "苦手分野を分析する画面。", cap: "分野ごとの結果から、優先して学ぶ場所が分かります。" },
+  { file: "06_position", alt: "合格可能性と現在地を表示する画面。", cap: "学習データがたまると、合格までの現在地を目安として確認できます。" },
+] as const;
+
 // 全ブレークポイント共通のカルーセル。
 // - スワイプ: タッチ/トラックパッドはネイティブ横スクロール（scroll-snap）
 // - ドラッグ: マウスはポインタで掴んでスクロール（PC対応）
 // - 左右矢印 / ドット: タップで対象画面へ中央寄せ
 // - 自動スクロールはしない
-export default function LpShotsCarousel() {
+export default function LpShotsCarousel({ released = false }: { released?: boolean }) {
+  const shots = released ? RELEASED_SHOTS : SHOTS;
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const targetRef = useRef(0); // 連続クリックでも正しく進むよう最新の目標indexを保持
@@ -58,7 +68,7 @@ export default function LpShotsCarousel() {
   const goTo = (i: number) => {
     const track = trackRef.current;
     if (!track) return;
-    const clamped = Math.max(0, Math.min(SHOTS.length - 1, i));
+    const clamped = Math.max(0, Math.min(shots.length - 1, i));
     const el = track.children[clamped] as HTMLElement | undefined;
     if (!el) return;
     targetRef.current = clamped;
@@ -126,11 +136,11 @@ export default function LpShotsCarousel() {
           onPointerCancel={endDrag}
           onClickCapture={onClickCapture}
         >
-          {SHOTS.map(({ file, alt, cap }, i) => (
+          {shots.map(({ file, alt, cap }, i) => (
             <figure key={file} className={`uk-shot ${i === active ? "is-active" : ""}`}>
               <div className="uk-phone uk-phone-sm">
                 <Image
-                  src={`/screenshots/ukareru/${file}.webp`}
+                  src={released ? `/screenshots/ukareru-b17/${file}.png` : `/screenshots/ukareru/${file}.webp`}
                   alt={alt}
                   width={828}
                   height={1792}
@@ -150,14 +160,14 @@ export default function LpShotsCarousel() {
           className="uk-arrow uk-arrow-next"
           aria-label="次の画面へ"
           onClick={() => goTo(targetRef.current + 1)}
-          disabled={active === SHOTS.length - 1}
+          disabled={active === shots.length - 1}
         >
           <span aria-hidden="true">›</span>
         </button>
       </div>
 
       <div className="uk-shots-dots" aria-label="アプリ画面の切り替え">
-        {SHOTS.map(({ file }, i) => (
+        {shots.map(({ file }, i) => (
           <button
             key={file}
             type="button"

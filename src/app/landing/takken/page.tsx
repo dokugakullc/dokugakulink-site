@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import "../../services/takken/lp.css";
 import UkareruLP from "@/components/UkareruLP";
+import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 const title = "ウカレル｜宅建独学を合格まで導く学習アプリ";
-const description =
-  "独学でも、迷わない。今日やるべき学習と合格までの現在地が分かる、働きながら宅建合格を目指す人のための学習アプリ。現在リリース準備中。App Store 公開のお知らせを事前登録受付中。";
+const description = isUkareruReleased()
+  ? "今日は15問だけ。今日やること、苦手分野、合格までの現在地が分かる、働きながら独学で宅建合格を目指す人のための一問一答アプリ。App Storeで無料配信中。"
+  : "今日は15問だけ。毎日やること、苦手分野、合格までの現在地が分かる宅建一問一答アプリ。事前登録で15問活用ガイドをすぐに受け取り、App Store公開時にお知らせします。";
 
 export const metadata: Metadata = {
   title,
   description,
   keywords: [
     "宅建", "宅建士", "宅建アプリ", "独学", "宅建勉強法",
-    "宅建過去問", "宅建一問一答", "宅建合格", "宅建 独学 アプリ", "宅建 学習管理",
+    "宅建一問一答", "宅建合格", "宅建 独学 アプリ", "宅建 学習管理",
   ],
   alternates: {
     canonical: "/landing/takken",
@@ -43,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title,
-    description: "独学でも、迷わない。今日やるべき学習と合格までの現在地が分かる宅建学習アプリ。",
+    description,
     images: ["https://www.dokugakulink.com/landing/takken/opengraph-image"],
   },
 };

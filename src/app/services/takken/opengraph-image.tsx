@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -21,6 +22,7 @@ async function fetchFont(): Promise<ArrayBuffer | null> {
 }
 
 export default async function Image() {
+  const isReleased = isUkareruReleased();
   const font = await fetchFont();
   const fontFamily = font ? '"Noto Sans JP", sans-serif' : "sans-serif";
 
@@ -82,10 +84,10 @@ export default async function Image() {
 
           <div style={{ display: "flex", flexDirection: "column", marginBottom: 20 }}>
             <span style={{ fontSize: 70, fontWeight: 700, color: "white", lineHeight: 1.2 }}>
-              今日の15問が、
+              今日は、
             </span>
             <span style={{ fontSize: 70, fontWeight: 700, color: "#93c5fd", lineHeight: 1.2 }}>
-              未来を変える。
+              15問だけ。
             </span>
           </div>
 
@@ -108,7 +110,7 @@ export default async function Image() {
               }}
             >
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80" }} />
-              <span style={{ color: "white", fontSize: 20, fontWeight: 700 }}>事前登録受付中</span>
+              <span style={{ color: "white", fontSize: 20, fontWeight: 700 }}>{isReleased ? "App Storeで配信中" : "事前登録受付中"}</span>
             </div>
           </div>
 

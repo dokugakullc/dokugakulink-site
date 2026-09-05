@@ -569,6 +569,26 @@
 .uk-status-body { margin: 0 0 10px; line-height: 1.9; color: #33465e; }
 .uk-status-note { margin: 12px 0 0; font-size: 13px; color: #6b7b8f; }
 
+/* Waitlist guide — 登録特典の中身と利用後の変化を具体化 */
+.uk-guide-showcase { background: #fff; }
+.uk-guide-grid { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: 64px; align-items: center; }
+.uk-guide-preview { max-width: 390px; margin: 0 auto; padding: 10px; border: 1px solid #dbe4ef; border-radius: 18px; background: #fff; box-shadow: 0 22px 54px rgba(13,37,69,.14); transform: rotate(-1.2deg); }
+.uk-guide-preview-img { display: block; width: 100%; height: auto; border-radius: 10px; }
+.uk-guide-copy h2 { margin: 10px 0 18px; }
+.uk-guide-lead { color: #33465e; line-height: 1.9; margin-bottom: 24px; }
+.uk-guide-benefits { list-style: none; display: grid; gap: 12px; margin: 0 0 22px; padding: 0; }
+.uk-guide-benefits li { position: relative; display: grid; gap: 3px; padding: 14px 16px 14px 46px; border: 1px solid #e1e8f0; border-radius: 14px; background: #f8fafc; }
+.uk-guide-benefits li::before { content: "✓"; position: absolute; left: 18px; top: 15px; color: var(--blue); font-weight: 800; }
+.uk-guide-benefits strong { color: var(--text); }
+.uk-guide-benefits span { color: var(--t2); font-size: 14px; line-height: 1.6; }
+.uk-guide-outcome { margin-bottom: 24px; padding: 16px 18px; border-left: 4px solid var(--blue); background: var(--blue-s); color: #33465e; line-height: 1.75; }
+.uk-guide-note { margin-top: 12px; color: var(--t3); font-size: 12px; line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .uk-guide-grid { grid-template-columns: 1fr; gap: 38px; }
+  .uk-guide-preview { width: min(82vw, 330px); }
+}
+
 /* S3.5 復習設計 */
 .uk-review-lead { margin: 14px auto 16px; max-width: 620px; line-height: 1.95; color: #33465e; }
 .uk-review-list { list-style: none; padding: 0; margin: 0 auto 14px; max-width: 620px; }

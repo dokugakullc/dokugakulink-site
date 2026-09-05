@@ -427,7 +427,7 @@ export default function EmailForm({
         {status === "loading"
           ? "送信中…"
           : isCompact
-            ? "無料で事前登録する"
+            ? "無料ガイドと公開通知を受け取る"
             : "学習ガイドと公開のお知らせを受け取る"}
       </button>
 
