@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 一時生成物（PDF目視確認用の中間ファイルなど）
+/tmp/
+
+# Claude Code のローカル固有ファイル。
+# 将来 .claude/settings.json や .claude/skills/ を共有する余地を残すため、
+# .claude/ 全体ではなく個別に除外する。
+/.claude/launch.json
+/.claude/.cc-writes/
