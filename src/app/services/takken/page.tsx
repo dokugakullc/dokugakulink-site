@@ -34,7 +34,7 @@ export const metadata: Metadata = {
         url: "https://www.dokugakulink.com/services/takken/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "ウカレル｜今日の15問が、未来を変える。独学でも、迷わない。",
+        alt: "ウカレル｜今日は、15問だけ。独学でも、迷わない。",
       },
     ],
   },

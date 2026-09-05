@@ -74,4 +74,3 @@ dokugaku link合同会社／ウカレル
 - 配信対象の抽出：AIが補助し、Ownerが件数を承認
 - 送信実行：OwnerまたはOwnerが指定した担当者
 - 解除処理：OwnerまたはOwnerが指定した担当者
-

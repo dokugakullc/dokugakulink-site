@@ -6,8 +6,11 @@ export const contentType = "image/png";
 
 async function fetchFont(): Promise<ArrayBuffer | null> {
   try {
+    // このOGPで描画しうる全文字（公開前ラベル「事前登録受付中」と公開後ラベル
+    // 「App Storeで配信中」の両方を含む）。text= のサブセット取得のため、
+    // 文言を変えたらこの文字列も必ず更新すること。
     const chars =
-      "ウカレル今日の15問が未来を変える。独学でも迷わない事前登録受付中今やること合格まで現在地苦手分析可視化弱点を特定dokugakulink.com";
+      "ウカレル今日は、15問だけ。独学でも迷わない。App Storeで配信中事前登録受付中今やること合格までの現在地苦手分析迷わず学習を始める合格まで可視化弱点を特定dokugakulink.com";
     const cssRes = await fetch(
       `https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&text=${encodeURIComponent(chars)}&display=block`,
       { headers: { "User-Agent": "Mozilla/5.0 (compatible; bot)" } }
