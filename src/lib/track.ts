@@ -35,6 +35,14 @@ export function trackCtaClicked(params: Params): void {
   phCapture("waitlist_cta_clicked", p);
 }
 
+/** 公開後LPからApp Storeへ進むクリック。Leadとは分けて計測する。 */
+export function trackAppStoreCtaClicked(params: Params): void {
+  const p = withUtm(params);
+  sendGAEvent("app_store_cta_clicked", p);
+  metaTrackCustom("app_store_cta_clicked", params);
+  phCapture("app_store_cta_clicked", p);
+}
+
 /** フォーム入力開始（最初の1回のみ）。 */
 export function trackFormStarted(params: Params): void {
   const p = withUtm(params);
