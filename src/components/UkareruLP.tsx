@@ -63,6 +63,20 @@ const RELEASED_FAQ = [
 
 export default function UkareruLP({ source }: { source: string }) {
   const isReleased = isUkareruReleased();
+  // ヒーローの端末画像。カルーセル（LpShotsCarousel）と同じ公開判定で素材を切り替える。
+  const heroShot = isReleased
+    ? {
+        src: "/screenshots/ukareru-b17/01_home.png",
+        alt: "ウカレルのホーム画面。今日の15問が表示されている。",
+        width: 1320,
+        height: 2868,
+      }
+    : {
+        src: "/screenshots/ukareru/01_home.webp",
+        alt: "ウカレルのホーム画面。今日やるべき学習が表示されている。",
+        width: 828,
+        height: 1792,
+      };
 
   return (
     <div className="lp-root">
@@ -138,10 +152,10 @@ export default function UkareruLP({ source }: { source: string }) {
           <div className="uk-hero-visual">
             <div className="uk-phone">
               <Image
-                src="/screenshots/ukareru-b17/01_home.png"
-                alt="ウカレルのホーム画面。今日やるべき学習が表示されている。"
-                width={1320}
-                height={2868}
+                src={heroShot.src}
+                alt={heroShot.alt}
+                width={heroShot.width}
+                height={heroShot.height}
                 preload
                 sizes="(max-width: 720px) 60vw, 300px"
                 className="uk-phone-img"
