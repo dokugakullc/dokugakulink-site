@@ -20,6 +20,7 @@ const validContact = {
   email: "taro@example.com",
   message: "問い合わせ本文です。",
   contact_type: "service",
+  privacy_consent: true,
 };
 
 // ── validateContactInput ─────────────────────────────────────────────
@@ -30,6 +31,7 @@ test("contact: 正常入力は ok=true・trim される", () => {
     message: " 本文 ",
     contact_type: "service",
     company: "  テスト社  ",
+    privacy_consent: true,
   });
   assert.equal(r.ok, true);
   if (r.ok) {
@@ -47,7 +49,7 @@ test("contact: contact_type は必須・許可リスト外/欠落は拒否、com
   // 許可リスト外 → 拒否
   assert.equal(validateContactInput({ ...validContact, contact_type: "hacker" }).ok, false);
   // 全許可値 → ok
-  for (const t of ["service", "partnership", "media", "support", "other"]) {
+  for (const t of ["service", "partnership", "media", "support", "app_billing", "wealth", "other"]) {
     assert.equal(validateContactInput({ ...validContact, contact_type: t }).ok, true, t);
   }
   // company 未指定 → ok（空文字）
@@ -56,6 +58,18 @@ test("contact: contact_type は必須・許可リスト外/欠落は拒否、com
   if (r.ok) assert.equal(r.value.company, "");
   // company 上限超過 → 拒否
   assert.equal(validateContactInput({ ...validContact, company: "あ".repeat(121) }).ok, false);
+});
+
+test("contact: プライバシーポリシー同意は真偽値 true のときだけ受理", () => {
+  const noConsent: Record<string, unknown> = { ...validContact };
+  delete noConsent.privacy_consent;
+  for (const v of [undefined, false, "true", 1, null, "on"]) {
+    const r = validateContactInput({ ...noConsent, privacy_consent: v });
+    assert.equal(r.ok, false, String(v));
+    if (!r.ok) assert.equal(r.code, "privacy_consent_required");
+  }
+  assert.equal(validateContactInput(noConsent).ok, false);
+  assert.equal(validateContactInput(validContact).ok, true);
 });
 
 test("contact: 空/空白のみ/改行のみを拒否", () => {

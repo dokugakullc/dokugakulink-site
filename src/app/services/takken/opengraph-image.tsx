@@ -1,12 +1,16 @@
 import { ImageResponse } from "next/og";
+import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 async function fetchFont(): Promise<ArrayBuffer | null> {
   try {
+    // このOGPで描画しうる全文字（公開前ラベル「事前登録受付中」と公開後ラベル
+    // 「App Storeで配信中」の両方を含む）。text= のサブセット取得のため、
+    // 文言を変えたらこの文字列も必ず更新すること。
     const chars =
-      "ウカレル今日の15問が未来を変える。独学でも迷わない事前登録受付中今やること合格まで現在地苦手分析可視化弱点を特定dokugakulink.com";
+      "ウカレル今日は、15問だけ。独学でも迷わない。App Storeで配信中事前登録受付中今やること合格までの現在地苦手分析迷わず学習を始める合格まで可視化弱点を特定dokugakulink.com";
     const cssRes = await fetch(
       `https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&text=${encodeURIComponent(chars)}&display=block`,
       { headers: { "User-Agent": "Mozilla/5.0 (compatible; bot)" } }
@@ -21,6 +25,7 @@ async function fetchFont(): Promise<ArrayBuffer | null> {
 }
 
 export default async function Image() {
+  const isReleased = isUkareruReleased();
   const font = await fetchFont();
   const fontFamily = font ? '"Noto Sans JP", sans-serif' : "sans-serif";
 
@@ -82,10 +87,10 @@ export default async function Image() {
 
           <div style={{ display: "flex", flexDirection: "column", marginBottom: 20 }}>
             <span style={{ fontSize: 70, fontWeight: 700, color: "white", lineHeight: 1.2 }}>
-              今日の15問が、
+              今日は、
             </span>
             <span style={{ fontSize: 70, fontWeight: 700, color: "#93c5fd", lineHeight: 1.2 }}>
-              未来を変える。
+              15問だけ。
             </span>
           </div>
 
@@ -108,7 +113,7 @@ export default async function Image() {
               }}
             >
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80" }} />
-              <span style={{ color: "white", fontSize: 20, fontWeight: 700 }}>事前登録受付中</span>
+              <span style={{ color: "white", fontSize: 20, fontWeight: 700 }}>{isReleased ? "App Storeで配信中" : "事前登録受付中"}</span>
             </div>
           </div>
 

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HomeScreen, ProblemScreen } from "@/components/AppMockup";
+import AppStoreCta from "@/components/AppStoreCta";
+import InkanServiceCard from "@/components/InkanServiceCard";
+import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const metadata: Metadata = {
   alternates: {
@@ -9,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
+  const released = isUkareruReleased();
   return (
     <>
       {/* Hero */}
@@ -123,7 +127,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 開発中のサービス */}
+      {/* ウカレル（公開状態で「開発中」⇔「配信中」を切り替える） */}
       <section className="bg-white py-24 md:py-32">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -132,16 +136,25 @@ export default function Home() {
               <div className="flex items-center gap-3 mb-6">
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
                   <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                  開発中
+                  {released ? "配信中" : "開発中"}
                 </span>
                 <p className="text-xs font-semibold uppercase tracking-widest text-blue-700">Service</p>
               </div>
               <p className="text-xl font-bold text-[#0d2545] mb-2 leading-tight">ウカレル</p>
               <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-2 leading-tight">
-                宅建独学を合格まで導く学習アプリ
+                宅建士学習アプリ
               </h2>
-              <p className="text-sm text-gray-500 mb-2">リリース準備中</p>
-              <p className="text-sm font-medium text-blue-700 mb-6">事前登録受付中</p>
+              {released ? (
+                <>
+                  <p className="text-sm text-gray-500 mb-2">App Storeで配信中（iPhone）</p>
+                  <p className="text-sm font-medium text-blue-700 mb-6">無料ダウンロード</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-500 mb-2">リリース準備中</p>
+                  <p className="text-sm font-medium text-blue-700 mb-6">事前登録受付中</p>
+                </>
+              )}
               <p className="text-base font-bold text-[#0d2545] mb-6 italic">
                 「今日の15問が、未来を変える。」
               </p>
@@ -161,15 +174,26 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-sm text-gray-600 leading-loose mb-8">
-                ウカレルは、独学で資格取得を目指す社会人のための合格ナビゲーションアプリです。
+                ウカレルは、独学で資格取得を目指す社会人のための宅建士学習アプリです。
                 Phase 1では宅地建物取引士試験に対応し、将来的にFP・簿記・行政書士へ展開します。
               </p>
-              <Link
-                href="/services/takken"
-                className="inline-flex items-center px-7 py-3.5 bg-[#0d2545] text-white text-sm font-semibold rounded hover:bg-[#142f5a] transition-colors"
-              >
-                詳しく見る &rarr;
-              </Link>
+              <div className="flex flex-wrap gap-4">
+                {released && (
+                  <AppStoreCta
+                    source="home"
+                    location="service"
+                    className="inline-flex items-center px-7 py-3.5 bg-[#007AFF] text-white text-sm font-semibold rounded hover:bg-[#0055CC] transition-colors"
+                  >
+                    App Storeで無料ダウンロード
+                  </AppStoreCta>
+                )}
+                <Link
+                  href="/services/takken"
+                  className="inline-flex items-center px-7 py-3.5 bg-[#0d2545] text-white text-sm font-semibold rounded hover:bg-[#142f5a] transition-colors"
+                >
+                  詳しく見る &rarr;
+                </Link>
+              </div>
             </div>
 
             {/* モックアップ */}
@@ -179,6 +203,22 @@ export default function Home() {
                 <ProblemScreen />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Webサービス */}
+      <section className="bg-[#f5f7fa] py-20 md:py-24">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Web Service</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-4 leading-tight">Webサービス</h2>
+              <p className="text-sm text-gray-600 leading-loose">
+                日々の業務を少し楽にする、無料のWebサービスを公開しています。
+              </p>
+            </div>
+            <InkanServiceCard />
           </div>
         </div>
       </section>
@@ -193,13 +233,22 @@ export default function Home() {
             {/* アプリ概要 */}
             <div className="border border-white/20 rounded-lg p-8 bg-white/5">
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs font-medium text-blue-300 border border-blue-400/40 px-3 py-1 rounded-full">開発中</span>
+                <span className="text-xs font-medium text-blue-300 border border-blue-400/40 px-3 py-1 rounded-full">{released ? "App Storeで配信中" : "開発中"}</span>
               </div>
-              <h3 className="text-xl font-bold mb-3">宅地建物取引士試験 独学支援アプリ</h3>
+              <h3 className="text-xl font-bold mb-3">宅建士学習アプリ「ウカレル」</h3>
               <p className="text-blue-100 text-sm leading-loose mb-5">
                 「今日やるべき学習が分かる仕組み」と「学習継続を支援する体験設計」によって、
                 独学での宅建合格率向上を目指しています。
               </p>
+              {released && (
+                <AppStoreCta
+                  source="home"
+                  location="now_building"
+                  className="inline-flex items-center mr-6 mb-3 text-sm font-medium text-white underline underline-offset-4 hover:text-blue-200 transition-colors"
+                >
+                  App Storeで見る &rarr;
+                </AppStoreCta>
+              )}
               <Link
                 href="/services/takken"
                 className="inline-flex items-center text-sm font-medium text-blue-300 hover:text-white transition-colors"
@@ -211,17 +260,17 @@ export default function Home() {
             {/* 数値・ゴール */}
             <div className="space-y-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-4">対応予定 4資格</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-4">{released ? "対応資格（予定を含む）" : "対応予定 4資格"}</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: "宅建士", note: "開発中" },
+                    { label: "宅建士", note: released ? "配信中" : "開発中" },
                     { label: "FP", note: "予定" },
                     { label: "行政書士", note: "予定" },
                     { label: "簿記", note: "予定" },
                   ].map(({ label, note }) => (
                     <div key={label} className="bg-white/10 rounded-lg px-4 py-3 flex items-center justify-between">
                       <span className="text-sm font-medium">{label}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${note === "開発中" ? "bg-blue-500/30 text-blue-200" : "bg-white/10 text-white/50"}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${note === "開発中" || note === "配信中" ? "bg-blue-500/30 text-blue-200" : "bg-white/10 text-white/50"}`}>
                         {note}
                       </span>
                     </div>
@@ -263,8 +312,10 @@ export default function Home() {
               {
                 phase: "Phase 1",
                 title: "宅建アプリ開発",
-                status: "進行中",
-                current: true,
+                // 配信開始月は App Store Connect で Owner 確認待ち（PLAN.md 決定事項）。
+                status: released ? "完了" : "進行中",
+                note: released ? "2026年9月 App Store配信開始" : undefined,
+                current: !released,
                 items: ["問題データベース構築", "間隔反復アルゴリズム実装", "学習継続UX設計"],
               },
               {
@@ -281,7 +332,7 @@ export default function Home() {
                 current: false,
                 items: ["教材・システム統合", "コミュニティ機能構築", "行政書士他へ展開"],
               },
-            ].map(({ phase, title, status, current, items }) => (
+            ].map(({ phase, title, status, note, current, items }: { phase: string; title: string; status: string; note?: string; current: boolean; items: string[] }) => (
               <div
                 key={phase}
                 className={`rounded-lg p-6 border ${
@@ -298,7 +349,8 @@ export default function Home() {
                     {status}
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-[#0d2545] mb-4">{title}</h3>
+                <h3 className={`text-base font-bold text-[#0d2545] ${note ? "mb-1" : "mb-4"}`}>{title}</h3>
+                {note && <p className="text-xs font-medium text-blue-700 mb-4">{note}</p>}
                 <ul className="space-y-2">
                   {items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-xs text-gray-600">

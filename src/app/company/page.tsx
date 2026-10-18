@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import AppStoreCta from "@/components/AppStoreCta";
+import InkanServiceCard from "@/components/InkanServiceCard";
+import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const metadata: Metadata = {
   title: "会社概要",
@@ -11,11 +14,11 @@ export const metadata: Metadata = {
 };
 
 const milestones = [
-  { year: "2025", label: "宅建アプリ開発開始", current: true, goal: false },
-  { year: "2026", label: "宅建学習サービス提供開始", current: false, goal: false },
-  { year: "2027", label: "FP・簿記へ展開", current: false, goal: false },
-  { year: "2028", label: "行政書士へ展開", current: false, goal: false },
-  { year: "2030", label: "オンライン学習プラットフォーム完成", current: false, goal: true },
+  { year: "2025", label: "宅建アプリ開発開始", goal: false },
+  { year: "2026", label: "宅建学習サービス提供開始", goal: false },
+  { year: "2027", label: "FP・簿記へ展開", goal: false },
+  { year: "2028", label: "行政書士へ展開", goal: false },
+  { year: "2030", label: "オンライン学習プラットフォーム完成", goal: true },
 ];
 
 const features = [
@@ -59,6 +62,7 @@ const features = [
 
 const companyInfo = [
   { label: "会社名", value: "dokugaku link合同会社" },
+  { label: "代表社員", value: "陣内 智徳" },
   { label: "設立", value: "2025年10月27日（令和7年10月27日）" },
   { label: "法人番号", value: "2120003031128" },
   { label: "所在地", value: "〒530-0001\n大阪市北区梅田1-1-3\n大阪駅前第3ビル29階1-1-1号室" },
@@ -70,6 +74,9 @@ const companyInfo = [
 ];
 
 export default function CompanyPage() {
+  const released = isUkareruReleased();
+  // 「現在」マーク：公開前は開発開始（2025）、配信開始後は提供開始（2026）に置く。
+  const currentYear = released ? "2026" : "2025";
   return (
     <div className="bg-white">
 
@@ -123,7 +130,9 @@ export default function CompanyPage() {
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
-              { number: "1", unit: "件", label: "開発中サービス", sub: "宅建独学支援アプリ" },
+              released
+                ? { number: "1", unit: "件", label: "配信中アプリ", sub: "宅建士学習アプリ「ウカレル」" }
+                : { number: "1", unit: "件", label: "開発中サービス", sub: "宅建士学習アプリ" },
               { number: "1", unit: "事業", label: "提供中サービス", sub: "ウェルスコンサルティング" },
               { number: "4", unit: "資格", label: "展開予定資格", sub: "宅建・FP・行政書士・簿記" },
               { number: "4", unit: "領域", label: "対象領域", sub: "教育・資産形成・不動産・テクノロジー" },
@@ -232,7 +241,7 @@ export default function CompanyPage() {
             <div className="md:col-span-3">
               <div className="relative">
                 <div className="absolute top-2 bottom-2 left-[4.25rem] w-px bg-gray-200" />
-                {milestones.map(({ year, label, current, goal }) => (
+                {milestones.map(({ year, label, goal }) => { const current = year === currentYear; return (
                   <div key={year} className="flex items-start mb-8 last:mb-0">
                     <div className="w-16 pt-0.5 text-right pr-4 shrink-0">
                       <span className={`text-sm font-bold ${current ? "text-blue-700" : "text-gray-400"}`}>
@@ -262,7 +271,7 @@ export default function CompanyPage() {
                       )}
                     </div>
                   </div>
-                ))}
+                ); })}
               </div>
             </div>
           </div>
@@ -323,7 +332,7 @@ export default function CompanyPage() {
         </div>
       </section>
 
-      {/* 事業一覧・開発中プロジェクト */}
+      {/* 事業一覧・プロジェクト（公開状態で「開発中」⇔「配信中」を切り替える） */}
       <section className="py-20 md:py-28 bg-[#f5f7fa] border-b border-gray-100">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -345,15 +354,24 @@ export default function CompanyPage() {
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Projects</p>
-              <h2 className="text-lg font-bold text-[#0d2545] mb-6">開発中プロジェクト</h2>
+              <h2 className="text-lg font-bold text-[#0d2545] mb-6">{released ? "提供中のアプリ" : "開発中プロジェクト"}</h2>
               <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">開発中</span>
-                <p className="text-sm font-bold text-[#0d2545] mt-4 mb-2">宅建試験 独学支援アプリ</p>
+                <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">{released ? "App Storeで配信中" : "開発中"}</span>
+                <p className="text-sm font-bold text-[#0d2545] mt-4 mb-2">宅建士学習アプリ「ウカレル」</p>
                 <p className="text-xs text-gray-600 leading-loose">
                   今日やるべき学習が分かる仕組みと、学習継続を支援する体験設計で、
                   独学者の宅建合格率向上を目指すモバイルアプリ。
                 </p>
-                <div className="mt-4">
+                <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+                  {released && (
+                    <AppStoreCta
+                      source="company"
+                      location="projects"
+                      className="text-sm text-blue-700 font-medium hover:underline"
+                    >
+                      App Storeで見る &rarr;
+                    </AppStoreCta>
+                  )}
                   <Link
                     href="/services/takken"
                     className="text-sm text-blue-700 font-medium hover:underline"
@@ -362,6 +380,8 @@ export default function CompanyPage() {
                   </Link>
                 </div>
               </div>
+              <h2 className="text-lg font-bold text-[#0d2545] mt-10 mb-6">提供中のWebサービス</h2>
+              <InkanServiceCard compact />
             </div>
           </div>
         </div>

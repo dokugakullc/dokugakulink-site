@@ -527,3 +527,96 @@
   /* keep final CTA clear of the sticky bar */
   .lp-root .uk-final { padding-bottom: 120px; }
 }
+
+/* ファーストビュー内の事前登録フォーム。
+   ヒーローは明るい背景・フォームは白文字前提のため、暗いカードで包んでコントラストを確保する。 */
+.uk-hero-form {
+  background: #0d2545;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 10px 30px rgba(13, 37, 69, 0.18);
+}
+.uk-hero-form-alt {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #5b6b7f;
+}
+.uk-hero-form-alt-link {
+  color: #007aff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+@media (max-width: 720px) {
+  .uk-hero-form { padding: 16px; border-radius: 16px; }
+}
+
+/* ヒーロー内の即時特典の説明 */
+.uk-hero-offer {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  background: #eef5ff;
+  border: 1px solid #d3e5fb;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #1c3557;
+}
+
+/* S1.5 開発状況 */
+.uk-status { background: #f7f9fc; border-top: 1px solid #e6edf6; border-bottom: 1px solid #e6edf6; }
+.uk-status-h { font-size: 22px; line-height: 1.45; margin: 0 0 14px; }
+.uk-status-body { margin: 0 0 10px; line-height: 1.9; color: #33465e; }
+.uk-status-note { margin: 12px 0 0; font-size: 13px; color: #6b7b8f; }
+
+/* Waitlist guide — 登録特典の中身と利用後の変化を具体化 */
+.uk-guide-showcase { background: #fff; }
+.uk-guide-grid { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: 64px; align-items: center; }
+.uk-guide-preview { max-width: 390px; margin: 0 auto; padding: 10px; border: 1px solid #dbe4ef; border-radius: 18px; background: #fff; box-shadow: 0 22px 54px rgba(13,37,69,.14); transform: rotate(-1.2deg); }
+.uk-guide-preview-img { display: block; width: 100%; height: auto; border-radius: 10px; }
+.uk-guide-copy h2 { margin: 10px 0 18px; }
+.uk-guide-lead { color: #33465e; line-height: 1.9; margin-bottom: 24px; }
+.uk-guide-benefits { list-style: none; display: grid; gap: 12px; margin: 0 0 22px; padding: 0; }
+.uk-guide-benefits li { position: relative; display: grid; gap: 3px; padding: 14px 16px 14px 46px; border: 1px solid #e1e8f0; border-radius: 14px; background: #f8fafc; }
+.uk-guide-benefits li::before { content: "✓"; position: absolute; left: 18px; top: 15px; color: var(--blue); font-weight: 800; }
+.uk-guide-benefits strong { color: var(--text); }
+.uk-guide-benefits span { color: var(--t2); font-size: 14px; line-height: 1.6; }
+.uk-guide-outcome { margin-bottom: 24px; padding: 16px 18px; border-left: 4px solid var(--blue); background: var(--blue-s); color: #33465e; line-height: 1.75; }
+.uk-guide-note { margin-top: 12px; color: var(--t3); font-size: 12px; line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .uk-guide-grid { grid-template-columns: 1fr; gap: 38px; }
+  .uk-guide-preview { width: min(82vw, 330px); }
+}
+
+/* S3.5 復習設計 */
+.uk-review-lead { margin: 14px auto 16px; max-width: 620px; line-height: 1.95; color: #33465e; }
+.uk-review-list { list-style: none; padding: 0; margin: 0 auto 14px; max-width: 620px; }
+.uk-review-list li { position: relative; padding-left: 26px; margin-bottom: 10px; line-height: 1.7; }
+.uk-review-list li::before {
+  content: "✓"; position: absolute; left: 0; top: 0;
+  color: #007aff; font-weight: 700;
+}
+.uk-review-note { max-width: 620px; margin: 0 auto; font-size: 13px; color: #6b7b8f; line-height: 1.8; }
+
+.uk-register-trust-link { color: #93c5fd; text-decoration: underline; text-underline-offset: 2px; }
+
+@media (max-width: 720px) {
+  .uk-status-h { font-size: 19px; }
+  .uk-hero-offer { font-size: 13.5px; padding: 11px 12px; }
+}
+
+/* 公開後ヒーロー：Apple 公式バッジ＋（PCのみ）QRコード */
+.uk-hero-store { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.uk-store-badge { display: inline-block; line-height: 0; }
+.uk-store-badge img { display: block; height: 60px; width: auto; }
+.uk-store-badge:focus-visible { outline: 2px solid #007aff; outline-offset: 4px; border-radius: 10px; }
+.uk-store-qr { display: none; align-items: center; gap: 12px; }
+.uk-store-qr img { display: block; width: 96px; height: 96px; border: 1px solid #e1e8f0; border-radius: 8px; }
+.uk-store-qr p { margin: 0; font-size: 12px; line-height: 1.6; color: #6b7b8f; }
+@media (min-width: 1024px) {
+  .uk-store-qr { display: flex; }
+}
+@media (max-width: 768px) {
+  .uk-hero-store { justify-content: center; }
+}

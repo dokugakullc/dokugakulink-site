@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { trackCtaClicked } from "@/lib/track";
 import { resolveVariant } from "@/lib/ab";
+import AppStoreCta from "@/components/AppStoreCta";
 
 const navLinks = [
   { href: "/", label: "ホーム" },
@@ -14,7 +15,7 @@ const navLinks = [
   { href: "/contact", label: "お問い合わせ" },
 ];
 
-export default function Header() {
+export default function Header({ ukareruReleased = false }: { ukareruReleased?: boolean }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   // 広告LP（Meta広告の正本遷移先）。回遊導線を排し、登録一点に集中させる。
@@ -37,15 +38,25 @@ export default function Header() {
                 dokugaku link
               </span>
             </span>
-            <a
-              href="#register"
-              onClick={() =>
-                trackCtaClicked({ source: "landing_takken", location: "header", variant: resolveVariant() })
-              }
-              className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#007AFF] text-white text-[13px] sm:text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
-            >
-              無料で事前登録
-            </a>
+            {ukareruReleased ? (
+              <AppStoreCta
+                source="landing_takken"
+                location="header"
+                className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#007AFF] text-white text-[13px] sm:text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
+              >
+                App Storeで始める
+              </AppStoreCta>
+            ) : (
+              <a
+                href="#register"
+                onClick={() =>
+                  trackCtaClicked({ source: "landing_takken", location: "header", variant: resolveVariant() })
+                }
+                className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#007AFF] text-white text-[13px] sm:text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
+              >
+                無料ガイドを受け取る
+              </a>
+            )}
           </div>
         </div>
       </header>
@@ -77,14 +88,19 @@ export default function Header() {
                 </Link>
               ))}
             </nav>
-            {isServiceLP && (
-              <a
-                href="#register"
+            {isServiceLP && (ukareruReleased ? (
+              <AppStoreCta
+                source="services_takken"
+                location="header"
                 className="px-5 py-2.5 bg-[#007AFF] text-white text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap"
               >
-                リリース通知を受け取る
+                App Storeで始める
+              </AppStoreCta>
+            ) : (
+              <a href="#register" className="px-5 py-2.5 bg-[#007AFF] text-white text-sm font-bold rounded-full hover:bg-[#0055CC] transition-colors whitespace-nowrap">
+                無料ガイドを受け取る
               </a>
-            )}
+            ))}
           </div>
 
           <button

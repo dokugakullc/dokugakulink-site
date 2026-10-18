@@ -34,7 +34,7 @@ export default function Footer() {
         <div className="mx-auto max-w-3xl px-6 py-12 text-center">
           <p className="text-base font-bold tracking-tight">dokugaku link合同会社</p>
           <p className="mt-2 text-sm text-blue-100/80 leading-relaxed">
-            宅建学習アプリ「ウカレル」を提供しています。
+            宅建士学習アプリ「ウカレル」を提供しています。
           </p>
           <nav className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             {adLpLinks.map(({ href, label }) => (

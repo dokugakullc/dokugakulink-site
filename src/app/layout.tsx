@@ -8,6 +8,7 @@ import MicrosoftClarity from "@/components/MicrosoftClarity";
 import MetaPixel from "@/components/MetaPixel";
 import PostHog from "@/components/PostHog";
 import { isProductionDeployment } from "@/lib/deployEnv";
+import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -112,7 +113,7 @@ export default function RootLayout({
         <MicrosoftClarity />
         {enableProductionTracking && <MetaPixel />}
         <PostHog />
-        <Header />
+        <Header ukareruReleased={isUkareruReleased()} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

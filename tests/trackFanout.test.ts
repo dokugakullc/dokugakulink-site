@@ -160,6 +160,20 @@ test("Meta イベントには UTM も fbclid も付与されない", () => {
   assert.deepEqual(metaParams("landing_page_view"), { source: "hero" });
 });
 
+test("App Store CTA: GA4/PostHog/Metaへ1回ずつ送信し、Leadには数えない", () => {
+  track.trackAppStoreCtaClicked({ source: "landing_takken", location: "hero" });
+
+  assert.equal(gaCount("app_store_cta_clicked"), 1);
+  assert.equal(gaParams("app_store_cta_clicked")!.utm_campaign, "prelaunch_202608");
+  assert.equal(gaParams("app_store_cta_clicked")!.location, "hero");
+  assert.equal(phParams("app_store_cta_clicked")!.utm_source, "meta");
+  assert.deepEqual(metaParams("app_store_cta_clicked"), {
+    source: "landing_takken",
+    location: "hero",
+  });
+  assert.equal(metaStdCount("Lead"), 0);
+});
+
 test("GA4/PostHog/Meta のいずれにも fbclid は流れない", () => {
   track.trackSubmitted({ source: "form" });
   for (const p of [gaParams("waitlist_submitted"), phParams("waitlist_submitted"), metaParams("Lead")]) {

@@ -52,6 +52,7 @@ const contactBody = (over: Record<string, unknown> = {}) => ({
   email: "taro@example.com",
   message: "本文です",
   contact_type: "service",
+  privacy_consent: true,
   turnstileToken: TOKEN,
   ...over,
 });

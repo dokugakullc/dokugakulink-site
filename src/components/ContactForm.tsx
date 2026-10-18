@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CONTACT_LIMITS, CONTACT_TYPES, CONTACT_TYPE_VALUES, EMAIL_RE, HONEYPOT_FIELD } from "@/lib/formSecurity";
 import { resolveSubmissionId, type SubmissionState } from "@/lib/submission";
@@ -12,7 +13,7 @@ const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const TURNSTILE_ENABLED = process.env.NEXT_PUBLIC_TURNSTILE_ENABLED;
 
 type Status = "idle" | "sending" | "success" | "error";
-type FieldKey = "name" | "email" | "contactType" | "company" | "message" | "turnstile";
+type FieldKey = "name" | "email" | "contactType" | "company" | "message" | "consent" | "turnstile";
 type FieldErrors = Partial<Record<FieldKey, string>>;
 
 const { NAME_MAX, EMAIL_MAX, MESSAGE_MAX, COMPANY_MAX } = CONTACT_LIMITS;
@@ -24,6 +25,7 @@ function validateFields(values: {
   contactType: string;
   company: string;
   message: string;
+  consent: boolean;
 }): FieldErrors {
   const errors: FieldErrors = {};
   const name = values.name.trim();
@@ -40,6 +42,7 @@ function validateFields(values: {
   if (company.length > COMPANY_MAX) errors.company = `会社名は${COMPANY_MAX}文字以内で入力してください。`;
   if (!message) errors.message = "お問い合わせ内容を入力してください。";
   else if (message.length > MESSAGE_MAX) errors.message = `お問い合わせ内容は${MESSAGE_MAX}文字以内で入力してください。`;
+  if (!values.consent) errors.consent = "プライバシーポリシーへの同意が必要です。";
   return errors;
 }
 
@@ -53,6 +56,7 @@ export default function ContactForm() {
   const [contactType, setContactType] = useState("");
   const [company, setCompany] = useState("");
   const [message, setMessage] = useState("");
+  const [consent, setConsent] = useState(false);
   // honeypot（通常は空）。値が入るのは自動化ツールのみ。
   const [hp, setHp] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -72,6 +76,7 @@ export default function ContactForm() {
   const emailRef = useRef<HTMLInputElement>(null);
   const contactTypeRef = useRef<HTMLSelectElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const consentRef = useRef<HTMLInputElement>(null);
   const formErrorRef = useRef<HTMLParagraphElement>(null);
   const successRef = useRef<HTMLParagraphElement>(null);
   // 同期ロック（React state に依存しない多重送信防止）
@@ -92,6 +97,7 @@ export default function ContactForm() {
     else if (errors.email) emailRef.current?.focus();
     else if (errors.contactType) contactTypeRef.current?.focus();
     else if (errors.message) messageRef.current?.focus();
+    else if (errors.consent) consentRef.current?.focus();
   };
 
   const clearFieldError = (key: FieldKey) =>
@@ -105,6 +111,7 @@ export default function ContactForm() {
     setContactType("");
     setCompany("");
     setMessage("");
+    setConsent(false);
     setHp("");
     setFieldErrors({});
     setErrorMessage("");
@@ -121,7 +128,7 @@ export default function ContactForm() {
     // 同期ロック: 同一tickの多重送信を即時遮断（state 更新の遅延に依存しない）
     if (submitGuard.isLocked()) return;
 
-    const errors = validateFields({ name, email, contactType, company, message });
+    const errors = validateFields({ name, email, contactType, company, message, consent });
     // Turnstile: SiteKey 設定時は token 取得まで送信不可（未取得・期限切れ・エラーで null）。
     if (!canSubmitTurnstile({ siteConfigured: turnstileActive, token: turnstileToken })) {
       errors.turnstile = "認証の確認が完了していません。少し待つか、チェックをやり直してください。";
@@ -154,6 +161,7 @@ export default function ContactForm() {
           message,
           contact_type: contactType,
           company,
+          privacy_consent: consent,
           submissionId: next.id,
           attribution: getAttribution(),
           // Turnstile token は固定フィールドで送る（サーバーで検証・保存/メール/Analytics には出さない）。
@@ -202,7 +210,7 @@ export default function ContactForm() {
         <p className="text-sm text-gray-600 leading-loose">
           {confirmationSent ? (
             <>
-              ご登録のメールアドレスに受付完了メールをお送りしました。<br />
+              ご入力いただいたメールアドレスに受付完了メールをお送りしました。<br />
               通常2営業日以内にご返信いたします。
             </>
           ) : (
@@ -381,6 +389,38 @@ export default function ContactForm() {
         {fieldErrors.message && (
           <p id="message-error" className="mt-2 text-sm text-red-600">
             {fieldErrors.message}
+          </p>
+        )}
+      </div>
+
+      {/* プライバシーポリシー同意（必須）。サーバー側でも privacy_consent === true を検証する。 */}
+      <div>
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            ref={consentRef}
+            type="checkbox"
+            required
+            aria-required="true"
+            checked={consent}
+            onChange={(e) => {
+              setConsent(e.target.checked);
+              clearFieldError("consent");
+            }}
+            disabled={sending}
+            aria-invalid={fieldErrors.consent ? true : undefined}
+            aria-describedby={fieldErrors.consent ? "consent-error" : undefined}
+            className="mt-1 w-4 h-4 shrink-0 accent-[#0d2545]"
+          />
+          <span className="text-sm text-gray-700 leading-relaxed">
+            <Link href="/privacy" target="_blank" className="text-blue-700 underline underline-offset-2 hover:text-blue-900">
+              プライバシーポリシー
+            </Link>
+            に同意のうえ送信します。 <span className="text-red-500" aria-hidden="true">*</span>
+          </span>
+        </label>
+        {fieldErrors.consent && (
+          <p id="consent-error" className="mt-2 text-sm text-red-600">
+            {fieldErrors.consent}
           </p>
         )}
       </div>
