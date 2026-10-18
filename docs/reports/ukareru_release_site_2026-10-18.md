@@ -20,7 +20,7 @@ App Store で配信中のウカレルに合わせて、サイト全体を「配�
 | LP（`/services/takken`・`/landing/takken`） | ヒーローの CTA を Apple 公式バッジ（toolbox.marketingtools.apple.com から取得・無改変）に変更。PC 幅（1024px 以上）のみ App Store の QR コード。公開後のみ `apple-itunes-app`（Safari のスマートアプリバナー）。 |
 | トップ | ウカレル欄・「現在取り組んでいること」・ロードマップ（Phase 1＝完了・2026年9月 App Store 配信開始／Phase 2＝準備中）を公開状態で切替。App Store CTA を追加。 |
 | 事業内容・会社概要 | 「開発中」「リリース準備中」「事前登録受付中」を配信中表記へ切替。数字欄・ロードマップの「現在」マーク・プロジェクト欄。 |
-| お知らせ | 日付を `YYYY-MM-DD`（または `YYYY-MM`）で持ち、日付の新しい順に並べる。配信開始記事（2026-09-20・**要確認**・公開後のみ）。過去記事のタグは公開後に「受付終了」または非表示。 |
+| お知らせ | 日付を `YYYY-MM-DD`（または `YYYY-MM`）で持ち、日付の新しい順に並べる。配信開始記事（2026-09-20・Owner 確認済み・公開後のみ）。過去記事のタグは公開後に「受付終了」または非表示。 |
 
 ### P1：法務・問い合わせ
 
@@ -71,14 +71,13 @@ App Store で配信中のウカレルに合わせて、サイト全体を「配�
 
 ## 未確認事項
 
-- ウカレルの配信開始日（お知らせ記事は 2026-09-20。Owner の記憶。App Store Connect で要確認）。
 - お問い合わせの実送信（本番の環境変数が必要なため、ローカルでは送信していない）。
 - 本番（Vercel Production）での表示。環境変数の設定と再デプロイは Owner 作業。
 
 ## Owner がやること
 
 1. Vercel の Production 環境変数に `NEXT_PUBLIC_UKARERU_RELEASED=1` を設定して再デプロイ
-2. App Store Connect で配信開始日（2026-09-20 と記憶）を確認（サポートURL `/contact` は確認済み）
+2. ~~App Store Connect で配信開始日を確認~~ → 2026-09-20 で確定（Owner 確認済み）。サポートURL `/contact` も確認済み
 3. App Store 説明文の無料期間の表現を揃える（案は `docs/marketing/app-store-metadata-ja.md`）
 4. Google Search Console で主要ページの再クロールを依頼
-5. ウェルスコンサルの料金目安・成果物サンプルの提供
+5. ウェルスコンサルの料金目安・成果物サンプルを確定する（たたき台：`docs/business/wealth-consulting/`）

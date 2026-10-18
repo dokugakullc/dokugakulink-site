@@ -30,9 +30,9 @@
 ## Owner がやること
 
 1. Vercel の Production 環境変数に `NEXT_PUBLIC_UKARERU_RELEASED=1` を設定して再デプロイ
-2. App Store Connect で配信開始日を確認（お知らせ記事は **2026-09-20・要確認**。サポートURL `/contact` は確認済み）
+2. ~~App Store Connect で配信開始日を確認~~ → 2026-09-20 で確定（Owner 確認済み）。サポートURL `/contact` も確認済み
 3. App Store 説明文の無料期間の表現を揃える（案は `docs/marketing/app-store-metadata-ja.md`）
 4. Google Search Console で主要ページの再クロールを依頼
-5. ウェルスコンサルの料金目安・成果物サンプルの提供（**TODO：受領まで未掲載**）
+5. ウェルスコンサルの料金目安・成果物サンプル：たたき台を `docs/business/wealth-consulting/` に作成（**サイトには未掲載・Owner 確定待ち**）
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

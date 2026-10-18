@@ -40,7 +40,7 @@ const items: NewsItem[] = [
   },
   {
     slug: "ukareru-app-store-release",
-    // 配信開始日は Owner の記憶による。App Store Connect で確認するまで要確認（PLAN.md 決定事項）。
+    // 配信開始日は Owner 確認済み（2026-10-18）。
     date: "2026-09-20",
     category: "サービス",
     title: "宅建士学習アプリ「ウカレル」をApp Storeで配信開始しました",
