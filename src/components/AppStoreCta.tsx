@@ -1,6 +1,6 @@
 "use client";
 
-import { APP_STORE_URL } from "@/lib/appStore";
+import { appStoreCampaignUrl } from "@/lib/appStore";
 import { trackAppStoreCtaClicked } from "@/lib/track";
 
 export default function AppStoreCta({
@@ -16,7 +16,8 @@ export default function AppStoreCta({
 }) {
   return (
     <a
-      href={APP_STORE_URL}
+      // ct = 置き場所（例: landing_takken-hero）。App Store Connect の流入元で比較できるようにする。
+      href={appStoreCampaignUrl(`${source}-${location}`)}
       className={className}
       target="_blank"
       rel="noopener"

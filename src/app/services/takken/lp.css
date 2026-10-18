@@ -605,3 +605,18 @@
   .uk-status-h { font-size: 19px; }
   .uk-hero-offer { font-size: 13.5px; padding: 11px 12px; }
 }
+
+/* 公開後ヒーロー：Apple 公式バッジ＋（PCのみ）QRコード */
+.uk-hero-store { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.uk-store-badge { display: inline-block; line-height: 0; }
+.uk-store-badge img { display: block; height: 60px; width: auto; }
+.uk-store-badge:focus-visible { outline: 2px solid #007aff; outline-offset: 4px; border-radius: 10px; }
+.uk-store-qr { display: none; align-items: center; gap: 12px; }
+.uk-store-qr img { display: block; width: 96px; height: 96px; border: 1px solid #e1e8f0; border-radius: 8px; }
+.uk-store-qr p { margin: 0; font-size: 12px; line-height: 1.6; color: #6b7b8f; }
+@media (min-width: 1024px) {
+  .uk-store-qr { display: flex; }
+}
+@media (max-width: 768px) {
+  .uk-hero-store { justify-content: center; }
+}

@@ -5,7 +5,7 @@ import { handleContact, type ContactHandlerDeps } from "../src/lib/contactHandle
 import type { EmailKind, Inquiry } from "../src/lib/contactDelivery";
 import { makeReq } from "./helpers";
 
-const validBody = { name: "山田 太郎", email: "taro@example.com", message: "本文です", contact_type: "service" };
+const validBody = { name: "山田 太郎", email: "taro@example.com", message: "本文です", contact_type: "service", privacy_consent: true };
 
 type Sent = { kind: EmailKind; idempotencyKey: string; inquiry: Inquiry };
 
@@ -40,6 +40,19 @@ test("不正 JSON → 400", async () => {
 test("入力不正 → 400", async () => {
   const r = await handleContact(makeReq({ body: { name: "", email: "bad", message: "" } }), deps());
   assert.equal(r.status, 400);
+});
+
+test("プライバシーポリシー未同意 → 400・保存も送信もしない", async () => {
+  const sent: Sent[] = [];
+  const noConsent: Record<string, unknown> = { ...validBody };
+  delete noConsent.privacy_consent;
+  for (const body of [noConsent, { ...validBody, privacy_consent: false }, { ...validBody, privacy_consent: "true" }]) {
+    const r = await handleContact(makeReq({ body }), deps({ sent }));
+    assert.equal(r.status, 400);
+    assert.equal(r.body.success, undefined);
+    assert.equal(r.body.error, "プライバシーポリシーへの同意が必要です");
+  }
+  assert.equal(sent.length, 0);
 });
 
 test("honeypot 作動 → 400・非成功・受付/受付番号/確認メールを表示しない・送信0", async () => {

@@ -17,18 +17,18 @@ Obsidian Vault:
 必須参照:
 
 1. `00_PROJECT_INDEX.md`
-2. `00_Product_Constitution.md.md`
+2. `00_Product_Constitution.md`
 3. `01_IMPLEMENTATION_MAP.md`
 4. `02_ENVIRONMENT_REGISTRY.md`
 5. `03_CURRENT_SPRINT.md`
-6. `50_Website/00_README.md.md`
+6. `50_Website/00_README.md`
 
 対象に応じて、`50_Website` 内のDecision Log、Backlog、Analytics、Feature Policy、
 Roadmap、Brand Guidelines、Legal文書を読むこと。
 
 ## Web正本
 
-- ローカル: `/Users/tomonorijinnai/dokugakulink-site/`
+- ローカル: `/Users/tomonorijinnai/Development/dokugakulink-site/`
 - GitHub: `dokugakullc/dokugakulink-site`
 - ウカレルLP本体（共有コンポーネント）: `src/components/UkareruLP.tsx`
   - `src/app/landing/takken/`（**Meta広告・SNSの正本遷移先**。正本URL=`/landing/takken`）

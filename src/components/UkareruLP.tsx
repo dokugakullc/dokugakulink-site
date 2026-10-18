@@ -10,7 +10,7 @@ import { isUkareruReleased } from "@/lib/ukareruRelease";
 const FAQ = [
   {
     q: "ウカレルは何のアプリですか？",
-    a: "宅地建物取引士（宅建）試験の独学者に向けた学習アプリです。今日やるべき学習、合格までの現在地、苦手分野が分かり、働きながらでも迷わず学習を進められます。",
+    a: "宅地建物取引士（宅建）試験の独学者に向けた宅建士学習アプリです。今日やるべき学習、合格までの現在地、苦手分野が分かり、働きながらでも迷わず学習を進められます。",
   },
   {
     q: "いつリリースされますか？",
@@ -41,7 +41,7 @@ const FAQ = [
 const RELEASED_FAQ = [
   {
     q: "ウカレルは何のアプリですか？",
-    a: "宅建試験の独学者向け一問一答アプリです。今日の15問、苦手分析、合格までの現在地を通じて、次に何を学ぶか迷いにくくします。",
+    a: "宅建試験の独学者向けの宅建士学習アプリです（一問一答形式）。今日の15問、苦手分析、合格までの現在地を通じて、次に何を学ぶか迷いにくくします。",
   },
   {
     q: "利用料金はいくらですか？",
@@ -92,7 +92,7 @@ export default function UkareruLP({ source }: { source: string }) {
             <h1>今日は、<br />15問だけ。</h1>
             <p className="hero-tag">独学でも、<br />迷わない。</p>
             <p className="hero-sub">
-              毎日やることが分かる、宅建の一問一答。<br />働きながら独学で合格を目指す人の学習アプリです。
+              毎日やることが分かる、宅建の一問一答。<br />働きながら独学で合格を目指す人の宅建士学習アプリです。
             </p>
             {isReleased ? (
               <div className="uk-hero-cta">
@@ -100,9 +100,30 @@ export default function UkareruLP({ source }: { source: string }) {
                   登録から<strong>30日間、すべての機能を無料</strong>で利用できます。
                   無料期間の終了だけで自動課金されることはありません。
                 </p>
-                <AppStoreCta source={source} location="hero" className="btn btn-lg">
-                  App Storeで無料で始める
-                </AppStoreCta>
+                <div className="uk-hero-store">
+                  {/* Apple 公式バッジ（toolbox.marketingtools.apple.com から取得・改変しない） */}
+                  <AppStoreCta source={source} location="hero" className="uk-store-badge">
+                    <Image
+                      src="/badges/app-store-download-ja-black.svg"
+                      alt="App Storeからダウンロード"
+                      width={163}
+                      height={60}
+                      unoptimized
+                      preload
+                    />
+                  </AppStoreCta>
+                  {/* PC 表示のみ：iPhone のカメラで読み取って App Store を開く */}
+                  <div className="uk-store-qr">
+                    <Image
+                      src="/qr/app-store-ukareru.svg"
+                      alt="App StoreのウカレルのページへのQRコード"
+                      width={96}
+                      height={96}
+                      unoptimized
+                    />
+                    <p>iPhoneのカメラで<br />読み取ってダウンロード</p>
+                  </div>
+                </div>
                 <div className="cta-badges">
                   <div className="badge"><span className="badge-dot" />ダウンロード無料</div>
                   <div className="badge"><span className="badge-dot" />30日間すべての機能が無料</div>

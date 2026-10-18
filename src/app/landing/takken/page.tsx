@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import "../../services/takken/lp.css";
 import UkareruLP from "@/components/UkareruLP";
 import { isUkareruReleased } from "@/lib/ukareruRelease";
+import { APP_STORE_ID } from "@/lib/appStore";
 
-const title = "ウカレル｜宅建独学を合格まで導く学習アプリ";
+const title = "ウカレル｜独学で宅建合格を目指す宅建士学習アプリ";
 const description = isUkareruReleased()
-  ? "今日は15問だけ。今日やること、苦手分野、合格までの現在地が分かる、働きながら独学で宅建合格を目指す人のための一問一答アプリ。App Storeで無料配信中。"
-  : "今日は15問だけ。毎日やること、苦手分野、合格までの現在地が分かる宅建一問一答アプリ。事前登録で15問活用ガイドをすぐに受け取り、App Store公開時にお知らせします。";
+  ? "今日は15問だけ。今日やること、苦手分野、合格までの現在地が分かる、働きながら独学で宅建合格を目指す人のための宅建士学習アプリ（一問一答）。App Storeで無料配信中。"
+  : "今日は15問だけ。毎日やること、苦手分野、合格までの現在地が分かる宅建士学習アプリ（一問一答）。事前登録で15問活用ガイドをすぐに受け取り、App Store公開時にお知らせします。";
 
 export const metadata: Metadata = {
   title,
@@ -18,6 +19,14 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/landing/takken",
   },
+  // 広告専用LP。検索結果には /services/takken だけを出す（2026-10-18 Owner 決定）。
+  // URL・route・canonical は変えない（DEC-WEB-2026-07-21）。リンクは辿らせる。
+  robots: {
+    index: false,
+    follow: true,
+  },
+  // Safari のスマートアプリバナー（apple-itunes-app）。公開前は出さない。
+  ...(isUkareruReleased() ? { itunes: { appId: APP_STORE_ID } } : {}),
   icons: {
     icon: [
       { url: "/favicon-ukareru.svg", type: "image/svg+xml" },

@@ -61,7 +61,7 @@ const sections = [
     ),
   },
   {
-    title: "第5条（サブスクリプション）",
+    title: "第5条（サブスクリプション・返金）",
     body: (
       <>
         <p>
@@ -75,6 +75,9 @@ const sections = [
         </p>
         <p>
           プレミアムプランは、解約されるまで1か月ごとに自動更新されます。更新を停止する場合は、現在の契約期間が終了する24時間前までに、Apple IDのサブスクリプション設定から自動更新をオフにしてください。解約手続きはいつでも行うことができます。
+        </p>
+        <p>
+          デジタルコンテンツの性質上、購入後の返品・返金には原則として応じられません。返金の可否および手続きはAppleの定める条件に従います。ただし、法令上認められる場合はこの限りではありません。
         </p>
       </>
     ),
@@ -135,7 +138,11 @@ export default function TermsPage() {
             Terms of Service
           </p>
           <h1 className="text-3xl md:text-4xl font-bold leading-tight">利用規約</h1>
-          <p className="text-blue-100 text-sm mt-5">最終更新日：2026年7月24日</p>
+          <p className="text-blue-100 text-sm mt-5">
+            制定日：2026年7月5日
+            <br />
+            最終更新日：2026年10月18日
+          </p>
         </div>
       </div>
 

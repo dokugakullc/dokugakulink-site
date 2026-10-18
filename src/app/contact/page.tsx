@@ -200,6 +200,8 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600 leading-loose mt-3 mb-8">
             メールまたは下記フォームよりお問い合わせいただけます。
+            <br />
+            アプリ「ウカレル」に関するお問い合わせは {SUPPORT_EMAIL}、それ以外（会社・ウェルスコンサルティング・取材等）は info@dokugakulink.com で承ります。
           </p>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -249,7 +251,7 @@ export default function ContactPage() {
                 <h3 className="text-base font-bold text-[#0d2545]">お問い合わせフォーム</h3>
               </div>
               <p className="text-sm text-gray-600 leading-loose">
-                メールソフトをお使いでない場合は、下記フォームからもお問い合わせいただけます。内容を確認のうえ、ご登録のメールアドレスへご連絡いたします。
+                メールソフトをお使いでない場合は、下記フォームからもお問い合わせいただけます。内容を確認のうえ、ご入力いただいたメールアドレスへご連絡いたします。
               </p>
               <a
                 href="#contact-form"

@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import AppStoreCta from "@/components/AppStoreCta";
+import InkanServiceCard from "@/components/InkanServiceCard";
+import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const metadata: Metadata = {
   title: "事業内容",
   description:
-    "dokugaku link合同会社の事業内容。不動産・資産形成コンサルティングと、宅建・FP・行政書士・簿記などの独学支援アプリ開発を展開しています。",
+    "dokugaku link合同会社の事業内容。不動産・資産形成コンサルティングと、宅建・FP・行政書士・簿記などの資格学習アプリの開発を展開しています。",
   alternates: {
     canonical: "/business",
   },
 };
 
 export default function BusinessPage() {
+  const released = isUkareruReleased();
   return (
     <div className="bg-white">
       <div className="bg-[#0d2545] text-white">
@@ -201,6 +205,30 @@ export default function BusinessPage() {
                 </div>
               </div>
 
+              {/* 対応範囲 */}
+              <div>
+                <h3 className="text-sm font-bold text-[#0d2545] uppercase tracking-wider mb-5">
+                  対応範囲
+                </h3>
+                <div className="border border-gray-200 rounded-lg px-6 py-5 text-sm text-gray-600 leading-loose">
+                  不動産（購入・売却・保有）と資金計画に関する調査・分析・助言に限ります。株式・投資信託など有価証券の個別の投資判断に関する助言は行いません。
+                </div>
+              </div>
+
+              {/* 代表の保有資格 */}
+              <div>
+                <h3 className="text-sm font-bold text-[#0d2545] uppercase tracking-wider mb-5">
+                  代表の保有資格
+                </h3>
+                <ul className="flex flex-wrap gap-2">
+                  {["宅建士", "FP2級", "簿記2級", "証券外務員二種"].map((item) => (
+                    <li key={item} className="text-sm px-4 py-2 border border-gray-200 rounded-full text-[#0d2545] bg-white">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
             </div>
           </div>
         </div>
@@ -265,21 +293,30 @@ export default function BusinessPage() {
                 </div>
               </div>
 
-              {/* 現在開発中 */}
+              {/* 提供中／開発中のサービス（公開状態で切り替え） */}
               <div>
                 <h3 className="text-sm font-bold text-[#0d2545] uppercase tracking-wider mb-5">
-                  現在開発中のサービス
+                  {released ? "提供中のサービス" : "現在開発中のサービス"}
                 </h3>
                 <div className="border border-gray-200 rounded-lg p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">開発中</span>
+                    <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">{released ? "配信中" : "開発中"}</span>
                   </div>
                   <p className="text-xl font-bold text-[#0d2545] mb-1">ウカレル</p>
-                  <p className="text-base font-bold text-[#0d2545] mb-1">独学社会人のための合格ナビゲーションアプリ</p>
-                  <p className="text-sm text-gray-500 mb-1">リリース準備中</p>
-                  <p className="text-sm font-medium text-blue-700 mb-4">事前登録受付中</p>
+                  <p className="text-base font-bold text-[#0d2545] mb-1">独学社会人のための宅建士学習アプリ</p>
+                  {released ? (
+                    <>
+                      <p className="text-sm text-gray-500 mb-1">App Storeで配信中（iPhone）</p>
+                      <p className="text-sm font-medium text-blue-700 mb-4">無料ダウンロード</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-500 mb-1">リリース準備中</p>
+                      <p className="text-sm font-medium text-blue-700 mb-4">事前登録受付中</p>
+                    </>
+                  )}
                   <p className="text-sm text-gray-600 leading-loose mb-5">
-                    ウカレルは、独学で資格取得を目指す社会人のための合格ナビゲーションアプリです。
+                    ウカレルは、独学で資格取得を目指す社会人のための宅建士学習アプリです。
                     Phase 1では宅地建物取引士試験に対応し、将来的にFP・簿記・行政書士へ展開します。
                   </p>
                   <ul className="space-y-2">
@@ -295,6 +332,23 @@ export default function BusinessPage() {
                       </li>
                     ))}
                   </ul>
+                  {released && (
+                    <div className="mt-6 flex flex-wrap gap-4">
+                      <AppStoreCta
+                        source="business"
+                        location="service"
+                        className="inline-flex items-center px-6 py-3 bg-[#007AFF] text-white text-sm font-semibold rounded hover:bg-[#0055CC] transition-colors"
+                      >
+                        App Storeで無料ダウンロード
+                      </AppStoreCta>
+                      <Link
+                        href="/services/takken"
+                        className="inline-flex items-center px-6 py-3 border border-gray-300 text-[#0d2545] text-sm font-semibold rounded hover:bg-gray-50 transition-colors"
+                      >
+                        ウカレルの詳細 &rarr;
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -349,6 +403,26 @@ export default function BusinessPage() {
                 </p>
               </div>
 
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Webサービス */}
+      <section id="web" className="py-20 md:py-28 border-t border-gray-100">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 items-start">
+            <div className="md:col-span-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-3">Web Service</p>
+              <h2 className="text-xl font-bold text-[#0d2545] leading-snug">
+                Webサービス
+              </h2>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-sm text-gray-600 leading-loose mb-6">
+                日々の業務を少し楽にする、無料のWebサービスを公開しています。
+              </p>
+              <InkanServiceCard />
             </div>
           </div>
         </div>

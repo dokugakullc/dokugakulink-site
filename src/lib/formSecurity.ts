@@ -21,6 +21,8 @@ export const CONTACT_TYPES = [
   { value: "partnership", label: "業務提携について" },
   { value: "media", label: "取材・メディアについて" },
   { value: "support", label: "不具合・サポート" },
+  { value: "app_billing", label: "アプリの課金・解約" },
+  { value: "wealth", label: "ウェルスコンサルティングのご相談" },
   { value: "other", label: "その他" },
 ] as const;
 
@@ -234,7 +236,7 @@ export function validateContactInput(raw: unknown): Result<ContactInput> {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
     return err("invalid_body", "リクエストが不正です");
   }
-  const { name, email, message, contact_type, company } = raw as Record<string, unknown>;
+  const { name, email, message, contact_type, company, privacy_consent } = raw as Record<string, unknown>;
 
   // 型不正（配列・数値・オブジェクト・null 等）は空欄チェックの前に string 型で弾く
   if (typeof name !== "string" || !name.trim()) {
@@ -273,6 +275,11 @@ export function validateContactInput(raw: unknown): Result<ContactInput> {
   const company_ = typeof company === "string" ? company.trim() : "";
   if (company_.length > CONTACT_LIMITS.COMPANY_MAX) {
     return err("company_too_long", "会社名が長すぎます");
+  }
+
+  // プライバシーポリシーへの同意（必須）。真偽値の true だけを同意とみなす（"true" 等の文字列は不可）。
+  if (privacy_consent !== true) {
+    return err("privacy_consent_required", "プライバシーポリシーへの同意が必要です");
   }
 
   return {

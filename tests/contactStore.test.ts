@@ -17,6 +17,7 @@ const validBody = {
   message: "本文です",
   contact_type: "service",
   company: "テスト株式会社",
+  privacy_consent: true,
 };
 
 type Ctx = {

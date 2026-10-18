@@ -24,6 +24,8 @@ const items: LegalItem[] = [
   { label: "メールアドレス", value: "info@dokugakulink.com", isEmail: true },
   { label: "受付時間", value: "平日 10:00〜18:00" },
   { label: "サービス名", value: "ウカレル" },
+  // 最低対応OSは takken-app の IPHONEOS_DEPLOYMENT_TARGET（13.0）と DEC-2026-002 に一致させる。
+  { label: "動作環境", value: "iPhone（iOS 13.0以降）" },
   {
     label: "販売価格",
     value: "プレミアムプラン：月額580円（税込）\n利用登録日から30日間はすべての機能を無料で利用できます。30日経過後も「今日の15問」および学習履歴の閲覧は無料です。",
