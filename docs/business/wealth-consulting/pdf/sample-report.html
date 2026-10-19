@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>【サンプル】収益不動産 購入判断レポート</title>
+<style>
+  /* Business Document Design System v1.x のトークン値（tokens.css）を写したもの。サンプル用。 */
+  @page { size: A4; margin: 22mm 18mm 20mm 18mm; }
+  :root {
+    --ink: #1E2126; --ink-2: #434950; --muted: #5C636C; --faint: #7C848E;
+    --rule: #DDE0E4; --rule-strong: #A2A9B2; --tint: #F5F6F7;
+    --primary: #1F3A5F; --danger: #9B2C2C;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0; color: var(--ink);
+    font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+    font-size: 10.5pt; line-height: 18pt; letter-spacing: 0.02em; font-weight: 400;
+  }
+  .num { font-family: Inter, "Helvetica Neue", sans-serif; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+  .sample-band {
+    font-size: 9pt; line-height: 15pt; color: var(--danger); font-weight: 600;
+    letter-spacing: 0.06em; padding-bottom: 4pt; border-bottom: 0.75pt solid var(--danger); margin-bottom: 20pt;
+  }
+  header.doc { margin-bottom: 20pt; }
+  .eyebrow { font-size: 9pt; line-height: 15pt; color: var(--muted); letter-spacing: 0.06em; font-weight: 500; }
+  h1 { font-size: 24pt; line-height: 32pt; font-weight: 600; margin: 4pt 0 12pt; letter-spacing: -0.005em; color: var(--ink); }
+  .meta { display: grid; grid-template-columns: 22mm 1fr 22mm 1fr; gap: 2pt 8pt; font-size: 9pt; line-height: 15pt; color: var(--ink-2); }
+  .meta dt { color: var(--muted); }
+  .meta dd { margin: 0; }
+  h2 {
+    font-size: 15pt; line-height: 24pt; font-weight: 600; margin: 18pt 0 8pt; color: var(--primary);
+    padding-bottom: 4pt; border-bottom: 0.75pt solid var(--rule-strong); break-after: avoid;
+  }
+  h2 .no { font-family: Inter, "Helvetica Neue", sans-serif; margin-right: 6pt; }
+  p { margin: 0 0 8pt; }
+  ul { margin: 0 0 8pt; padding-left: 14pt; }
+  li { margin-bottom: 3pt; }
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 8pt; break-inside: avoid; font-size: 10pt; line-height: 16pt; }
+  th, td { padding: 4pt 6pt; border-bottom: 0.5pt solid var(--rule); vertical-align: top; text-align: left; }
+  thead th { font-size: 9pt; font-weight: 500; color: var(--muted); border-bottom: 0.75pt solid var(--rule-strong); letter-spacing: 0.06em; }
+  td.r, th.r { text-align: right; }
+  tr.total td { font-weight: 600; border-bottom: 0.75pt solid var(--rule-strong); }
+  tbody th { font-weight: 500; color: var(--ink-2); width: 34%; }
+  .conclusion { margin: 4pt 0 8pt; padding: 10pt 12pt; background: var(--tint); }
+  .conclusion li { margin-bottom: 6pt; }
+  .conclusion strong { color: var(--primary); font-weight: 600; }
+  .note { font-size: 8.5pt; line-height: 14pt; color: var(--muted); }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12pt; margin: 8pt 0 4pt; }
+  .kpi .label { font-size: 9pt; line-height: 15pt; color: var(--muted); letter-spacing: 0.06em; }
+  .kpi .value { font-size: 20pt; line-height: 28pt; font-weight: 600; color: var(--ink); }
+  .kpi .value small { font-size: 10.5pt; font-weight: 500; margin-left: 2pt; }
+  .page-break { break-before: page; }
+  footer.doc { margin-top: 16pt; padding-top: 6pt; border-top: 0.5pt solid var(--rule); font-size: 8pt; line-height: 12pt; color: var(--faint); }
+</style>
+</head>
+<body>
+
+<div class="sample-band">SAMPLE ― 成果物の見本です。登場する人物・物件・数値はすべて架空です。</div>
+
+<header class="doc">
+  <div class="eyebrow">ウェルスコンサルティング ／ スポット分析</div>
+  <h1>収益不動産 購入判断レポート</h1>
+  <dl class="meta">
+    <dt>ご相談者</dt><dd>A様（架空）</dd>
+    <dt>作成日</dt><dd>2026年○月○日</dd>
+    <dt>対象物件</dt><dd>大阪市内の一棟アパート（架空）</dd>
+    <dt>作成</dt><dd>dokugaku link合同会社</dd>
+  </dl>
+</header>
+
+<h2><span class="no">1</span>ご相談の内容</h2>
+<table>
+  <tbody>
+    <tr><th>ご相談者</th><td>A様（会社役員・50代）</td></tr>
+    <tr><th>検討中の物件</th><td>大阪市内の一棟アパート（木造・築18年・12戸）</td></tr>
+    <tr><th>売出価格</th><td><span class="num">8,000</span>万円</td></tr>
+    <tr><th>ご相談の趣旨</th><td>購入すべきか。購入する場合、借入条件とリスクをどう考えるべきか</td></tr>
+    <tr><th>ご希望</th><td><span class="num">10</span>年程度保有し、その後の売却も視野に入れたい</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">2</span>結論（判断材料のまとめ）</h2>
+<p>当社は購入の可否を決めるのではなく、A様がご判断いただくための材料を整理します。</p>
+<div class="kpis">
+  <div class="kpi"><div class="label">毎年の手残り（標準・税引前）</div><div class="value num">166.9<small>万円</small></div></div>
+  <div class="kpi"><div class="label">自己資金に対する利回り</div><div class="value num">7.6<small>%</small></div></div>
+  <div class="kpi"><div class="label">返済余力（DSCR）</div><div class="value num">1.63<small>倍</small></div></div>
+</div>
+<div class="conclusion">
+  <ul>
+    <li>標準的な前提では、<strong>毎年の手残り（税引前）は約167万円、自己資金に対する利回りは約7.6%</strong>です。</li>
+    <li>空室が15%に増え、金利が2.5%に上がると、<strong>手残りは約87万円</strong>まで下がります。それでも返済余力（DSCR）は1.29倍あります。</li>
+    <li>年間の手残りがゼロになるのは、<strong>空室率が約36%（金利1.5%）／約29%（金利2.5%）</strong>に達したときです。周辺の空室状況と比べて、この余裕が十分かをご判断ください。</li>
+    <li>確認が必要な点：大規模修繕の時期と費用、周辺の賃料相場の推移、融資条件（金利タイプ・期間）。</li>
+  </ul>
+</div>
+
+<h2><span class="no">3</span>前提条件</h2>
+<table>
+  <tbody>
+    <tr><th>満室時の年間賃料</th><td><span class="num">600</span>万円（表面利回り <span class="num">7.5</span>%）</td></tr>
+    <tr><th>空室・滞納による損失</th><td><span class="num">8</span>%（標準）／<span class="num">15</span>%（悲観）</td></tr>
+    <tr><th>運営費</th><td>年 <span class="num">120</span>万円（管理・修繕・固定資産税・保険など）</td></tr>
+    <tr><th>購入時の諸費用</th><td><span class="num">600</span>万円</td></tr>
+    <tr><th>自己資金</th><td><span class="num">2,200</span>万円（物件価格の <span class="num">20</span>%＋諸費用）</td></tr>
+    <tr><th>借入</th><td><span class="num">6,400</span>万円・<span class="num">30</span>年・元利均等返済</td></tr>
+    <tr><th>金利</th><td><span class="num">1.5</span>%（標準）／<span class="num">2.5</span>%（悲観）</td></tr>
+  </tbody>
+</table>
+<p class="note">税金（所得税・住民税・譲渡所得税）は含めていません。税務のご判断は税理士にご確認ください。</p>
+
+<h2><span class="no">4</span>収支の試算（1年目・税引前）</h2>
+<table>
+  <thead><tr><th>項目</th><th class="r">標準（空室8%・金利1.5%）</th><th class="r">悲観（空室15%・金利2.5%）</th></tr></thead>
+  <tbody>
+    <tr><td>実際の賃料収入</td><td class="r num">552.0万円</td><td class="r num">510.0万円</td></tr>
+    <tr><td>運営費</td><td class="r num">△120.0万円</td><td class="r num">△120.0万円</td></tr>
+    <tr><td>運営による収益（NOI）</td><td class="r num">432.0万円</td><td class="r num">390.0万円</td></tr>
+    <tr><td>年間の返済額</td><td class="r num">△265.1万円</td><td class="r num">△303.5万円</td></tr>
+    <tr class="total"><td>手残り（税引前）</td><td class="r num">166.9万円</td><td class="r num">86.5万円</td></tr>
+    <tr><td>自己資金に対する利回り</td><td class="r num">7.6%</td><td class="r num">3.9%</td></tr>
+    <tr><td>返済余力（DSCR＝NOI÷返済額）</td><td class="r num">1.63倍</td><td class="r num">1.29倍</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">5</span>シナリオ比較</h2>
+<table>
+  <thead><tr><th>シナリオ</th><th class="r">空室率</th><th class="r">金利</th><th class="r">手残り</th><th class="r">DSCR</th></tr></thead>
+  <tbody>
+    <tr><td>標準</td><td class="r num">8%</td><td class="r num">1.5%</td><td class="r num">166.9万円</td><td class="r num">1.63倍</td></tr>
+    <tr><td>金利だけ上昇</td><td class="r num">8%</td><td class="r num">2.5%</td><td class="r num">128.5万円</td><td class="r num">1.42倍</td></tr>
+    <tr><td>空室だけ増加</td><td class="r num">15%</td><td class="r num">1.5%</td><td class="r num">124.9万円</td><td class="r num">1.47倍</td></tr>
+    <tr><td>悲観（両方）</td><td class="r num">15%</td><td class="r num">2.5%</td><td class="r num">86.5万円</td><td class="r num">1.29倍</td></tr>
+  </tbody>
+</table>
+<p>手残りがゼロになる空室率：約 <span class="num">35.8</span>%（金利1.5%）／約 <span class="num">29.4</span>%（金利2.5%）</p>
+
+<h2><span class="no">6</span>10年後に売却した場合の試算（標準シナリオ・税引前）</h2>
+<table>
+  <tbody>
+    <tr><td>売却価格（NOI 432万円 ÷ 想定利回り 6.0%）</td><td class="r num">7,200万円</td></tr>
+    <tr><td>売却費用（4%）</td><td class="r num">△288万円</td></tr>
+    <tr><td>借入の残り（10年後）</td><td class="r num">△4,577万円</td></tr>
+    <tr><td>売却による手取り</td><td class="r num">約2,335万円</td></tr>
+    <tr><td>10年間の手残りの合計</td><td class="r num">約1,670万円</td></tr>
+    <tr class="total"><td>合計（自己資金 2,200万円に対して）</td><td class="r num">約4,004万円（約1.8倍）</td></tr>
+  </tbody>
+</table>
+<p class="note">賃料・運営費は10年間一定と仮定しています。築年数の経過による賃料の下落と大規模修繕の費用は、実際のレポートでは個別に見積もります。</p>
+
+<h2><span class="no">7</span>リスクと確認事項</h2>
+<table>
+  <thead><tr><th>リスク</th><th>影響</th><th>確認・対策の例</th></tr></thead>
+  <tbody>
+    <tr><td>空室の増加</td><td>手残りの減少</td><td>周辺の同種物件の空室率・募集期間を調べる</td></tr>
+    <tr><td>金利の上昇</td><td>返済額の増加</td><td>固定金利の選択肢、繰上返済の余力</td></tr>
+    <tr><td>大規模修繕</td><td>一時的な大きな支出</td><td>修繕履歴の確認、10年以内の修繕計画と積立</td></tr>
+    <tr><td>売却価格の下振れ</td><td>出口での手取り減少</td><td>売却時の想定利回りを6.5%・7.0%でも試算する</td></tr>
+    <tr><td>災害・事故</td><td>収入の停止・修繕費</td><td>ハザードマップの確認、保険の補償範囲</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">8</span>次の一歩（ご提案）</h2>
+<ol>
+  <li>売主側の資料（レントロール・修繕履歴・固定資産税の課税明細）の取り寄せ</li>
+  <li>金融機関2〜3行での融資条件の比較</li>
+  <li>上記の資料がそろった段階で、本レポートの前提を更新</li>
+</ol>
+
+<h2><span class="no">9</span>ご注意</h2>
+<ul class="note">
+  <li>本レポートは、ご相談時点で入手できた情報に基づく試算であり、将来の収益を保証するものではありません。</li>
+  <li>当社は宅地建物取引業者ではありません。物件の媒介・売買の取り次ぎは行いません。</li>
+  <li>当社は、株式・投資信託など有価証券の個別の投資判断に関する助言は行いません。</li>
+  <li>税務・法律に関するご判断は、税理士・弁護士などの専門家にご確認ください。</li>
+</ul>
+
+<footer class="doc">dokugaku link合同会社 ／ 〒530-0001 大阪市北区梅田1-1-3 大阪駅前第3ビル29階1-1-1号室 ／ info@dokugakulink.com<br>本書はサンプルです。実在の人物・物件・取引とは関係ありません。</footer>
+
+</body>
+</html>
