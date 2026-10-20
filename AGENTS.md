@@ -35,7 +35,7 @@ Roadmap、Brand Guidelines、Legal文書を読むこと。
   - `src/app/services/takken/`（サイト内「ウカレル」紹介ページ。ヘッダー/フッター/トップの導線先）
   - 両ルートは同一の `UkareruLP` を描画する。**URL・route・canonical は不変**（新規route/redirect禁止）。
 
-`/Users/tomonorijinnai/takken-app/docs/` は静的・法的ページ系、
+`/Users/tomonorijinnai/Development/takken-app/docs/` は静的・法的ページ系、
 `takken_app/web/` はFlutter Web用であり、公式LPの正本ではない。
 
 現フェーズ（App Store公開前）の目的は**ウェイティングリスト登録**。リリース後も同じURLを継続利用する。
