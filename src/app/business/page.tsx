@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AppStoreCta from "@/components/AppStoreCta";
-import InkanServiceCard from "@/components/InkanServiceCard";
+import TsukurusanTools from "@/components/TsukurusanTools";
 import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const metadata: Metadata = {
@@ -413,16 +413,16 @@ export default function BusinessPage() {
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 items-start">
             <div className="md:col-span-1">
-              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-3">Web Service</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-3">Free Tools</p>
               <h2 className="text-xl font-bold text-[#0d2545] leading-snug">
-                Webサービス
+                無料ツール（作るさんシリーズ）
               </h2>
             </div>
             <div className="md:col-span-3">
               <p className="text-sm text-gray-600 leading-loose mb-6">
-                日々の業務を少し楽にする、無料のWebサービスを公開しています。
+                日々の業務を少し楽にする、無料のWebツールを公開しています。
               </p>
-              <InkanServiceCard />
+              <TsukurusanTools />
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HomeScreen, ProblemScreen } from "@/components/AppMockup";
 import AppStoreCta from "@/components/AppStoreCta";
-import InkanServiceCard from "@/components/InkanServiceCard";
+import TsukurusanTools from "@/components/TsukurusanTools";
 import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const metadata: Metadata = {
@@ -207,19 +207,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Webサービス */}
+      {/* 無料ツール（作るさんシリーズ） */}
       <section className="bg-[#f5f7fa] py-20 md:py-24">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Web Service</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-4 leading-tight">Webサービス</h2>
-              <p className="text-sm text-gray-600 leading-loose">
-                日々の業務を少し楽にする、無料のWebサービスを公開しています。
-              </p>
-            </div>
-            <InkanServiceCard />
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-700 mb-4">Free Tools</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0d2545] mb-4 leading-tight">無料ツール（作るさんシリーズ）</h2>
+          <p className="text-sm text-gray-600 leading-loose mb-8">
+            日々の業務を少し楽にする、無料のWebツールを公開しています。
+          </p>
+          <TsukurusanTools />
         </div>
       </section>
 

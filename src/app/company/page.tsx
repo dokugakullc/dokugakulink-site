@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AppStoreCta from "@/components/AppStoreCta";
-import InkanServiceCard from "@/components/InkanServiceCard";
+import TsukurusanTools from "@/components/TsukurusanTools";
 import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const metadata: Metadata = {
@@ -380,8 +380,8 @@ export default function CompanyPage() {
                   </Link>
                 </div>
               </div>
-              <h2 className="text-lg font-bold text-[#0d2545] mt-10 mb-6">提供中のWebサービス</h2>
-              <InkanServiceCard compact />
+              <h2 className="text-lg font-bold text-[#0d2545] mt-10 mb-6">無料ツール（作るさんシリーズ）</h2>
+              <TsukurusanTools columns={1} />
             </div>
           </div>
         </div>
