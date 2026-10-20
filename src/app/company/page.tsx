@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AppStoreCta from "@/components/AppStoreCta";
-import InkanServiceCard from "@/components/InkanServiceCard";
+import TsukurusanTools from "@/components/TsukurusanTools";
 import { isUkareruReleased } from "@/lib/ukareruRelease";
 
 export const metadata: Metadata = {
@@ -62,7 +62,6 @@ const features = [
 
 const companyInfo = [
   { label: "会社名", value: "dokugaku link合同会社" },
-  { label: "代表社員", value: "陣内 智徳" },
   { label: "設立", value: "2025年10月27日（令和7年10月27日）" },
   { label: "法人番号", value: "2120003031128" },
   { label: "所在地", value: "〒530-0001\n大阪市北区梅田1-1-3\n大阪駅前第3ビル29階1-1-1号室" },
@@ -380,8 +379,8 @@ export default function CompanyPage() {
                   </Link>
                 </div>
               </div>
-              <h2 className="text-lg font-bold text-[#0d2545] mt-10 mb-6">提供中のWebサービス</h2>
-              <InkanServiceCard compact />
+              <h2 className="text-lg font-bold text-[#0d2545] mt-10 mb-6">無料ツール（作るさんシリーズ）</h2>
+              <TsukurusanTools columns={1} />
             </div>
           </div>
         </div>
